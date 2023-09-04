@@ -13,3 +13,4 @@ malva = { path = "../malva" }
 [[bin]]
 name = "malva"
 path = "src/main.rs"
+doc = false
