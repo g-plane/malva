@@ -1,0 +1,12 @@
+[package]
+name = "malva"
+version = "0.0.0"
+edition = "2021"
+authors = ["Pig Fang <g-plane@hotmail.com>"]
+description = "CSS/SCSS/Sass/Less formatter."
+repository = "https://github.com/g-plane/malva"
+license = "MIT"
+
+[dependencies]
+raffia = { path = "../../raffia/raffia" }
+tiny_pretty = { path = "../../tiny_pretty" }
