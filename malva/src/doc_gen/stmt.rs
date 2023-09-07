@@ -10,9 +10,26 @@ impl DocGen for Declaration<'_> {
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx));
         }
-        docs.push(Doc::text(":"));
+        docs.push(Doc::text(": "));
+
+        docs.push(
+            Doc::list(
+                itertools::intersperse(
+                    self.value.iter().map(|value| value.doc(ctx)),
+                    Doc::softline(),
+                )
+                .collect(),
+            )
+            .nest(ctx.indent_width),
+        );
 
         Doc::list(docs)
+    }
+}
+
+impl DocGen for ImportantAnnotation<'_> {
+    fn doc(&self, _: &Ctx) -> Doc {
+        Doc::text("!important")
     }
 }
 

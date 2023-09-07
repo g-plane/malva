@@ -3,6 +3,41 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
+impl DocGen for BracketBlock<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        let mut docs = itertools::intersperse(
+            self.value.iter().map(|value| value.doc(ctx)),
+            Doc::softline(),
+        )
+        .collect::<Vec<_>>();
+        docs.insert(0, Doc::text("["));
+        docs.push(Doc::text("]"));
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for ComponentValue<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        match self {
+            ComponentValue::BracketBlock(bracket_block) => bracket_block.doc(ctx),
+            ComponentValue::Dimension(dimension) => dimension.doc(ctx),
+            ComponentValue::HexColor(hex_color) => hex_color.doc(ctx),
+            ComponentValue::IdSelector(id_selector) => id_selector.doc(ctx),
+            ComponentValue::ImportantAnnotation(important) => important.doc(ctx),
+            ComponentValue::InterpolableIdent(interpolable_ident) => interpolable_ident.doc(ctx),
+            ComponentValue::InterpolableStr(interpolable_str) => interpolable_str.doc(ctx),
+            ComponentValue::Number(number) => number.doc(ctx),
+            ComponentValue::Percentage(percentage) => percentage.doc(ctx),
+            ComponentValue::Ratio(ratio) => ratio.doc(ctx),
+            ComponentValue::SassNestingDeclaration(sass_nesting_decl) => sass_nesting_decl.doc(ctx),
+            ComponentValue::SassParenthesizedExpression(sass_parenthesized_expr) => {
+                sass_parenthesized_expr.doc(ctx)
+            }
+            _ => todo!(),
+        }
+    }
+}
+
 impl DocGen for Dimension<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         let unit = match self.kind {
@@ -78,6 +113,15 @@ impl DocGen for Number<'_> {
 impl DocGen for Percentage<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         self.value.doc(ctx).append(Doc::text("%"))
+    }
+}
+
+impl DocGen for Ratio<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        self.numerator
+            .doc(ctx)
+            .append(Doc::text("/"))
+            .append(self.denominator.doc(ctx))
     }
 }
 
