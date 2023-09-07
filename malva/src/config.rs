@@ -1,12 +1,19 @@
-pub use tiny_pretty::LineBreak;
+#[cfg(feature = "config_serde")]
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
 pub struct FormatOptions {
+    #[cfg_attr(feature = "config_serde", serde(flatten))]
     pub layout: LayoutOptions,
+    #[cfg_attr(feature = "config_serde", serde(flatten))]
     pub language: LanguageOptions,
 }
 
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
 pub struct LayoutOptions {
     pub print_width: usize,
     pub use_tabs: bool,
@@ -26,12 +33,34 @@ impl Default for LayoutOptions {
 }
 
 #[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
+pub enum LineBreak {
+    #[default]
+    Lf,
+    Crlf,
+}
+
+impl From<LineBreak> for tiny_pretty::LineBreak {
+    fn from(value: LineBreak) -> Self {
+        match value {
+            LineBreak::Lf => tiny_pretty::LineBreak::Lf,
+            LineBreak::Crlf => tiny_pretty::LineBreak::Crlf,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
 pub struct LanguageOptions {
     pub hex_case: HexCase,
     pub quotes: Quotes,
 }
 
 #[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
 pub enum HexCase {
     Ignore,
     #[default]
@@ -40,6 +69,8 @@ pub enum HexCase {
 }
 
 #[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
 pub enum Quotes {
     #[default]
     AlwaysDouble,

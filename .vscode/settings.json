@@ -1,4 +1,5 @@
 {
+    "rust-analyzer.cargo.features": ["config_serde"],
     "[css][scss][sass][less]": {
         "editor.formatOnSave": false
     }
