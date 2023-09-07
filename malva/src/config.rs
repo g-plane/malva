@@ -1,20 +1,20 @@
 pub use tiny_pretty::LineBreak;
 
 #[derive(Clone, Debug, Default)]
-pub struct Options {
-    pub general: GeneralOptions,
+pub struct FormatOptions {
+    pub layout: LayoutOptions,
     pub language: LanguageOptions,
 }
 
 #[derive(Clone, Debug)]
-pub struct GeneralOptions {
+pub struct LayoutOptions {
     pub print_width: usize,
     pub use_tabs: bool,
     pub indent_width: usize,
     pub line_break: LineBreak,
 }
 
-impl Default for GeneralOptions {
+impl Default for LayoutOptions {
     fn default() -> Self {
         Self {
             print_width: 80,
