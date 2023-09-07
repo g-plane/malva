@@ -1,12 +1,11 @@
+pub mod config;
 mod ctx;
 mod doc_gen;
 mod error;
-mod options;
 
-use crate::{ctx::Ctx, options::Options};
+use crate::{config::Options, ctx::Ctx};
 use doc_gen::DocGen;
 pub use error::Error;
-pub use options::*;
 pub use raffia::Syntax;
 use raffia::{ast::Stylesheet, token::Comment, ParserBuilder};
 

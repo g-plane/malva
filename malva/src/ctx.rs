@@ -1,4 +1,4 @@
-use crate::options::LanguageOptions;
+use crate::config::LanguageOptions;
 use raffia::{token::Comment, Syntax};
 
 pub(crate) struct Ctx<'a, 's> {

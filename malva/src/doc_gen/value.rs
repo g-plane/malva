@@ -40,7 +40,7 @@ impl DocGen for Ident<'_> {
 
 impl DocGen for HexColor<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        use crate::options::HexCase;
+        use crate::config::HexCase;
 
         let hex = match ctx.options.hex_case {
             HexCase::Ignore => format!("#{}", self.raw),
@@ -83,7 +83,7 @@ impl DocGen for Percentage<'_> {
 
 impl DocGen for Str<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        use crate::options::Quotes;
+        use crate::config::Quotes;
 
         let (left, right) = self.raw.split_at(1);
         let inner = &right[0..right.len() - 1];
