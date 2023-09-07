@@ -3,15 +3,31 @@
 version = 3
 
 [[package]]
+name = "either"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
+
+[[package]]
 name = "heck"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
+name = "itertools"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "malva"
 version = "0.0.0"
 dependencies = [
+ "itertools",
  "raffia",
  "tiny_pretty",
 ]
@@ -43,7 +59,9 @@ dependencies = [
 
 [[package]]
 name = "raffia"
-version = "0.3.0"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f34628c86f5c2edaa22eb59a0e95f3369983a1abcea110cd71bb3b67d14ca42"
 dependencies = [
  "raffia_macro",
  "smallvec",
@@ -52,6 +70,8 @@ dependencies = [
 [[package]]
 name = "raffia_macro"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "739679d3e4fda2d82602444155efe0bfb7af0f1b9018711066b30965b849e990"
 dependencies = [
  "heck",
  "quote",

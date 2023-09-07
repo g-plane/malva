@@ -8,5 +8,6 @@ repository = "https://github.com/g-plane/malva"
 license = "MIT"
 
 [dependencies]
-raffia = { path = "../../raffia/raffia" }
+itertools = "0.11"
+raffia = "0.4"
 tiny_pretty = { path = "../../tiny_pretty" }
