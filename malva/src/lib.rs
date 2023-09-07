@@ -22,6 +22,8 @@ pub fn print_stylesheet(
     syntax: Syntax,
     options: &FormatOptions,
 ) -> Result<String, Error> {
+    use tiny_pretty::{IndentKind, PrintOptions};
+
     let ctx = Ctx {
         syntax,
         options: &options.language,
@@ -29,5 +31,18 @@ pub fn print_stylesheet(
         indent_width: options.layout.indent_width,
     };
     let doc = stylesheet.doc(&ctx);
-    tiny_pretty::print(&doc, &Default::default()).map_err(Error::from)
+    tiny_pretty::print(
+        &doc,
+        &PrintOptions {
+            indent_kind: if options.layout.use_tabs {
+                IndentKind::Tab
+            } else {
+                IndentKind::Space
+            },
+            line_break: options.layout.line_break.clone().into(),
+            width: options.layout.print_width,
+            tab_size: options.layout.indent_width,
+        },
+    )
+    .map_err(Error::from)
 }
