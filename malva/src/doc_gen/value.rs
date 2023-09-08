@@ -20,18 +20,76 @@ impl DocGen for Calc<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         use crate::config::OperatorLineBreak;
 
-        self.left
-            .doc(ctx)
-            .append(match ctx.options.operator_linebreak {
-                OperatorLineBreak::Before => Doc::softline().nest(ctx.indent_width),
-                OperatorLineBreak::After => Doc::space(),
-            })
-            .append(self.op.doc(ctx))
-            .append(match ctx.options.operator_linebreak {
-                OperatorLineBreak::Before => Doc::space(),
-                OperatorLineBreak::After => Doc::softline().nest(ctx.indent_width),
-            })
-            .append(self.right.doc(ctx))
+        let left = if let (
+            ComponentValue::Calc(Calc {
+                op:
+                    CalcOperator {
+                        kind: CalcOperatorKind::Plus | CalcOperatorKind::Minus,
+                        ..
+                    },
+                ..
+            }),
+            CalcOperatorKind::Multiply | CalcOperatorKind::Division,
+        ) = (&*self.left, &self.op.kind)
+        {
+            Doc::text("(")
+                .append(self.left.doc(ctx))
+                .append(Doc::text(")"))
+        } else {
+            self.left.doc(ctx)
+        };
+
+        let right = if let (
+            CalcOperatorKind::Multiply | CalcOperatorKind::Division,
+            ComponentValue::Calc(Calc {
+                op:
+                    CalcOperator {
+                        kind: CalcOperatorKind::Plus | CalcOperatorKind::Minus,
+                        ..
+                    },
+                ..
+            }),
+        )
+        | (
+            CalcOperatorKind::Plus | CalcOperatorKind::Minus,
+            ComponentValue::Calc(Calc {
+                op:
+                    CalcOperator {
+                        kind: CalcOperatorKind::Minus,
+                        ..
+                    },
+                ..
+            }),
+        )
+        | (
+            CalcOperatorKind::Multiply | CalcOperatorKind::Division,
+            ComponentValue::Calc(Calc {
+                op:
+                    CalcOperator {
+                        kind: CalcOperatorKind::Division,
+                        ..
+                    },
+                ..
+            }),
+        ) = (&self.op.kind, &*self.right)
+        {
+            Doc::text("(")
+                .append(self.right.doc(ctx))
+                .append(Doc::text(")"))
+        } else {
+            self.right.doc(ctx)
+        };
+
+        left.append(match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => Doc::softline().nest(ctx.indent_width),
+            OperatorLineBreak::After => Doc::space(),
+        })
+        .append(self.op.doc(ctx))
+        .append(match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => Doc::space(),
+            OperatorLineBreak::After => Doc::softline().nest(ctx.indent_width),
+        })
+        .append(right)
     }
 }
 
