@@ -16,10 +16,41 @@ impl DocGen for BracketBlock<'_> {
     }
 }
 
+impl DocGen for Calc<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        use crate::config::OperatorLineBreak;
+
+        self.left
+            .doc(ctx)
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::softline().nest(ctx.indent_width),
+                OperatorLineBreak::After => Doc::space(),
+            })
+            .append(self.op.doc(ctx))
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::space(),
+                OperatorLineBreak::After => Doc::softline().nest(ctx.indent_width),
+            })
+            .append(self.right.doc(ctx))
+    }
+}
+
+impl DocGen for CalcOperator {
+    fn doc(&self, _: &Ctx) -> Doc {
+        Doc::text(match self.kind {
+            CalcOperatorKind::Plus => "+",
+            CalcOperatorKind::Minus => "-",
+            CalcOperatorKind::Multiply => "*",
+            CalcOperatorKind::Division => "/",
+        })
+    }
+}
+
 impl DocGen for ComponentValue<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         match self {
             ComponentValue::BracketBlock(bracket_block) => bracket_block.doc(ctx),
+            ComponentValue::Calc(calc) => calc.doc(ctx),
             ComponentValue::Dimension(dimension) => dimension.doc(ctx),
             ComponentValue::Delimiter(delimiter) => delimiter.doc(ctx),
             ComponentValue::Function(function) => function.doc(ctx),
@@ -35,6 +66,7 @@ impl DocGen for ComponentValue<'_> {
             ComponentValue::SassParenthesizedExpression(sass_parenthesized_expr) => {
                 sass_parenthesized_expr.doc(ctx)
             }
+            ComponentValue::Url(url) => url.doc(ctx),
             _ => todo!(),
         }
     }
@@ -86,6 +118,7 @@ impl DocGen for Function<'_> {
         docs.push(Doc::text("("));
 
         let mut args = Vec::with_capacity(self.args.len() * 2);
+        args.push(Doc::line_or_nil());
         let mut iter = self.args.iter();
         if let Some(first) = iter.next() {
             args.push(first.doc(ctx));
@@ -102,7 +135,12 @@ impl DocGen for Function<'_> {
             }
             args.push(value.doc(ctx));
         });
-        docs.push(Doc::list(args).group().nest(ctx.indent_width));
+        docs.push(
+            Doc::list(args)
+                .nest(ctx.indent_width)
+                .append(Doc::line_or_nil())
+                .group(),
+        );
 
         docs.push(Doc::text(")"));
         Doc::list(docs)
@@ -214,6 +252,66 @@ impl DocGen for Str<'_> {
                     Doc::text(format!("'{inner}'"))
                 }
             }
+        }
+    }
+}
+
+impl DocGen for Url<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        let mut docs = Vec::with_capacity(3);
+        docs.push(Doc::text("url("));
+
+        let mut args = Vec::with_capacity(1);
+        if let Some(value) = &self.value {
+            args.push(Doc::line_or_nil());
+            args.push(value.doc(ctx));
+
+            if !self.modifiers.is_empty() {
+                args.push(Doc::line_or_space());
+                args.append(
+                    &mut itertools::intersperse(
+                        self.modifiers.iter().map(|modifier| modifier.doc(ctx)),
+                        Doc::softline(),
+                    )
+                    .collect(),
+                );
+            }
+        }
+
+        docs.push(
+            Doc::list(args)
+                .nest(ctx.indent_width)
+                .append(Doc::line_or_nil())
+                .group(),
+        );
+        docs.push(Doc::text(")"));
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for UrlModifier<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        match self {
+            UrlModifier::Ident(ident) => ident.doc(ctx),
+            UrlModifier::Function(function) => function.doc(ctx),
+        }
+    }
+}
+
+impl DocGen for UrlRaw<'_> {
+    fn doc(&self, _: &Ctx) -> Doc {
+        Doc::text(self.raw)
+    }
+}
+
+impl DocGen for UrlValue<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        match self {
+            UrlValue::Raw(raw) => raw.doc(ctx),
+            UrlValue::SassInterpolated(sass_interpolated) => todo!(),
+            UrlValue::Str(str) => str.doc(ctx),
+            UrlValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
         }
     }
 }

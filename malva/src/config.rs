@@ -56,6 +56,7 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
 pub struct LanguageOptions {
     pub hex_case: HexCase,
     pub quotes: Quotes,
+    pub operator_linebreak: OperatorLineBreak,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -77,4 +78,13 @@ pub enum Quotes {
     AlwaysSingle,
     PreferDouble,
     PreferSingle,
+}
+
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
+pub enum OperatorLineBreak {
+    Before,
+    #[default]
+    After,
 }
