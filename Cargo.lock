@@ -34,6 +34,7 @@ name = "malva"
 version = "0.0.0"
 dependencies = [
  "itertools",
+ "memchr",
  "raffia",
  "serde",
  "tiny_pretty",
@@ -46,6 +47,12 @@ dependencies = [
  "malva",
  "serde_json",
 ]
+
+[[package]]
+name = "memchr"
+version = "2.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f232d6ef707e1956a43342693d2a31e72989554d58299d7a88738cc95b0d35c"
 
 [[package]]
 name = "proc-macro2"

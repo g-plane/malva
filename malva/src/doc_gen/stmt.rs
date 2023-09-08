@@ -1,6 +1,6 @@
 use super::DocGen;
 use crate::ctx::Ctx;
-use raffia::{ast::*, Syntax};
+use raffia::{ast::*, Spanned, Syntax};
 use tiny_pretty::Doc;
 
 impl DocGen for Declaration<'_> {
@@ -52,10 +52,19 @@ impl DocGen for SimpleBlock<'_> {
         }
 
         let mut stmts = Vec::with_capacity(self.statements.len() * 2);
-        self.statements.iter().for_each(|stmt| {
+        let mut iter = self.statements.iter().peekable();
+        while let Some(stmt) = iter.next() {
             stmts.push(Doc::hardline());
             stmts.push(stmt.doc(ctx));
-        });
+            if let Some(next) = iter.peek() {
+                if ctx
+                    .line_bounds
+                    .is_away_more_than_one_line(stmt.span().end, next.span().start)
+                {
+                    stmts.push(Doc::hardline());
+                }
+            }
+        }
         docs.push(Doc::list(stmts).nest(ctx.indent_width));
         docs.push(Doc::hardline());
 
@@ -89,14 +98,30 @@ impl DocGen for Statement<'_> {
 impl DocGen for Stylesheet<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         let mut stmts = Vec::with_capacity(self.statements.len() * 2);
-        let mut iter = self.statements.iter();
+        let mut iter = self.statements.iter().peekable();
         if let Some(first) = iter.next() {
             stmts.push(first.doc(ctx));
+            if let Some(next) = iter.peek() {
+                if ctx
+                    .line_bounds
+                    .is_away_more_than_one_line(first.span().end, next.span().start)
+                {
+                    stmts.push(Doc::hardline());
+                }
+            }
         }
-        iter.for_each(|stmt| {
+        while let Some(stmt) = iter.next() {
             stmts.push(Doc::hardline());
             stmts.push(stmt.doc(ctx));
-        });
+            if let Some(next) = iter.peek() {
+                if ctx
+                    .line_bounds
+                    .is_away_more_than_one_line(stmt.span().end, next.span().start)
+                {
+                    stmts.push(Doc::hardline());
+                }
+            }
+        }
         Doc::list(stmts)
     }
 }
