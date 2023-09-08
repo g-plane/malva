@@ -117,26 +117,58 @@ impl DocGen for Function<'_> {
         docs.push(self.name.doc(ctx));
         docs.push(Doc::text("("));
 
-        let mut args = Vec::with_capacity(self.args.len() * 2);
-        args.push(Doc::line_or_nil());
-        let mut iter = self.args.iter();
-        if let Some(first) = iter.next() {
-            args.push(first.doc(ctx));
-        }
-        iter.for_each(|value| {
-            if !matches!(
-                value,
-                ComponentValue::Delimiter(Delimiter {
-                    kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
-                    ..
-                })
-            ) {
-                args.push(Doc::line_or_space());
-            }
-            args.push(value.doc(ctx));
-        });
+        let mut arg_docs = Vec::with_capacity(self.args.len() * 2);
+        arg_docs.push(Doc::line_or_nil());
+
+        let args_groups = self
+            .args
+            .split_inclusive(|arg| {
+                matches!(
+                    arg,
+                    ComponentValue::Delimiter(Delimiter {
+                        kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                        ..
+                    })
+                )
+            })
+            .collect::<Vec<_>>();
+
+        let separator = if args_groups.len() == 1 {
+            Doc::line_or_space()
+        } else {
+            Doc::space()
+        };
+        arg_docs.extend(itertools::intersperse(
+            args_groups.iter().map(|group| {
+                if let Some(ComponentValue::Delimiter(
+                    delimiter @ Delimiter {
+                        kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                        ..
+                    },
+                )) = group.last()
+                {
+                    Doc::list(
+                        itertools::intersperse(
+                            group.iter().take(group.len() - 1).map(|arg| arg.doc(ctx)),
+                            separator.clone(),
+                        )
+                        .collect(),
+                    )
+                    .append(delimiter.doc(ctx))
+                } else {
+                    Doc::list(
+                        itertools::intersperse(
+                            group.iter().map(|arg| arg.doc(ctx)),
+                            separator.clone(),
+                        )
+                        .collect(),
+                    )
+                }
+            }),
+            Doc::line_or_space(),
+        ));
         docs.push(
-            Doc::list(args)
+            Doc::list(arg_docs)
                 .nest(ctx.indent_width)
                 .append(Doc::line_or_nil())
                 .group(),
