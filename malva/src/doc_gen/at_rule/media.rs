@@ -5,13 +5,15 @@ use tiny_pretty::Doc;
 
 impl DocGen for MediaAnd<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        Doc::list(vec![
-            Doc::text("and"),
-            Doc::line_or_space(),
-            self.media_in_parens.doc(ctx),
-        ])
-        .group()
-        .nest(ctx.indent_width)
+        use crate::config::OperatorLineBreak;
+
+        let mut docs = match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("and"), Doc::space()],
+            OperatorLineBreak::After => vec![Doc::text("and"), Doc::line_or_space()],
+        };
+        docs.push(self.media_in_parens.doc(ctx));
+
+        Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
@@ -29,13 +31,15 @@ impl DocGen for MediaCondition<'_> {
 
 impl DocGen for MediaConditionAfterMediaType<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        Doc::list(vec![
-            Doc::text("and"),
-            Doc::line_or_space(),
-            self.condition.doc(ctx),
-        ])
-        .group()
-        .nest(ctx.indent_width)
+        use crate::config::OperatorLineBreak;
+
+        let mut docs = match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("and"), Doc::space()],
+            OperatorLineBreak::After => vec![Doc::text("and"), Doc::line_or_space()],
+        };
+        docs.push(self.condition.doc(ctx));
+
+        Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
@@ -138,25 +142,29 @@ impl DocGen for MediaInParens<'_> {
 
 impl DocGen for MediaNot<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        Doc::list(vec![
-            Doc::text("not"),
-            Doc::line_or_space(),
-            self.media_in_parens.doc(ctx),
-        ])
-        .group()
-        .nest(ctx.indent_width)
+        use crate::config::OperatorLineBreak;
+
+        let mut docs = match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("not"), Doc::space()],
+            OperatorLineBreak::After => vec![Doc::text("not"), Doc::line_or_space()],
+        };
+        docs.push(self.media_in_parens.doc(ctx));
+
+        Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
 impl DocGen for MediaOr<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        Doc::list(vec![
-            Doc::text("or"),
-            Doc::line_or_space(),
-            self.media_in_parens.doc(ctx),
-        ])
-        .group()
-        .nest(ctx.indent_width)
+        use crate::config::OperatorLineBreak;
+
+        let mut docs = match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("or"), Doc::space()],
+            OperatorLineBreak::After => vec![Doc::text("or"), Doc::line_or_space()],
+        };
+        docs.push(self.media_in_parens.doc(ctx));
+
+        Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
