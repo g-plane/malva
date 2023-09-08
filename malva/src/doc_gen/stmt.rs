@@ -29,6 +29,12 @@ impl DocGen for Declaration<'_> {
             }
             values.push(value.doc(ctx));
         });
+
+        if let Some(important) = &self.important {
+            values.push(Doc::softline());
+            values.push(important.doc(ctx));
+        }
+
         docs.push(Doc::list(values).nest(ctx.indent_width));
 
         Doc::list(docs)
