@@ -49,10 +49,27 @@ impl DocGen for ImportantAnnotation<'_> {
 
 impl DocGen for QualifiedRule<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        self.selector
-            .doc(ctx)
-            .append(Doc::space())
-            .append(self.block.doc(ctx))
+        use crate::config::QualifiedRuleSelectorLineBreak;
+
+        // we don't use `SelectorList::doc` here
+        // because it's a special case for qualified rule
+        Doc::list(
+            itertools::intersperse(
+                self.selector
+                    .selectors
+                    .iter()
+                    .map(|selector| selector.doc(ctx)),
+                Doc::text(",").append(match ctx.options.qualified_rule_selector_linebreak {
+                    QualifiedRuleSelectorLineBreak::Always => Doc::hardline(),
+                    QualifiedRuleSelectorLineBreak::Consistent => Doc::line_or_space(),
+                    QualifiedRuleSelectorLineBreak::Wrap => Doc::softline(),
+                }),
+            )
+            .collect(),
+        )
+        .group()
+        .append(Doc::space())
+        .append(self.block.doc(ctx))
     }
 }
 
@@ -105,7 +122,14 @@ impl DocGen for Statement<'_> {
                 Statement::AtRule(at_rule) if at_rule.block.is_none() => {
                     stmt.append(Doc::text(";"))
                 }
-                Statement::Declaration(..) => stmt.append(Doc::text(";")),
+                Statement::Declaration(decl)
+                    if !matches!(
+                        decl.value.last(),
+                        Some(ComponentValue::SassNestingDeclaration(..))
+                    ) =>
+                {
+                    stmt.append(Doc::text(";"))
+                }
                 _ => stmt,
             }
         }

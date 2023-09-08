@@ -317,7 +317,7 @@ impl DocGen for SelectorList<'_> {
         Doc::list(
             itertools::intersperse(
                 self.selectors.iter().map(|selector| selector.doc(ctx)),
-                Doc::text(",").append(Doc::hardline()),
+                Doc::text(", "),
             )
             .collect(),
         )
