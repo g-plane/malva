@@ -12,16 +12,24 @@ impl DocGen for Declaration<'_> {
         }
         docs.push(Doc::text(": "));
 
-        docs.push(
-            Doc::list(
-                itertools::intersperse(
-                    self.value.iter().map(|value| value.doc(ctx)),
-                    Doc::softline(),
-                )
-                .collect(),
-            )
-            .nest(ctx.indent_width),
-        );
+        let mut values = Vec::with_capacity(self.value.len() * 2);
+        let mut iter = self.value.iter();
+        if let Some(first) = iter.next() {
+            values.push(first.doc(ctx));
+        }
+        iter.for_each(|value| {
+            if !matches!(
+                value,
+                ComponentValue::Delimiter(Delimiter {
+                    kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                    ..
+                })
+            ) {
+                values.push(Doc::softline());
+            }
+            values.push(value.doc(ctx));
+        });
+        docs.push(Doc::list(values).nest(ctx.indent_width));
 
         Doc::list(docs)
     }
@@ -79,6 +87,7 @@ impl DocGen for SimpleBlock<'_> {
 impl DocGen for Statement<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         let stmt = match self {
+            Statement::AtRule(at_rule) => at_rule.doc(ctx),
             Statement::Declaration(declaration) => declaration.doc(ctx),
             Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx),
             _ => todo!(),
@@ -87,8 +96,10 @@ impl DocGen for Statement<'_> {
             stmt
         } else {
             match self {
+                Statement::AtRule(at_rule) if at_rule.block.is_none() => {
+                    stmt.append(Doc::text(";"))
+                }
                 Statement::Declaration(..) => stmt.append(Doc::text(";")),
-                Statement::QualifiedRule(..) => stmt,
                 _ => stmt,
             }
         }

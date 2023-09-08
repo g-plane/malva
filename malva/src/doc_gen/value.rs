@@ -21,6 +21,8 @@ impl DocGen for ComponentValue<'_> {
         match self {
             ComponentValue::BracketBlock(bracket_block) => bracket_block.doc(ctx),
             ComponentValue::Dimension(dimension) => dimension.doc(ctx),
+            ComponentValue::Delimiter(delimiter) => delimiter.doc(ctx),
+            ComponentValue::Function(function) => function.doc(ctx),
             ComponentValue::HexColor(hex_color) => hex_color.doc(ctx),
             ComponentValue::IdSelector(id_selector) => id_selector.doc(ctx),
             ComponentValue::ImportantAnnotation(important) => important.doc(ctx),
@@ -34,6 +36,16 @@ impl DocGen for ComponentValue<'_> {
                 sass_parenthesized_expr.doc(ctx)
             }
             _ => todo!(),
+        }
+    }
+}
+
+impl DocGen for Delimiter {
+    fn doc(&self, _: &Ctx) -> Doc {
+        match self.kind {
+            DelimiterKind::Comma => Doc::text(","),
+            DelimiterKind::Solidus => Doc::text("/"),
+            DelimiterKind::Semicolon => Doc::text(";"),
         }
     }
 }
@@ -64,6 +76,47 @@ impl DocGen for Dimension<'_> {
             DimensionKind::Unknown => self.unit.doc(ctx),
         };
         self.value.doc(ctx).append(unit)
+    }
+}
+
+impl DocGen for Function<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        let mut docs = Vec::with_capacity(4);
+        docs.push(self.name.doc(ctx));
+        docs.push(Doc::text("("));
+
+        let mut args = Vec::with_capacity(self.args.len() * 2);
+        let mut iter = self.args.iter();
+        if let Some(first) = iter.next() {
+            args.push(first.doc(ctx));
+        }
+        iter.for_each(|value| {
+            if !matches!(
+                value,
+                ComponentValue::Delimiter(Delimiter {
+                    kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                    ..
+                })
+            ) {
+                args.push(Doc::line_or_space());
+            }
+            args.push(value.doc(ctx));
+        });
+        docs.push(Doc::list(args).group().nest(ctx.indent_width));
+
+        docs.push(Doc::text(")"));
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for FunctionName<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        match self {
+            FunctionName::Ident(ident) => ident.doc(ctx),
+            FunctionName::LessFormatFunction(less_format_fn) => less_format_fn.doc(ctx),
+            FunctionName::LessListFunction(less_list_fn) => less_list_fn.doc(ctx),
+            FunctionName::SassQualifiedName(sass_qualified_name) => sass_qualified_name.doc(ctx),
+        }
     }
 }
 
