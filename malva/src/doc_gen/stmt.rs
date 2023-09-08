@@ -110,20 +110,9 @@ impl DocGen for Stylesheet<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         let mut stmts = Vec::with_capacity(self.statements.len() * 2);
         let mut iter = self.statements.iter().peekable();
-        if let Some(first) = iter.next() {
-            stmts.push(first.doc(ctx));
-            if let Some(next) = iter.peek() {
-                if ctx
-                    .line_bounds
-                    .is_away_more_than_one_line(first.span().end, next.span().start)
-                {
-                    stmts.push(Doc::hardline());
-                }
-            }
-        }
         while let Some(stmt) = iter.next() {
-            stmts.push(Doc::hardline());
             stmts.push(stmt.doc(ctx));
+            stmts.push(Doc::hardline());
             if let Some(next) = iter.peek() {
                 if ctx
                     .line_bounds
