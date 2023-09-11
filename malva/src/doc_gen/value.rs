@@ -267,8 +267,15 @@ impl DocGen for InterpolableIdent<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         match self {
             InterpolableIdent::Literal(literal) => literal.doc(ctx),
-            _ => todo!(),
+            InterpolableIdent::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx),
+            InterpolableIdent::LessInterpolated(less_interpolated) => less_interpolated.doc(ctx),
         }
+    }
+}
+
+impl DocGen for InterpolableIdentStaticPart<'_> {
+    fn doc(&self, _: &Ctx) -> Doc {
+        Doc::text(self.raw)
     }
 }
 

@@ -15,9 +15,30 @@ impl DocGen for LessFormatFunction {
     }
 }
 
+impl DocGen for LessInterpolatedIdent<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        Doc::list(
+            self.elements
+                .iter()
+                .map(|element| match element {
+                    LessInterpolatedIdentElement::Static(s) => s.doc(ctx),
+                    LessInterpolatedIdentElement::Variable(variable) => variable.doc(ctx),
+                    LessInterpolatedIdentElement::Property(property) => property.doc(ctx),
+                })
+                .collect(),
+        )
+    }
+}
+
 impl DocGen for LessListFunction {
     fn doc(&self, _: &Ctx) -> Doc {
         Doc::text("~")
+    }
+}
+
+impl DocGen for LessPropertyInterpolation<'_> {
+    fn doc(&self, _: &Ctx) -> Doc {
+        Doc::text(format!("${}{}{}", '{', self.name.raw, '}'))
     }
 }
 
@@ -30,9 +51,21 @@ impl DocGen for LessPropertyMerge {
     }
 }
 
+impl DocGen for LessPropertyVariable<'_> {
+    fn doc(&self, _: &Ctx) -> Doc {
+        Doc::text(format!("${}", self.name.raw))
+    }
+}
+
 impl DocGen for LessVariable<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         Doc::text("@").append(self.name.doc(ctx))
+    }
+}
+
+impl DocGen for LessVariableInterpolation<'_> {
+    fn doc(&self, _: &Ctx) -> Doc {
+        Doc::text(format!("@{}{}{}", '{', self.name.raw, '}'))
     }
 }
 

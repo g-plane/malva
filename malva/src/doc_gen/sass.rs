@@ -3,6 +3,22 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
+impl DocGen for SassInterpolatedIdent<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        Doc::list(
+            self.elements
+                .iter()
+                .map(|element| match element {
+                    SassInterpolatedIdentElement::Static(s) => s.doc(ctx),
+                    SassInterpolatedIdentElement::Expression(expr) => {
+                        Doc::text("#{").append(expr.doc(ctx)).append(Doc::text("}"))
+                    }
+                })
+                .collect(),
+        )
+    }
+}
+
 impl DocGen for SassModuleMemberName<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         match self {
