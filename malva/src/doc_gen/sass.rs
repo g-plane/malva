@@ -3,8 +3,8 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
-impl DocGen for SassInterpolatedIdent<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             self.elements
                 .iter()
@@ -19,8 +19,8 @@ impl DocGen for SassInterpolatedIdent<'_> {
     }
 }
 
-impl DocGen for SassModuleMemberName<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SassModuleMemberName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             SassModuleMemberName::Ident(ident) => ident.doc(ctx),
             SassModuleMemberName::Variable(variable) => variable.doc(ctx),
@@ -28,14 +28,14 @@ impl DocGen for SassModuleMemberName<'_> {
     }
 }
 
-impl DocGen for SassNestingDeclaration<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SassNestingDeclaration<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.block.doc(ctx)
     }
 }
 
-impl DocGen for SassParenthesizedExpression<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
@@ -48,14 +48,14 @@ impl DocGen for SassParenthesizedExpression<'_> {
     }
 }
 
-impl DocGen for SassPlaceholderSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SassPlaceholderSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("%").append(self.name.doc(ctx))
     }
 }
 
-impl DocGen for SassQualifiedName<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SassQualifiedName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(vec![
             self.module.doc(ctx),
             Doc::text("."),
@@ -64,8 +64,8 @@ impl DocGen for SassQualifiedName<'_> {
     }
 }
 
-impl DocGen for SassVariable<'_> {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SassVariable<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(format!("${}", self.name.raw))
     }
 }

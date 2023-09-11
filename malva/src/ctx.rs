@@ -1,7 +1,7 @@
 use crate::{config::LanguageOptions, LineBounds};
 use raffia::{token::Comment, Syntax};
 
-pub(crate) struct Ctx<'a, 's> {
+pub(crate) struct Ctx<'a, 's: 'a> {
     pub syntax: Syntax,
     pub options: &'a LanguageOptions,
     pub comments: &'a [Comment<'s>],

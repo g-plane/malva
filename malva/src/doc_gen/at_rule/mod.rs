@@ -5,8 +5,8 @@ use tiny_pretty::Doc;
 
 mod media;
 
-impl DocGen for AtRule<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for AtRule<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         docs.push(Doc::text(format!(
             "@{}",
@@ -24,8 +24,8 @@ impl DocGen for AtRule<'_> {
     }
 }
 
-impl DocGen for AtRulePrelude<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for AtRulePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             AtRulePrelude::Media(media) => media.doc(ctx),
             AtRulePrelude::Charset(charset) => charset.doc(ctx),
@@ -46,8 +46,8 @@ impl DocGen for AtRulePrelude<'_> {
     }
 }
 
-impl DocGen for ColorProfilePrelude<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for ColorProfilePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             ColorProfilePrelude::DashedIdent(dashed_ident) => dashed_ident.doc(ctx),
             ColorProfilePrelude::DeviceCmyk(device_cmyk) => device_cmyk.doc(ctx),
@@ -55,8 +55,8 @@ impl DocGen for ColorProfilePrelude<'_> {
     }
 }
 
-impl DocGen for CustomMedia<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for CustomMedia<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name
             .doc(ctx)
             .append(Doc::space())
@@ -64,8 +64,8 @@ impl DocGen for CustomMedia<'_> {
     }
 }
 
-impl DocGen for CustomMediaValue<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for CustomMediaValue<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             CustomMediaValue::MediaQueryList(media_query_list) => media_query_list.doc(ctx),
             CustomMediaValue::True(..) => Doc::text("true"),
@@ -74,8 +74,8 @@ impl DocGen for CustomMediaValue<'_> {
     }
 }
 
-impl DocGen for DocumentPrelude<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for DocumentPrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(
                 self.matchers.iter().map(|matcher| matcher.doc(ctx)),
@@ -88,8 +88,8 @@ impl DocGen for DocumentPrelude<'_> {
     }
 }
 
-impl DocGen for DocumentPreludeMatcher<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for DocumentPreludeMatcher<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             DocumentPreludeMatcher::Function(function) => function.doc(ctx),
             DocumentPreludeMatcher::Url(url) => url.doc(ctx),
@@ -97,8 +97,8 @@ impl DocGen for DocumentPreludeMatcher<'_> {
     }
 }
 
-impl DocGen for FontFamilyName<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for FontFamilyName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             FontFamilyName::Str(str) => str.doc(ctx),
             FontFamilyName::Unquoted(unquoted) => unquoted.doc(ctx),
@@ -106,8 +106,8 @@ impl DocGen for FontFamilyName<'_> {
     }
 }
 
-impl DocGen for KeyframeBlock<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for KeyframeBlock<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         use crate::config::BlockSelectorLineBreak;
 
         Doc::list(
@@ -127,8 +127,8 @@ impl DocGen for KeyframeBlock<'_> {
     }
 }
 
-impl DocGen for KeyframesName<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for KeyframesName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             KeyframesName::Ident(ident) => ident.doc(ctx),
             KeyframesName::Str(str) => str.doc(ctx),
@@ -138,8 +138,8 @@ impl DocGen for KeyframesName<'_> {
     }
 }
 
-impl DocGen for KeyframeSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for KeyframeSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             KeyframeSelector::Percentage(percentage) => percentage.doc(ctx),
             KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
@@ -157,8 +157,8 @@ impl DocGen for KeyframeSelector<'_> {
     }
 }
 
-impl DocGen for UnquotedFontFamilyName<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for UnquotedFontFamilyName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(self.idents.iter().map(|ident| ident.doc(ctx)), Doc::space())
                 .collect(),

@@ -8,6 +8,6 @@ mod selector;
 mod stmt;
 mod value;
 
-pub(super) trait DocGen {
-    fn doc(&self, ctx: &Ctx) -> Doc;
+pub(super) trait DocGen<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s>;
 }

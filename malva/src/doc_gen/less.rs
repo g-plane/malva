@@ -3,20 +3,20 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
-impl DocGen for LessEscapedStr<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessEscapedStr<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("~").append(self.str.doc(ctx))
     }
 }
 
-impl DocGen for LessFormatFunction {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessFormatFunction {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("%")
     }
 }
 
-impl DocGen for LessInterpolatedIdent<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessInterpolatedIdent<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             self.elements
                 .iter()
@@ -30,20 +30,20 @@ impl DocGen for LessInterpolatedIdent<'_> {
     }
 }
 
-impl DocGen for LessListFunction {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessListFunction {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("~")
     }
 }
 
-impl DocGen for LessPropertyInterpolation<'_> {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessPropertyInterpolation<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(format!("${}{}{}", '{', self.name.raw, '}'))
     }
 }
 
-impl DocGen for LessPropertyMerge {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessPropertyMerge {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         match self.kind {
             LessPropertyMergeKind::Comma => Doc::text("+"),
             LessPropertyMergeKind::Space => Doc::text("+_"),
@@ -51,26 +51,26 @@ impl DocGen for LessPropertyMerge {
     }
 }
 
-impl DocGen for LessPropertyVariable<'_> {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessPropertyVariable<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(format!("${}", self.name.raw))
     }
 }
 
-impl DocGen for LessVariable<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessVariable<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("@").append(self.name.doc(ctx))
     }
 }
 
-impl DocGen for LessVariableInterpolation<'_> {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessVariableInterpolation<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(format!("@{}{}{}", '{', self.name.raw, '}'))
     }
 }
 
-impl DocGen for LessVariableVariable<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LessVariableVariable<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("@@").append(self.variable.name.doc(ctx))
     }
 }

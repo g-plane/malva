@@ -3,8 +3,8 @@ use crate::ctx::Ctx;
 use raffia::{ast::*, token::TokenWithSpan, Spanned, Syntax};
 use tiny_pretty::Doc;
 
-impl DocGen for Declaration<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for Declaration<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         docs.push(self.name.doc(ctx));
         if let Some(less_property_merge) = &self.less_property_merge {
@@ -61,14 +61,14 @@ impl DocGen for Declaration<'_> {
     }
 }
 
-impl DocGen for ImportantAnnotation<'_> {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for ImportantAnnotation<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("!important")
     }
 }
 
-impl DocGen for QualifiedRule<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for QualifiedRule<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         use crate::config::BlockSelectorLineBreak;
 
         // we don't use `SelectorList::doc` here
@@ -93,8 +93,8 @@ impl DocGen for QualifiedRule<'_> {
     }
 }
 
-impl DocGen for SimpleBlock<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SimpleBlock<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let is_sass = ctx.syntax == Syntax::Sass;
         let mut docs = vec![];
 
@@ -127,8 +127,8 @@ impl DocGen for SimpleBlock<'_> {
     }
 }
 
-impl DocGen for Statement<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for Statement<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let stmt = match self {
             Statement::AtRule(at_rule) => at_rule.doc(ctx),
             Statement::Declaration(declaration) => declaration.doc(ctx),
@@ -157,8 +157,8 @@ impl DocGen for Statement<'_> {
     }
 }
 
-impl DocGen for Stylesheet<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for Stylesheet<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut stmts = Vec::with_capacity(self.statements.len() * 2);
         let mut iter = self.statements.iter().peekable();
         while let Some(stmt) = iter.next() {

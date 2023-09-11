@@ -23,12 +23,12 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
     print_stylesheet(&stylesheet, &comments, line_bounds, syntax, options)
 }
 
-pub fn print_stylesheet(
-    stylesheet: &Stylesheet,
-    comments: &[Comment],
+pub fn print_stylesheet<'a, 's>(
+    stylesheet: &'a Stylesheet<'s>,
+    comments: &'a [Comment<'s>],
     line_bounds: LineBounds,
     syntax: Syntax,
-    options: &FormatOptions,
+    options: &'a FormatOptions,
 ) -> Result<String, Error> {
     use tiny_pretty::{IndentKind, PrintOptions};
 

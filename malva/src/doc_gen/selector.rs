@@ -3,8 +3,8 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
-impl DocGen for AnPlusB {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for AnPlusB {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         let a = match self.a {
             0 => Doc::nil(),
             1 => Doc::text("n"),
@@ -20,8 +20,8 @@ impl DocGen for AnPlusB {
     }
 }
 
-impl DocGen for AttributeSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for AttributeSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         docs.push(Doc::text("["));
         docs.push(self.name.doc(ctx));
@@ -39,8 +39,8 @@ impl DocGen for AttributeSelector<'_> {
     }
 }
 
-impl DocGen for AttributeSelectorMatcher {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for AttributeSelectorMatcher {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(match self.kind {
             AttributeSelectorMatcherKind::Exact => "=",
             AttributeSelectorMatcherKind::MatchWord => "~=",
@@ -52,8 +52,8 @@ impl DocGen for AttributeSelectorMatcher {
     }
 }
 
-impl DocGen for AttributeSelectorModifier<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for AttributeSelectorModifier<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match &self.ident {
             InterpolableIdent::Literal(ident) if matches!(&*ident.name, "I" | "S") => {
                 Doc::text(ident.name.to_ascii_lowercase())
@@ -63,8 +63,8 @@ impl DocGen for AttributeSelectorModifier<'_> {
     }
 }
 
-impl DocGen for AttributeSelectorValue<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for AttributeSelectorValue<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             AttributeSelectorValue::Ident(ident) => ident.doc(ctx),
             AttributeSelectorValue::Str(str) => str.doc(ctx),
@@ -74,14 +74,14 @@ impl DocGen for AttributeSelectorValue<'_> {
     }
 }
 
-impl DocGen for ClassSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for ClassSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(".").append(self.name.doc(ctx))
     }
 }
 
-impl DocGen for Combinator {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for Combinator {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(match self.kind {
             CombinatorKind::Descendant => " ",
             CombinatorKind::Child => ">",
@@ -92,8 +92,8 @@ impl DocGen for Combinator {
     }
 }
 
-impl DocGen for ComplexSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for ComplexSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.children.len() * 2);
 
         let mut children = self.children.iter();
@@ -123,8 +123,8 @@ impl DocGen for ComplexSelector<'_> {
     }
 }
 
-impl DocGen for CompoundSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for CompoundSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             self.children
                 .iter()
@@ -134,8 +134,8 @@ impl DocGen for CompoundSelector<'_> {
     }
 }
 
-impl DocGen for CompoundSelectorList<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for CompoundSelectorList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(
                 self.selectors.iter().map(|selector| selector.doc(ctx)),
@@ -146,14 +146,14 @@ impl DocGen for CompoundSelectorList<'_> {
     }
 }
 
-impl DocGen for IdSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for IdSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("#").append(self.name.doc(ctx))
     }
 }
 
-impl DocGen for LanguageRange<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LanguageRange<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             LanguageRange::Ident(ident) => ident.doc(ctx),
             LanguageRange::Str(str) => str.doc(ctx),
@@ -161,8 +161,8 @@ impl DocGen for LanguageRange<'_> {
     }
 }
 
-impl DocGen for LanguageRangeList<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for LanguageRangeList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(
                 self.ranges.iter().map(|selector| selector.doc(ctx)),
@@ -173,8 +173,8 @@ impl DocGen for LanguageRangeList<'_> {
     }
 }
 
-impl DocGen for NestingSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for NestingSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let ampersand = Doc::text("&");
         if let Some(suffix) = &self.suffix {
             ampersand.append(suffix.doc(ctx))
@@ -184,8 +184,8 @@ impl DocGen for NestingSelector<'_> {
     }
 }
 
-impl DocGen for NsPrefix<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for NsPrefix<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let bar = Doc::text("|");
         if let Some(kind) = &self.kind {
             kind.doc(ctx).append(bar)
@@ -195,8 +195,8 @@ impl DocGen for NsPrefix<'_> {
     }
 }
 
-impl DocGen for NsPrefixKind<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for NsPrefixKind<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             NsPrefixKind::Ident(ident) => ident.doc(ctx),
             NsPrefixKind::Universal(..) => Doc::text("*"),
@@ -204,8 +204,8 @@ impl DocGen for NsPrefixKind<'_> {
     }
 }
 
-impl DocGen for Nth<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for Nth<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let index = self.index.doc(ctx);
         if let Some(matcher) = &self.matcher {
             let doc = index.append(Doc::text(" of"));
@@ -220,8 +220,8 @@ impl DocGen for Nth<'_> {
     }
 }
 
-impl DocGen for NthIndex<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for NthIndex<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             Self::AnPlusB(an_plus_b) => an_plus_b.doc(ctx),
             Self::Odd(..) => Doc::text("odd"),
@@ -231,8 +231,8 @@ impl DocGen for NthIndex<'_> {
     }
 }
 
-impl DocGen for PseudoClassSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let name = match &self.name {
             InterpolableIdent::Literal(literal) => Doc::text(literal.raw.to_ascii_lowercase()),
             _ => self.name.doc(ctx),
@@ -249,8 +249,8 @@ impl DocGen for PseudoClassSelector<'_> {
     }
 }
 
-impl DocGen for PseudoClassSelectorArg<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for PseudoClassSelectorArg<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
                 compound_selector.doc(ctx)
@@ -272,8 +272,8 @@ impl DocGen for PseudoClassSelectorArg<'_> {
     }
 }
 
-impl DocGen for PseudoElementSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let name = match &self.name {
             InterpolableIdent::Literal(literal) => Doc::text(literal.raw.to_ascii_lowercase()),
             _ => self.name.doc(ctx),
@@ -290,8 +290,8 @@ impl DocGen for PseudoElementSelector<'_> {
     }
 }
 
-impl DocGen for PseudoElementSelectorArg<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for PseudoElementSelectorArg<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             PseudoElementSelectorArg::CompoundSelector(compound_selector) => {
                 compound_selector.doc(ctx)
@@ -302,8 +302,8 @@ impl DocGen for PseudoElementSelectorArg<'_> {
     }
 }
 
-impl DocGen for SimpleSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SimpleSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             SimpleSelector::Class(selector) => selector.doc(ctx),
             SimpleSelector::Id(selector) => selector.doc(ctx),
@@ -317,8 +317,8 @@ impl DocGen for SimpleSelector<'_> {
     }
 }
 
-impl DocGen for SelectorList<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for SelectorList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(
                 self.selectors.iter().map(|selector| selector.doc(ctx)),
@@ -329,14 +329,14 @@ impl DocGen for SelectorList<'_> {
     }
 }
 
-impl DocGen for TagNameSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for TagNameSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name.doc(ctx)
     }
 }
 
-impl DocGen for TypeSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for TypeSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             TypeSelector::TagName(selector) => selector.doc(ctx),
             TypeSelector::Universal(selector) => selector.doc(ctx),
@@ -344,8 +344,8 @@ impl DocGen for TypeSelector<'_> {
     }
 }
 
-impl DocGen for UniversalSelector<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for UniversalSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let asterisk = Doc::text("*");
         if let Some(prefix) = &self.prefix {
             prefix.doc(ctx).append(asterisk)
@@ -355,8 +355,8 @@ impl DocGen for UniversalSelector<'_> {
     }
 }
 
-impl DocGen for WqName<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for WqName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         if let Some(prefix) = &self.prefix {
             prefix.doc(ctx).append(self.name.doc(ctx))
         } else {

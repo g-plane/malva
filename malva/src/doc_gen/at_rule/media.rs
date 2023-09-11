@@ -3,8 +3,8 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
-impl DocGen for MediaAnd<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaAnd<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -17,8 +17,8 @@ impl DocGen for MediaAnd<'_> {
     }
 }
 
-impl DocGen for MediaCondition<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(
                 self.conditions.iter().map(|condition| condition.doc(ctx)),
@@ -29,8 +29,8 @@ impl DocGen for MediaCondition<'_> {
     }
 }
 
-impl DocGen for MediaConditionAfterMediaType<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaConditionAfterMediaType<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -43,8 +43,8 @@ impl DocGen for MediaConditionAfterMediaType<'_> {
     }
 }
 
-impl DocGen for MediaConditionKind<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaConditionKind<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             MediaConditionKind::MediaInParens(media_in_parens) => media_in_parens.doc(ctx),
             MediaConditionKind::And(and) => and.doc(ctx),
@@ -54,8 +54,8 @@ impl DocGen for MediaConditionKind<'_> {
     }
 }
 
-impl DocGen for MediaFeature<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaFeature<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             MediaFeature::Plain(plain) => plain.doc(ctx),
             MediaFeature::Boolean(boolean) => boolean.doc(ctx),
@@ -65,14 +65,14 @@ impl DocGen for MediaFeature<'_> {
     }
 }
 
-impl DocGen for MediaFeatureBoolean<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaFeatureBoolean<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name.doc(ctx)
     }
 }
 
-impl DocGen for MediaFeatureComparison {
-    fn doc(&self, _: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaFeatureComparison {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(match self.kind {
             MediaFeatureComparisonKind::Equal => "=",
             MediaFeatureComparisonKind::GreaterThan => ">",
@@ -83,8 +83,8 @@ impl DocGen for MediaFeatureComparison {
     }
 }
 
-impl DocGen for MediaFeatureName<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaFeatureName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             MediaFeatureName::Ident(ident) => ident.doc(ctx),
             MediaFeatureName::SassVariable(sass_variable) => sass_variable.doc(ctx),
@@ -92,8 +92,8 @@ impl DocGen for MediaFeatureName<'_> {
     }
 }
 
-impl DocGen for MediaFeaturePlain<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaFeaturePlain<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(vec![
             self.name.doc(ctx),
             Doc::text(": "),
@@ -102,8 +102,8 @@ impl DocGen for MediaFeaturePlain<'_> {
     }
 }
 
-impl DocGen for MediaFeatureRange<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaFeatureRange<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(vec![
             self.left.doc(ctx),
             Doc::space(),
@@ -114,8 +114,8 @@ impl DocGen for MediaFeatureRange<'_> {
     }
 }
 
-impl DocGen for MediaFeatureRangeInterval<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaFeatureRangeInterval<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(vec![
             self.left.doc(ctx),
             Doc::space(),
@@ -130,8 +130,8 @@ impl DocGen for MediaFeatureRangeInterval<'_> {
     }
 }
 
-impl DocGen for MediaInParens<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaInParens<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let kind = match &self.kind {
             MediaInParensKind::MediaCondition(media_condition) => media_condition.doc(ctx),
             MediaInParensKind::MediaFeature(media_feature) => media_feature.doc(ctx),
@@ -140,8 +140,8 @@ impl DocGen for MediaInParens<'_> {
     }
 }
 
-impl DocGen for MediaNot<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaNot<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -154,8 +154,8 @@ impl DocGen for MediaNot<'_> {
     }
 }
 
-impl DocGen for MediaOr<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaOr<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -168,8 +168,8 @@ impl DocGen for MediaOr<'_> {
     }
 }
 
-impl DocGen for MediaQuery<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaQuery<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             MediaQuery::ConditionOnly(media_condition) => media_condition.doc(ctx),
             MediaQuery::WithType(media_query_with_type) => media_query_with_type.doc(ctx),
@@ -179,8 +179,8 @@ impl DocGen for MediaQuery<'_> {
     }
 }
 
-impl DocGen for MediaQueryWithType<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         if let Some(modifier) = &self.modifier {
             docs.push(modifier.doc(ctx));
@@ -195,8 +195,8 @@ impl DocGen for MediaQueryWithType<'_> {
     }
 }
 
-impl DocGen for MediaQueryList<'_> {
-    fn doc(&self, ctx: &Ctx) -> Doc {
+impl<'s> DocGen<'s> for MediaQueryList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(
                 self.queries.iter().map(|query| query.doc(ctx)),
