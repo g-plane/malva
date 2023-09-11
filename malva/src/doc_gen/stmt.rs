@@ -154,14 +154,16 @@ impl DocGen for Stylesheet<'_> {
         let mut iter = self.statements.iter().peekable();
         while let Some(stmt) = iter.next() {
             stmts.push(stmt.doc(ctx));
-            stmts.push(Doc::hard_line());
             if let Some(next) = iter.peek() {
+                stmts.push(Doc::hard_line());
                 if ctx
                     .line_bounds
                     .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
                 {
                     stmts.push(Doc::empty_line());
                 }
+            } else if ctx.syntax != Syntax::Sass {
+                stmts.push(Doc::hard_line());
             }
         }
         Doc::list(stmts)
