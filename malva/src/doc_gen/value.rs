@@ -311,41 +311,7 @@ impl DocGen for Ratio<'_> {
 
 impl DocGen for Str<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        use crate::config::Quotes;
-
-        let (left, right) = self.raw.split_at(1);
-        let inner = &right[0..right.len() - 1];
-
-        match ctx.options.quotes {
-            Quotes::AlwaysDouble => {
-                if left == "\"" {
-                    Doc::text(self.raw)
-                } else {
-                    Doc::text(format!("\"{}\"", inner.replace('"', "\\\"")))
-                }
-            }
-            Quotes::AlwaysSingle => {
-                if left == "\'" {
-                    Doc::text(self.raw)
-                } else {
-                    Doc::text(format!("'{}'", inner.replace('\'', "\\'")))
-                }
-            }
-            Quotes::PreferDouble => {
-                if left == "\"" || inner.contains("\\\"") {
-                    Doc::text(self.raw)
-                } else {
-                    Doc::text(format!("\"{inner}\""))
-                }
-            }
-            Quotes::PreferSingle => {
-                if left == "\'" || inner.contains("\\\'") {
-                    Doc::text(self.raw)
-                } else {
-                    Doc::text(format!("'{inner}'"))
-                }
-            }
-        }
+        Doc::text(format_str_raw(self.raw, ctx))
     }
 }
 
@@ -480,7 +446,7 @@ impl<'s> DocGen for TokenWithSpan<'s> {
             Token::RParen(..) => Doc::text(")"),
             Token::Semicolon(..) => Doc::text(";"),
             Token::Solidus(..) => Doc::text("/"),
-            Token::Str(str) => todo!(),
+            Token::Str(str) => Doc::text(format_str_raw(str.raw, ctx)),
             Token::StrTemplate(..) => unreachable!(),
             Token::Tilde(..) => Doc::text("~"),
             Token::TildeEqual(..) => Doc::text("~="),
@@ -598,5 +564,43 @@ fn format_number_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
         format!("{coefficient}e{exponent}").into()
     } else {
         number
+    }
+}
+
+fn format_str_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
+    use crate::config::Quotes;
+
+    let (left, right) = raw.split_at(1);
+    let inner = &right[0..right.len() - 1];
+
+    match ctx.options.quotes {
+        Quotes::AlwaysDouble => {
+            if left == "\"" {
+                raw.into()
+            } else {
+                format!("\"{}\"", inner.replace('"', "\\\"")).into()
+            }
+        }
+        Quotes::AlwaysSingle => {
+            if left == "\'" {
+                raw.into()
+            } else {
+                format!("'{}'", inner.replace('\'', "\\'")).into()
+            }
+        }
+        Quotes::PreferDouble => {
+            if left == "\"" || inner.contains("\\\"") {
+                raw.into()
+            } else {
+                format!("\"{inner}\"").into()
+            }
+        }
+        Quotes::PreferSingle => {
+            if left == "\'" || inner.contains("\\\'") {
+                raw.into()
+            } else {
+                format!("'{inner}'").into()
+            }
+        }
     }
 }
