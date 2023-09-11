@@ -1,6 +1,6 @@
 use super::DocGen;
 use crate::ctx::Ctx;
-use raffia::{ast::*, Spanned, Syntax};
+use raffia::{ast::*, token::TokenWithSpan, Spanned, Syntax};
 use tiny_pretty::Doc;
 
 impl DocGen for Declaration<'_> {
@@ -19,9 +19,17 @@ impl DocGen for Declaration<'_> {
             InterpolableIdent::Literal(Ident { name, .. })
                 if name.starts_with("--") || name.eq_ignore_ascii_case("filter") =>
             {
+                use raffia::token::Token;
                 while let Some(value) = iter.next() {
                     values.push(value.doc(ctx));
-                    if matches!(iter.peek(), Some(next) if value.span().end < next.span().start) {
+                    if let ComponentValue::TokenWithSpan(TokenWithSpan {
+                        token: Token::Comma(..) | Token::Semicolon(..),
+                        ..
+                    }) = value
+                    {
+                        values.push(Doc::soft_line());
+                    } else if matches!(iter.peek(), Some(next) if value.span().end < next.span().start)
+                    {
                         values.push(Doc::soft_line());
                     }
                 }
