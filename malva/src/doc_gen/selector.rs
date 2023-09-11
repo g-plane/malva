@@ -28,6 +28,11 @@ impl DocGen for AttributeSelector<'_> {
         if let Some((matcher, value)) = self.matcher.as_ref().zip(self.value.as_ref()) {
             docs.push(matcher.doc(ctx));
             docs.push(value.doc(ctx));
+            if let Some(modifier) = &self.modifier {
+                docs.reserve(2);
+                docs.push(Doc::space());
+                docs.push(modifier.doc(ctx));
+            }
         }
         docs.push(Doc::text("]"));
         Doc::list(docs)
