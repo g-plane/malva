@@ -410,10 +410,7 @@ impl<'s> DocGen for TokenWithSpan<'s> {
             Token::RParen(..) => Doc::text(")"),
             Token::Semicolon(..) => Doc::text(";"),
             Token::Solidus(..) => Doc::text("/"),
-            Token::Str(str) => {
-                let str = Str::from((str.clone(), self.span.clone()));
-                str.doc(ctx)
-            }
+            Token::Str(str) => todo!(),
             Token::StrTemplate(..) => todo!(),
             Token::Tilde(..) => Doc::text("~"),
             Token::TildeEqual(..) => Doc::text("~="),
