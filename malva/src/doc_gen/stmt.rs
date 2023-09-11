@@ -14,11 +14,11 @@ impl DocGen for Declaration<'_> {
 
         let mut values = Vec::with_capacity(self.value.len() * 2);
 
+        let mut iter = self.value.iter().peekable();
         match &self.name {
             InterpolableIdent::Literal(Ident { name, .. })
                 if name.starts_with("--") || name.eq_ignore_ascii_case("filter") =>
             {
-                let mut iter = self.value.iter().peekable();
                 while let Some(value) = iter.next() {
                     values.push(value.doc(ctx));
                     if matches!(iter.peek(), Some(next) if value.span().end < next.span().start) {
@@ -27,22 +27,18 @@ impl DocGen for Declaration<'_> {
                 }
             }
             _ => {
-                let mut iter = self.value.iter();
-                if let Some(first) = iter.next() {
-                    values.push(first.doc(ctx));
-                }
-                iter.for_each(|value| {
+                while let Some(value) = iter.next() {
+                    values.push(value.doc(ctx));
                     if !matches!(
-                        value,
-                        ComponentValue::Delimiter(Delimiter {
+                        iter.peek(),
+                        Some(ComponentValue::Delimiter(Delimiter {
                             kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
                             ..
-                        })
+                        })) | None
                     ) {
                         values.push(Doc::soft_line());
                     }
-                    values.push(value.doc(ctx));
-                });
+                }
             }
         }
 
