@@ -106,7 +106,7 @@ impl DocGen for SimpleBlock<'_> {
             if let Some(next) = iter.peek() {
                 if ctx
                     .line_bounds
-                    .is_away_more_than_one_line(stmt.span().end, next.span().start)
+                    .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
                 {
                     stmts.push(Doc::hardline());
                 }
@@ -162,7 +162,7 @@ impl DocGen for Stylesheet<'_> {
             if let Some(next) = iter.peek() {
                 if ctx
                     .line_bounds
-                    .is_away_more_than_one_line(stmt.span().end, next.span().start)
+                    .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
                 {
                     stmts.push(Doc::hardline());
                 }
