@@ -13,22 +13,38 @@ impl DocGen for Declaration<'_> {
         docs.push(Doc::text(": "));
 
         let mut values = Vec::with_capacity(self.value.len() * 2);
-        let mut iter = self.value.iter();
-        if let Some(first) = iter.next() {
-            values.push(first.doc(ctx));
-        }
-        iter.for_each(|value| {
-            if !matches!(
-                value,
-                ComponentValue::Delimiter(Delimiter {
-                    kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
-                    ..
-                })
-            ) {
-                values.push(Doc::softline());
+
+        match &self.name {
+            InterpolableIdent::Literal(Ident { name, .. })
+                if name.starts_with("--") || name.eq_ignore_ascii_case("filter") =>
+            {
+                let mut iter = self.value.iter().peekable();
+                while let Some(value) = iter.next() {
+                    values.push(value.doc(ctx));
+                    if matches!(iter.peek(), Some(next) if value.span().end < next.span().start) {
+                        values.push(Doc::softline());
+                    }
+                }
             }
-            values.push(value.doc(ctx));
-        });
+            _ => {
+                let mut iter = self.value.iter();
+                if let Some(first) = iter.next() {
+                    values.push(first.doc(ctx));
+                }
+                iter.for_each(|value| {
+                    if !matches!(
+                        value,
+                        ComponentValue::Delimiter(Delimiter {
+                            kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                            ..
+                        })
+                    ) {
+                        values.push(Doc::softline());
+                    }
+                    values.push(value.doc(ctx));
+                });
+            }
+        }
 
         if let Some(important) = &self.important {
             values.push(Doc::softline());

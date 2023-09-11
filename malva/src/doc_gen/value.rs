@@ -1,6 +1,6 @@
 use super::DocGen;
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, token::TokenWithSpan};
 use tiny_pretty::Doc;
 
 impl DocGen for BracketBlock<'_> {
@@ -124,6 +124,7 @@ impl DocGen for ComponentValue<'_> {
             ComponentValue::SassParenthesizedExpression(sass_parenthesized_expr) => {
                 sass_parenthesized_expr.doc(ctx)
             }
+            ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx),
             ComponentValue::Url(url) => url.doc(ctx),
             _ => todo!(),
         }
@@ -342,6 +343,81 @@ impl DocGen for Str<'_> {
                     Doc::text(format!("'{inner}'"))
                 }
             }
+        }
+    }
+}
+
+impl<'s> DocGen for TokenWithSpan<'s> {
+    fn doc(&self, ctx: &Ctx) -> Doc<'s> {
+        use raffia::token::Token;
+
+        match &self.token {
+            Token::Ampersand(..) => Doc::text("&"),
+            Token::Asterisk(..) => Doc::text("*"),
+            Token::AsteriskEqual(..) => Doc::text("*="),
+            Token::At(..) => Doc::text("@"),
+            Token::AtKeyword(at_keyword) => Doc::text(format!("@{}", at_keyword.ident.raw)),
+            Token::AtLBraceVar(at_lbrace_var) => {
+                Doc::text(format!("@{}{}{}", '{', at_lbrace_var.ident.raw, '}'))
+            }
+            Token::BacktickCode(backtick_code) => Doc::text(format!("`{}`", backtick_code.raw)),
+            Token::Bar(..) => Doc::text("|"),
+            Token::BarBar(..) => Doc::text("||"),
+            Token::BarEqual(..) => Doc::text("|="),
+            Token::CaretEqual(..) => Doc::text("^="),
+            Token::Cdc(..) | Token::Cdo(..) => unreachable!(),
+            Token::Colon(..) => Doc::text(":"),
+            Token::ColonColon(..) => Doc::text("::"),
+            Token::Comma(..) => Doc::text(","),
+            Token::Dedent(..) => unreachable!(),
+            Token::Dimension(..) => {
+                todo!()
+            }
+            Token::DollarEqual(..) => Doc::text("$="),
+            Token::DollarLBraceVar(dollar_lbrace_var) => {
+                Doc::text(format!("${}{}{}", '{', dollar_lbrace_var.ident.raw, '}'))
+            }
+            Token::DollarVar(dollar_var) => Doc::text(format!("${}", dollar_var.ident.raw)),
+            Token::Dot(..) => Doc::text("."),
+            Token::DotDotDot(..) => Doc::text("..."),
+            Token::Eof(..) => unreachable!(),
+            Token::Equal(..) => Doc::text("="),
+            Token::EqualEqual(..) => Doc::text("=="),
+            Token::Exclamation(..) => Doc::text("!"),
+            Token::ExclamationEqual(..) => Doc::text("!="),
+            Token::GreaterThan(..) => Doc::text(">"),
+            Token::GreaterThanEqual(..) => Doc::text(">="),
+            Token::Hash(hash) => Doc::text(format!("#{}", hash.raw)),
+            Token::HashLBrace(..) => Doc::text("#{"),
+            Token::Ident(ident) => Doc::text(ident.raw),
+            Token::Indent(..) => unreachable!(),
+            Token::LBrace(..) => Doc::text("{"),
+            Token::LBracket(..) => Doc::text("["),
+            Token::LessThan(..) => Doc::text("<"),
+            Token::LessThanEqual(..) => Doc::text("<="),
+            Token::Linebreak(..) => unreachable!(),
+            Token::LParen(..) => Doc::text("("),
+            Token::Minus(..) => Doc::text("-"),
+            Token::Number(..) => todo!(),
+            Token::NumberSign(..) => Doc::text("#"),
+            Token::Percent(..) => Doc::text("%"),
+            Token::Percentage(..) => todo!(),
+            Token::Plus(..) => Doc::text("+"),
+            Token::PlusUnderscore(..) => Doc::text("+_"),
+            Token::Question(..) => Doc::text("?"),
+            Token::RBrace(..) => Doc::text("}"),
+            Token::RBracket(..) => Doc::text("]"),
+            Token::RParen(..) => Doc::text(")"),
+            Token::Semicolon(..) => Doc::text(";"),
+            Token::Solidus(..) => Doc::text("/"),
+            Token::Str(str) => {
+                let str = Str::from((str.clone(), self.span.clone()));
+                str.doc(ctx)
+            }
+            Token::StrTemplate(..) => todo!(),
+            Token::Tilde(..) => Doc::text("~"),
+            Token::TildeEqual(..) => Doc::text("~="),
+            Token::UrlRaw(..) | Token::UrlTemplate(..) => unreachable!(),
         }
     }
 }
