@@ -57,7 +57,7 @@ pub struct LanguageOptions {
     pub hex_case: HexCase,
     pub quotes: Quotes,
     pub operator_linebreak: OperatorLineBreak,
-    pub qualified_rule_selector_linebreak: QualifiedRuleSelectorLineBreak,
+    pub block_selector_linebreak: BlockSelectorLineBreak,
     pub omit_zero_before_dot: bool,
 }
 
@@ -94,7 +94,7 @@ pub enum OperatorLineBreak {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
-pub enum QualifiedRuleSelectorLineBreak {
+pub enum BlockSelectorLineBreak {
     Always,
     #[default]
     Consistent,

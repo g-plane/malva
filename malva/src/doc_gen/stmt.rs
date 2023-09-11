@@ -61,7 +61,7 @@ impl DocGen for ImportantAnnotation<'_> {
 
 impl DocGen for QualifiedRule<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        use crate::config::QualifiedRuleSelectorLineBreak;
+        use crate::config::BlockSelectorLineBreak;
 
         // we don't use `SelectorList::doc` here
         // because it's a special case for qualified rule
@@ -71,10 +71,10 @@ impl DocGen for QualifiedRule<'_> {
                     .selectors
                     .iter()
                     .map(|selector| selector.doc(ctx)),
-                Doc::text(",").append(match ctx.options.qualified_rule_selector_linebreak {
-                    QualifiedRuleSelectorLineBreak::Always => Doc::hard_line(),
-                    QualifiedRuleSelectorLineBreak::Consistent => Doc::line_or_space(),
-                    QualifiedRuleSelectorLineBreak::Wrap => Doc::soft_line(),
+                Doc::text(",").append(match ctx.options.block_selector_linebreak {
+                    BlockSelectorLineBreak::Always => Doc::hard_line(),
+                    BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
+                    BlockSelectorLineBreak::Wrap => Doc::soft_line(),
                 }),
             )
             .collect(),
