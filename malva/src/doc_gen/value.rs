@@ -258,14 +258,7 @@ impl DocGen for Ident<'_> {
 
 impl DocGen for HexColor<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
-        use crate::config::HexCase;
-
-        let hex = match ctx.options.hex_case {
-            HexCase::Ignore => format!("#{}", self.raw),
-            HexCase::Lower => format!("#{}", self.raw.to_ascii_lowercase()),
-            HexCase::Upper => format!("#{}", self.raw.to_ascii_uppercase()),
-        };
-        Doc::text(hex)
+        Doc::text(format_hex_raw(self.raw, ctx))
     }
 }
 
@@ -388,7 +381,7 @@ impl<'s> DocGen for TokenWithSpan<'s> {
             Token::ExclamationEqual(..) => Doc::text("!="),
             Token::GreaterThan(..) => Doc::text(">"),
             Token::GreaterThanEqual(..) => Doc::text(">="),
-            Token::Hash(hash) => Doc::text(format!("#{}", hash.raw)),
+            Token::Hash(hash) => Doc::text(format_hex_raw(hash.raw, ctx)),
             Token::HashLBrace(..) => Doc::text("#{"),
             Token::Ident(ident) => Doc::text(ident.raw),
             Token::Indent(..) => unreachable!(),
@@ -489,5 +482,15 @@ impl DocGen for UrlValue<'_> {
             UrlValue::Str(str) => str.doc(ctx),
             UrlValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
         }
+    }
+}
+
+fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
+    use crate::config::HexCase;
+
+    match ctx.options.hex_case {
+        HexCase::Ignore => format!("#{}", raw),
+        HexCase::Lower => format!("#{}", raw.to_ascii_lowercase()),
+        HexCase::Upper => format!("#{}", raw.to_ascii_uppercase()),
     }
 }
