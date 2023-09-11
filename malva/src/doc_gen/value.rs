@@ -126,6 +126,7 @@ impl DocGen for ComponentValue<'_> {
             }
             ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx),
             ComponentValue::Url(url) => url.doc(ctx),
+            ComponentValue::UnicodeRange(unicode_range) => unicode_range.doc(ctx),
             _ => todo!(),
         }
     }
@@ -416,6 +417,18 @@ impl<'s> DocGen for TokenWithSpan<'s> {
             Token::TildeEqual(..) => Doc::text("~="),
             Token::UrlRaw(..) | Token::UrlTemplate(..) => unreachable!(),
         }
+    }
+}
+
+impl DocGen for UnicodeRange<'_> {
+    fn doc(&self, _: &Ctx) -> Doc {
+        let mut s = format!("U+{}", self.start_raw);
+        if let Some(end_raw) = self.end_raw {
+            s.push('-');
+            s.push_str(end_raw);
+        }
+        s.make_ascii_uppercase();
+        Doc::text(s)
     }
 }
 
