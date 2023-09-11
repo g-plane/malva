@@ -7,7 +7,7 @@ impl DocGen for BracketBlock<'_> {
     fn doc(&self, ctx: &Ctx) -> Doc {
         let mut docs = itertools::intersperse(
             self.value.iter().map(|value| value.doc(ctx)),
-            Doc::softline(),
+            Doc::soft_line(),
         )
         .collect::<Vec<_>>();
         docs.insert(0, Doc::text("["));
@@ -81,13 +81,13 @@ impl DocGen for Calc<'_> {
         };
 
         left.append(match ctx.options.operator_linebreak {
-            OperatorLineBreak::Before => Doc::softline().nest(ctx.indent_width),
+            OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
             OperatorLineBreak::After => Doc::space(),
         })
         .append(self.op.doc(ctx))
         .append(match ctx.options.operator_linebreak {
             OperatorLineBreak::Before => Doc::space(),
-            OperatorLineBreak::After => Doc::softline().nest(ctx.indent_width),
+            OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
         })
         .append(right)
     }
@@ -447,7 +447,7 @@ impl DocGen for Url<'_> {
                 args.append(
                     &mut itertools::intersperse(
                         self.modifiers.iter().map(|modifier| modifier.doc(ctx)),
-                        Doc::softline(),
+                        Doc::soft_line(),
                     )
                     .collect(),
                 );

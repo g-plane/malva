@@ -22,7 +22,7 @@ impl DocGen for Declaration<'_> {
                 while let Some(value) = iter.next() {
                     values.push(value.doc(ctx));
                     if matches!(iter.peek(), Some(next) if value.span().end < next.span().start) {
-                        values.push(Doc::softline());
+                        values.push(Doc::soft_line());
                     }
                 }
             }
@@ -39,7 +39,7 @@ impl DocGen for Declaration<'_> {
                             ..
                         })
                     ) {
-                        values.push(Doc::softline());
+                        values.push(Doc::soft_line());
                     }
                     values.push(value.doc(ctx));
                 });
@@ -47,7 +47,7 @@ impl DocGen for Declaration<'_> {
         }
 
         if let Some(important) = &self.important {
-            values.push(Doc::softline());
+            values.push(Doc::soft_line());
             values.push(important.doc(ctx));
         }
 
@@ -76,9 +76,9 @@ impl DocGen for QualifiedRule<'_> {
                     .iter()
                     .map(|selector| selector.doc(ctx)),
                 Doc::text(",").append(match ctx.options.qualified_rule_selector_linebreak {
-                    QualifiedRuleSelectorLineBreak::Always => Doc::hardline(),
+                    QualifiedRuleSelectorLineBreak::Always => Doc::hard_line(),
                     QualifiedRuleSelectorLineBreak::Consistent => Doc::line_or_space(),
-                    QualifiedRuleSelectorLineBreak::Wrap => Doc::softline(),
+                    QualifiedRuleSelectorLineBreak::Wrap => Doc::soft_line(),
                 }),
             )
             .collect(),
@@ -101,19 +101,19 @@ impl DocGen for SimpleBlock<'_> {
         let mut stmts = Vec::with_capacity(self.statements.len() * 2);
         let mut iter = self.statements.iter().peekable();
         while let Some(stmt) = iter.next() {
-            stmts.push(Doc::hardline());
+            stmts.push(Doc::hard_line());
             stmts.push(stmt.doc(ctx));
             if let Some(next) = iter.peek() {
                 if ctx
                     .line_bounds
                     .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
                 {
-                    stmts.push(Doc::hardline());
+                    stmts.push(Doc::hard_line());
                 }
             }
         }
         docs.push(Doc::list(stmts).nest(ctx.indent_width));
-        docs.push(Doc::hardline());
+        docs.push(Doc::hard_line());
 
         if !is_sass {
             docs.push(Doc::text("}"));
@@ -158,13 +158,13 @@ impl DocGen for Stylesheet<'_> {
         let mut iter = self.statements.iter().peekable();
         while let Some(stmt) = iter.next() {
             stmts.push(stmt.doc(ctx));
-            stmts.push(Doc::hardline());
+            stmts.push(Doc::hard_line());
             if let Some(next) = iter.peek() {
                 if ctx
                     .line_bounds
                     .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
                 {
-                    stmts.push(Doc::hardline());
+                    stmts.push(Doc::hard_line());
                 }
             }
         }
