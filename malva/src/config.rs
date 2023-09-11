@@ -58,6 +58,7 @@ pub struct LanguageOptions {
     pub quotes: Quotes,
     pub operator_linebreak: OperatorLineBreak,
     pub qualified_rule_selector_linebreak: QualifiedRuleSelectorLineBreak,
+    pub omit_zero_before_dot: bool,
 }
 
 #[derive(Clone, Debug, Default)]

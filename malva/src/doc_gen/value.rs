@@ -1,6 +1,7 @@
 use super::DocGen;
 use crate::ctx::Ctx;
 use raffia::{ast::*, token::TokenWithSpan};
+use std::borrow::Cow;
 use tiny_pretty::Doc;
 
 impl DocGen for BracketBlock<'_> {
@@ -281,8 +282,8 @@ impl DocGen for InterpolableStr<'_> {
 }
 
 impl DocGen for Number<'_> {
-    fn doc(&self, _: &Ctx) -> Doc {
-        Doc::text(self.raw)
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        Doc::text(format_number_raw(self.raw, ctx))
     }
 }
 
@@ -392,10 +393,12 @@ impl<'s> DocGen for TokenWithSpan<'s> {
             Token::Linebreak(..) => unreachable!(),
             Token::LParen(..) => Doc::text("("),
             Token::Minus(..) => Doc::text("-"),
-            Token::Number(..) => todo!(),
+            Token::Number(number) => Doc::text(format_number_raw(number.raw, ctx)),
             Token::NumberSign(..) => Doc::text("#"),
             Token::Percent(..) => Doc::text("%"),
-            Token::Percentage(..) => todo!(),
+            Token::Percentage(percentage) => {
+                Doc::text(format!("{}%", format_number_raw(percentage.value.raw, ctx)))
+            }
             Token::Plus(..) => Doc::text("+"),
             Token::PlusUnderscore(..) => Doc::text("+_"),
             Token::Question(..) => Doc::text("?"),
@@ -492,5 +495,35 @@ fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
         HexCase::Ignore => format!("#{}", raw),
         HexCase::Lower => format!("#{}", raw.to_ascii_lowercase()),
         HexCase::Upper => format!("#{}", raw.to_ascii_uppercase()),
+    }
+}
+
+fn format_number_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
+    let number: Cow<_> = if ctx.options.omit_zero_before_dot {
+        if let Some(raw) = raw.strip_prefix("0.") {
+            format!(".{raw}").into()
+        } else if let Some(raw) = raw.strip_suffix("-0.") {
+            format!("-.{raw}").into()
+        } else if let Some(raw) = raw.strip_prefix("+0.") {
+            format!("+.{raw}").into()
+        } else {
+            raw.into()
+        }
+    } else {
+        if let Some(raw) = raw.strip_prefix('.') {
+            format!("0.{raw}").into()
+        } else if let Some(raw) = raw.strip_suffix("-.") {
+            format!("-0.{raw}").into()
+        } else if let Some(raw) = raw.strip_prefix("+.") {
+            format!("+0.{raw}").into()
+        } else {
+            raw.into()
+        }
+    };
+
+    if let Some((coefficient, exponent)) = number.split_once('E') {
+        format!("{coefficient}e{exponent}").into()
+    } else {
+        number
     }
 }
