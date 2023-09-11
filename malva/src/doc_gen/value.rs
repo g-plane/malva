@@ -541,7 +541,7 @@ fn format_number_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
     let number: Cow<_> = if ctx.options.omit_zero_before_dot {
         if let Some(raw) = raw.strip_prefix("0.") {
             format!(".{raw}").into()
-        } else if let Some(raw) = raw.strip_suffix("-0.") {
+        } else if let Some(raw) = raw.strip_prefix("-0.") {
             format!("-.{raw}").into()
         } else if let Some(raw) = raw.strip_prefix("+0.") {
             format!("+.{raw}").into()
@@ -551,7 +551,7 @@ fn format_number_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
     } else {
         if let Some(raw) = raw.strip_prefix('.') {
             format!("0.{raw}").into()
-        } else if let Some(raw) = raw.strip_suffix("-.") {
+        } else if let Some(raw) = raw.strip_prefix("-.") {
             format!("-0.{raw}").into()
         } else if let Some(raw) = raw.strip_prefix("+.") {
             format!("+0.{raw}").into()
