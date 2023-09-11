@@ -108,7 +108,7 @@ impl DocGen for SimpleBlock<'_> {
                     .line_bounds
                     .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
                 {
-                    stmts.push(Doc::hard_line());
+                    stmts.push(Doc::empty_line());
                 }
             }
         }
@@ -164,7 +164,7 @@ impl DocGen for Stylesheet<'_> {
                     .line_bounds
                     .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
                 {
-                    stmts.push(Doc::hard_line());
+                    stmts.push(Doc::empty_line());
                 }
             }
         }
