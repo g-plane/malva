@@ -372,8 +372,74 @@ impl<'s> DocGen for TokenWithSpan<'s> {
             Token::ColonColon(..) => Doc::text("::"),
             Token::Comma(..) => Doc::text(","),
             Token::Dedent(..) => unreachable!(),
-            Token::Dimension(..) => {
-                todo!()
+            Token::Dimension(dimension) => {
+                let unit_name = dimension.unit.raw;
+                let unit = if unit_name.eq_ignore_ascii_case("px")
+                    || unit_name.eq_ignore_ascii_case("em")
+                    || unit_name.eq_ignore_ascii_case("rem")
+                    || unit_name.eq_ignore_ascii_case("ex")
+                    || unit_name.eq_ignore_ascii_case("rex")
+                    || unit_name.eq_ignore_ascii_case("cap")
+                    || unit_name.eq_ignore_ascii_case("rcap")
+                    || unit_name.eq_ignore_ascii_case("ch")
+                    || unit_name.eq_ignore_ascii_case("rch")
+                    || unit_name.eq_ignore_ascii_case("ic")
+                    || unit_name.eq_ignore_ascii_case("ric")
+                    || unit_name.eq_ignore_ascii_case("lh")
+                    || unit_name.eq_ignore_ascii_case("rlh")
+                    || unit_name.eq_ignore_ascii_case("vw")
+                    || unit_name.eq_ignore_ascii_case("vh")
+                    || unit_name.eq_ignore_ascii_case("vi")
+                    || unit_name.eq_ignore_ascii_case("vb")
+                    || unit_name.eq_ignore_ascii_case("vmin")
+                    || unit_name.eq_ignore_ascii_case("vmax")
+                    || unit_name.eq_ignore_ascii_case("lvw")
+                    || unit_name.eq_ignore_ascii_case("lvh")
+                    || unit_name.eq_ignore_ascii_case("lvi")
+                    || unit_name.eq_ignore_ascii_case("lvb")
+                    || unit_name.eq_ignore_ascii_case("lvmin")
+                    || unit_name.eq_ignore_ascii_case("lvmax")
+                    || unit_name.eq_ignore_ascii_case("svw")
+                    || unit_name.eq_ignore_ascii_case("svh")
+                    || unit_name.eq_ignore_ascii_case("svi")
+                    || unit_name.eq_ignore_ascii_case("svb")
+                    || unit_name.eq_ignore_ascii_case("vmin")
+                    || unit_name.eq_ignore_ascii_case("vmax")
+                    || unit_name.eq_ignore_ascii_case("dvw")
+                    || unit_name.eq_ignore_ascii_case("dvh")
+                    || unit_name.eq_ignore_ascii_case("dvi")
+                    || unit_name.eq_ignore_ascii_case("dvb")
+                    || unit_name.eq_ignore_ascii_case("dvmin")
+                    || unit_name.eq_ignore_ascii_case("dvmax")
+                    || unit_name.eq_ignore_ascii_case("cm")
+                    || unit_name.eq_ignore_ascii_case("mm")
+                    || unit_name.eq_ignore_ascii_case("Q")
+                    || unit_name.eq_ignore_ascii_case("in")
+                    || unit_name.eq_ignore_ascii_case("pc")
+                    || unit_name.eq_ignore_ascii_case("pt")
+                    || unit_name.eq_ignore_ascii_case("deg")
+                    || unit_name.eq_ignore_ascii_case("grad")
+                    || unit_name.eq_ignore_ascii_case("rad")
+                    || unit_name.eq_ignore_ascii_case("turn")
+                    || unit_name.eq_ignore_ascii_case("s")
+                    || unit_name.eq_ignore_ascii_case("ms")
+                    || unit_name.eq_ignore_ascii_case("dpi")
+                    || unit_name.eq_ignore_ascii_case("dpcm")
+                    || unit_name.eq_ignore_ascii_case("dppx")
+                    || unit_name.eq_ignore_ascii_case("fr")
+                {
+                    Cow::from(unit_name.to_ascii_lowercase())
+                } else if unit_name.eq_ignore_ascii_case("Hz") {
+                    Cow::from("Hz")
+                } else if unit_name.eq_ignore_ascii_case("kHz") {
+                    Cow::from("kHz")
+                } else {
+                    Cow::from(unit_name)
+                };
+                Doc::text(format!(
+                    "{}{unit}",
+                    format_number_raw(dimension.value.raw, ctx)
+                ))
             }
             Token::DollarEqual(..) => Doc::text("$="),
             Token::DollarLBraceVar(dollar_lbrace_var) => {
@@ -415,7 +481,7 @@ impl<'s> DocGen for TokenWithSpan<'s> {
             Token::Semicolon(..) => Doc::text(";"),
             Token::Solidus(..) => Doc::text("/"),
             Token::Str(str) => todo!(),
-            Token::StrTemplate(..) => todo!(),
+            Token::StrTemplate(..) => unreachable!(),
             Token::Tilde(..) => Doc::text("~"),
             Token::TildeEqual(..) => Doc::text("~="),
             Token::UrlRaw(..) | Token::UrlTemplate(..) => unreachable!(),
