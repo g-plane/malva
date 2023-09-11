@@ -124,6 +124,7 @@ impl DocGen for Statement<'_> {
         let stmt = match self {
             Statement::AtRule(at_rule) => at_rule.doc(ctx),
             Statement::Declaration(declaration) => declaration.doc(ctx),
+            Statement::KeyframeBlock(keyframe_block) => keyframe_block.doc(ctx),
             Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx),
             _ => todo!(),
         };

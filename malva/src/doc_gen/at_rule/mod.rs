@@ -36,6 +36,7 @@ impl DocGen for AtRulePrelude<'_> {
             AtRulePrelude::Document(document) => document.doc(ctx),
             AtRulePrelude::FontFeatureValues(font_feature_values) => font_feature_values.doc(ctx),
             AtRulePrelude::FontPaletteValues(font_palette_values) => font_palette_values.doc(ctx),
+            AtRulePrelude::Keyframes(keyframes) => keyframes.doc(ctx),
             AtRulePrelude::Nest(nest) => nest.doc(ctx),
             AtRulePrelude::PositionFallback(position_fallback) => position_fallback.doc(ctx),
             AtRulePrelude::Property(property) => property.doc(ctx),
@@ -101,6 +102,57 @@ impl DocGen for FontFamilyName<'_> {
         match self {
             FontFamilyName::Str(str) => str.doc(ctx),
             FontFamilyName::Unquoted(unquoted) => unquoted.doc(ctx),
+        }
+    }
+}
+
+impl DocGen for KeyframeBlock<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        use crate::config::QualifiedRuleSelectorLineBreak;
+
+        Doc::list(
+            itertools::intersperse(
+                self.selectors.iter().map(|selector| selector.doc(ctx)),
+                Doc::text(",").append(match ctx.options.qualified_rule_selector_linebreak {
+                    QualifiedRuleSelectorLineBreak::Always => Doc::hard_line(),
+                    QualifiedRuleSelectorLineBreak::Consistent => Doc::line_or_space(),
+                    QualifiedRuleSelectorLineBreak::Wrap => Doc::soft_line(),
+                }),
+            )
+            .collect(),
+        )
+        .group()
+        .append(Doc::space())
+        .append(self.block.doc(ctx))
+    }
+}
+
+impl DocGen for KeyframesName<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        match self {
+            KeyframesName::Ident(ident) => ident.doc(ctx),
+            KeyframesName::Str(str) => str.doc(ctx),
+            KeyframesName::LessVariable(less_variable) => less_variable.doc(ctx),
+            KeyframesName::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
+        }
+    }
+}
+
+impl DocGen for KeyframeSelector<'_> {
+    fn doc(&self, ctx: &Ctx) -> Doc {
+        match self {
+            KeyframeSelector::Percentage(percentage) => percentage.doc(ctx),
+            KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
+                if name.eq_ignore_ascii_case("from") =>
+            {
+                Doc::text("from")
+            }
+            KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
+                if name.eq_ignore_ascii_case("to") =>
+            {
+                Doc::text("to")
+            }
+            KeyframeSelector::Ident(ident) => ident.doc(ctx),
         }
     }
 }
