@@ -8,3 +8,15 @@ pub(crate) struct Ctx<'a, 's> {
     pub indent_width: usize,
     pub line_bounds: LineBounds,
 }
+
+impl<'a, 's> Ctx<'a, 's> {
+    pub(crate) fn get_comments_between(
+        &self,
+        start: usize,
+        end: usize,
+    ) -> impl Iterator<Item = &'a Comment<'s>> {
+        self.comments
+            .iter()
+            .filter(move |comment| comment.span.start >= start && comment.span.end <= end)
+    }
+}
