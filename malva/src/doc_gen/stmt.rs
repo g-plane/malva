@@ -1,6 +1,10 @@
 use super::DocGen;
 use crate::ctx::Ctx;
-use raffia::{ast::*, token::TokenWithSpan, Spanned, Syntax};
+use raffia::{
+    ast::*,
+    token::{CommentKind, TokenWithSpan},
+    Spanned, Syntax,
+};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for Declaration<'s> {
@@ -20,7 +24,17 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 if name.starts_with("--") || name.eq_ignore_ascii_case("filter") =>
             {
                 use raffia::token::Token;
+                let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
+                    let span = value.span();
+                    let comments = ctx.get_comments_between(end, span.start);
+                    comments.for_each(|comment| {
+                        values.push(comment.doc(ctx));
+                        if matches!(comment.kind, CommentKind::Block) {
+                            values.push(Doc::soft_line());
+                        }
+                    });
+
                     values.push(value.doc(ctx));
                     if let ComponentValue::TokenWithSpan(TokenWithSpan {
                         token: Token::Comma(..) | Token::Semicolon(..),
@@ -32,10 +46,22 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     {
                         values.push(Doc::soft_line());
                     }
+
+                    end = span.end;
                 }
             }
             _ => {
+                let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
+                    let span = value.span();
+                    let comments = ctx.get_comments_between(end, span.start);
+                    comments.for_each(|comment| {
+                        values.push(comment.doc(ctx));
+                        if matches!(comment.kind, CommentKind::Block) {
+                            values.push(Doc::soft_line());
+                        }
+                    });
+
                     values.push(value.doc(ctx));
                     if !matches!(
                         iter.peek(),
@@ -46,6 +72,8 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     ) {
                         values.push(Doc::soft_line());
                     }
+
+                    end = span.end;
                 }
             }
         }
@@ -55,7 +83,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
             values.push(important.doc(ctx));
         }
 
-        docs.push(Doc::list(values).nest(ctx.indent_width));
+        docs.push(Doc::list(values).group().nest(ctx.indent_width));
 
         Doc::list(docs)
     }
