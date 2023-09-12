@@ -130,20 +130,38 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
             docs.push(Doc::text("{"));
         }
 
-        let mut stmts = Vec::with_capacity(self.statements.len() * 2);
-        let mut iter = self.statements.iter().peekable();
-        while let Some(stmt) = iter.next() {
-            stmts.push(Doc::hard_line());
-            stmts.push(stmt.doc(ctx));
-            if let Some(next) = iter.peek() {
-                if ctx
-                    .line_bounds
-                    .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
-                {
+        let (stmts, _) = self.statements.iter().fold(
+            (
+                Vec::with_capacity(self.statements.len() * 2),
+                self.span.start,
+            ),
+            |(mut stmts, mut end), stmt| {
+                let span = stmt.span();
+
+                let comments = ctx.get_comments_between(end, span.start);
+                comments.for_each(|comment| {
+                    match ctx.line_bounds.line_distance(end - 1, comment.span.start) {
+                        0 => stmts.push(Doc::space()),
+                        1 => stmts.push(Doc::hard_line()),
+                        _ => {
+                            stmts.push(Doc::empty_line());
+                            stmts.push(Doc::hard_line());
+                        }
+                    }
+                    stmts.push(comment.doc(ctx));
+                    end = comment.span.end;
+                });
+
+                if ctx.line_bounds.line_distance(end - 1, span.start) <= 1 {
+                    stmts.push(Doc::hard_line());
+                } else {
                     stmts.push(Doc::empty_line());
+                    stmts.push(Doc::hard_line());
                 }
-            }
-        }
+                stmts.push(stmt.doc(ctx));
+                (stmts, span.end)
+            },
+        );
         docs.push(Doc::list(stmts).nest(ctx.indent_width));
         docs.push(Doc::hard_line());
 
@@ -187,22 +205,42 @@ impl<'s> DocGen<'s> for Statement<'s> {
 
 impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let mut stmts = Vec::with_capacity(self.statements.len() * 2);
-        let mut iter = self.statements.iter().peekable();
-        while let Some(stmt) = iter.next() {
-            stmts.push(stmt.doc(ctx));
-            if let Some(next) = iter.peek() {
-                stmts.push(Doc::hard_line());
-                if ctx
-                    .line_bounds
-                    .is_away_more_than_one_line(stmt.span().end - 1, next.span().start)
-                {
-                    stmts.push(Doc::empty_line());
+        let (stmts, _) = self.statements.iter().fold(
+            (
+                Vec::with_capacity(self.statements.len() * 2),
+                self.span.start,
+            ),
+            |(mut stmts, mut end), stmt| {
+                let span = stmt.span();
+
+                let comments = ctx.get_comments_between(end, span.start);
+                comments.for_each(|comment| {
+                    if end > 0 {
+                        match ctx.line_bounds.line_distance(end - 1, comment.span.start) {
+                            0 => stmts.push(Doc::space()),
+                            1 => stmts.push(Doc::hard_line()),
+                            _ => {
+                                stmts.push(Doc::empty_line());
+                                stmts.push(Doc::hard_line());
+                            }
+                        }
+                    }
+                    stmts.push(comment.doc(ctx));
+                    end = comment.span.end;
+                });
+
+                if end > 0 {
+                    if ctx.line_bounds.line_distance(end - 1, span.start) <= 1 {
+                        stmts.push(Doc::hard_line());
+                    } else {
+                        stmts.push(Doc::empty_line());
+                        stmts.push(Doc::hard_line());
+                    }
                 }
-            } else if ctx.syntax != Syntax::Sass {
-                stmts.push(Doc::hard_line());
-            }
-        }
+                stmts.push(stmt.doc(ctx));
+                (stmts, span.end)
+            },
+        );
         Doc::list(stmts)
     }
 }
