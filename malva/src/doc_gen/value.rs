@@ -121,10 +121,13 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::Number(number) => number.doc(ctx),
             ComponentValue::Percentage(percentage) => percentage.doc(ctx),
             ComponentValue::Ratio(ratio) => ratio.doc(ctx),
+            ComponentValue::SassMap(sass_map) => sass_map.doc(ctx),
             ComponentValue::SassNestingDeclaration(sass_nesting_decl) => sass_nesting_decl.doc(ctx),
             ComponentValue::SassParenthesizedExpression(sass_parenthesized_expr) => {
                 sass_parenthesized_expr.doc(ctx)
             }
+            ComponentValue::SassUnaryExpression(sass_unary_expr) => sass_unary_expr.doc(ctx),
+            ComponentValue::SassVariable(sass_variable) => sass_variable.doc(ctx),
             ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx),
             ComponentValue::Url(url) => url.doc(ctx),
             ComponentValue::UnicodeRange(unicode_range) => unicode_range.doc(ctx),

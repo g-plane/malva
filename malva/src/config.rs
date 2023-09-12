@@ -59,6 +59,7 @@ pub struct LanguageOptions {
     pub operator_linebreak: OperatorLineBreak,
     pub block_selector_linebreak: BlockSelectorLineBreak,
     pub omit_zero_before_dot: bool,
+    pub trailing_comma: bool,
 }
 
 #[derive(Clone, Debug, Default)]
