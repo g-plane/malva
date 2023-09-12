@@ -30,9 +30,10 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     let comments = ctx.get_comments_between(end, span.start);
                     comments.for_each(|comment| {
                         values.push(comment.doc(ctx));
-                        if matches!(comment.kind, CommentKind::Block) {
-                            values.push(Doc::soft_line());
-                        }
+                        values.push(match comment.kind {
+                            CommentKind::Block => Doc::soft_line(),
+                            CommentKind::Line => Doc::hard_line(),
+                        });
                     });
 
                     values.push(value.doc(ctx));
@@ -57,9 +58,10 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     let comments = ctx.get_comments_between(end, span.start);
                     comments.for_each(|comment| {
                         values.push(comment.doc(ctx));
-                        if matches!(comment.kind, CommentKind::Block) {
-                            values.push(Doc::soft_line());
-                        }
+                        values.push(match comment.kind {
+                            CommentKind::Block => Doc::soft_line(),
+                            CommentKind::Line => Doc::hard_line(),
+                        });
                     });
 
                     values.push(value.doc(ctx));

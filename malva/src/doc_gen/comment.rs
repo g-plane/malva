@@ -15,7 +15,7 @@ impl<'s> DocGen<'s> for Comment<'s> {
                 docs.push(Doc::text("*/"));
                 Doc::list(docs)
             }
-            CommentKind::Line => Doc::text(format!("//{}", self.content)).append(Doc::hard_line()),
+            CommentKind::Line => Doc::text(format!("//{}", self.content)),
         }
     }
 }
