@@ -1,10 +1,6 @@
 use super::DocGen;
 use crate::ctx::Ctx;
-use raffia::{
-    ast::*,
-    token::{CommentKind, TokenWithSpan},
-    Spanned, Syntax,
-};
+use raffia::{ast::*, token::TokenWithSpan, Spanned, Syntax};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for Declaration<'s> {
