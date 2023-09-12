@@ -18,7 +18,10 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
         .syntax(syntax)
         .comments(&mut comments)
         .build();
-    let stylesheet = parser.parse::<Stylesheet>().map_err(Error::from)?;
+    let stylesheet = match parser.parse::<Stylesheet>() {
+        Ok(stylesheet) => stylesheet,
+        Err(error) => return Err(error.into()),
+    };
 
     Ok(print_stylesheet(
         &stylesheet,
