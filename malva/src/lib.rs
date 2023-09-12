@@ -4,10 +4,8 @@ mod doc_gen;
 mod error;
 mod line_bounds;
 
-use crate::{config::FormatOptions, ctx::Ctx};
-use doc_gen::DocGen;
-pub use error::Error;
-pub use line_bounds::LineBounds;
+use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen};
+pub use crate::{error::Error, line_bounds::LineBounds};
 pub use raffia::Syntax;
 use raffia::{ast::Stylesheet, token::Comment, ParserBuilder};
 
