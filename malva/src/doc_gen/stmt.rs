@@ -27,14 +27,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    let comments = ctx.get_comments_between(end, span.start);
-                    comments.for_each(|comment| {
-                        values.push(comment.doc(ctx));
-                        values.push(match comment.kind {
-                            CommentKind::Block => Doc::soft_line(),
-                            CommentKind::Line => Doc::hard_line(),
-                        });
-                    });
+                    values.extend(ctx.gen_comments_doc_inline(end, span.start));
 
                     values.push(value.doc(ctx));
                     if let ComponentValue::TokenWithSpan(TokenWithSpan {
@@ -55,14 +48,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    let comments = ctx.get_comments_between(end, span.start);
-                    comments.for_each(|comment| {
-                        values.push(comment.doc(ctx));
-                        values.push(match comment.kind {
-                            CommentKind::Block => Doc::soft_line(),
-                            CommentKind::Line => Doc::hard_line(),
-                        });
-                    });
+                    values.extend(ctx.gen_comments_doc_inline(end, span.start));
 
                     values.push(value.doc(ctx));
                     if !matches!(
