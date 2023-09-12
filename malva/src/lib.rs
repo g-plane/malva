@@ -20,7 +20,13 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
         .build();
     let stylesheet = parser.parse::<Stylesheet>().map_err(Error::from)?;
 
-    print_stylesheet(&stylesheet, &comments, line_bounds, syntax, options)
+    Ok(print_stylesheet(
+        &stylesheet,
+        &comments,
+        line_bounds,
+        syntax,
+        options,
+    ))
 }
 
 pub fn print_stylesheet<'a, 's>(
@@ -29,7 +35,7 @@ pub fn print_stylesheet<'a, 's>(
     line_bounds: LineBounds,
     syntax: Syntax,
     options: &'a FormatOptions,
-) -> Result<String, Error> {
+) -> String {
     use tiny_pretty::{IndentKind, PrintOptions};
 
     let ctx = Ctx {
@@ -53,5 +59,4 @@ pub fn print_stylesheet<'a, 's>(
             tab_size: options.layout.indent_width,
         },
     )
-    .map_err(Error::from)
 }
