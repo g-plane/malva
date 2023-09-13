@@ -130,8 +130,8 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::SassUnaryExpression(sass_unary_expr) => sass_unary_expr.doc(ctx),
             ComponentValue::SassVariable(sass_variable) => sass_variable.doc(ctx),
             ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx),
-            ComponentValue::Url(url) => url.doc(ctx),
             ComponentValue::UnicodeRange(unicode_range) => unicode_range.doc(ctx),
+            ComponentValue::Url(url) => url.doc(ctx),
             _ => todo!(),
         }
     }
