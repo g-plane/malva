@@ -4,6 +4,7 @@ use raffia::ast::*;
 use tiny_pretty::Doc;
 
 mod media;
+mod supports;
 
 impl<'s> DocGen<'s> for AtRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
@@ -41,6 +42,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::PositionFallback(position_fallback) => position_fallback.doc(ctx),
             AtRulePrelude::Property(property) => property.doc(ctx),
             AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),
+            AtRulePrelude::Supports(supports) => supports.doc(ctx),
             _ => todo!(),
         }
     }
