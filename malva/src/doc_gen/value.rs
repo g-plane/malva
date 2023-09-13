@@ -118,6 +118,7 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::ImportantAnnotation(important) => important.doc(ctx),
             ComponentValue::InterpolableIdent(interpolable_ident) => interpolable_ident.doc(ctx),
             ComponentValue::InterpolableStr(interpolable_str) => interpolable_str.doc(ctx),
+            ComponentValue::LayerName(layer_name) => layer_name.doc(ctx),
             ComponentValue::Number(number) => number.doc(ctx),
             ComponentValue::Percentage(percentage) => percentage.doc(ctx),
             ComponentValue::Ratio(ratio) => ratio.doc(ctx),

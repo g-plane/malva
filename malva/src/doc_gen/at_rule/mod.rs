@@ -4,6 +4,7 @@ use raffia::ast::*;
 use tiny_pretty::Doc;
 
 mod container;
+mod import;
 mod media;
 mod supports;
 
@@ -38,8 +39,12 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::Document(document) => document.doc(ctx),
             AtRulePrelude::FontFeatureValues(font_feature_values) => font_feature_values.doc(ctx),
             AtRulePrelude::FontPaletteValues(font_palette_values) => font_palette_values.doc(ctx),
+            AtRulePrelude::Import(import) => import.doc(ctx),
             AtRulePrelude::Keyframes(keyframes) => keyframes.doc(ctx),
+            AtRulePrelude::Layer(layer) => layer.doc(ctx),
+            AtRulePrelude::Namespace(namespace) => namespace.doc(ctx),
             AtRulePrelude::Nest(nest) => nest.doc(ctx),
+            AtRulePrelude::Page(page) => page.doc(ctx),
             AtRulePrelude::PositionFallback(position_fallback) => position_fallback.doc(ctx),
             AtRulePrelude::Property(property) => property.doc(ctx),
             AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),
@@ -157,6 +162,79 @@ impl<'s> DocGen<'s> for KeyframeSelector<'s> {
             }
             KeyframeSelector::Ident(ident) => ident.doc(ctx),
         }
+    }
+}
+
+impl<'s> DocGen<'s> for LayerName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::list(
+            itertools::intersperse(
+                self.idents.iter().map(|ident| ident.doc(ctx)),
+                Doc::text("."),
+            )
+            .collect(),
+        )
+    }
+}
+
+impl<'s> DocGen<'s> for NamespacePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        if let Some(prefix) = &self.prefix {
+            prefix
+                .doc(ctx)
+                .append(Doc::line_or_space())
+                .append(self.uri.doc(ctx))
+                .group()
+                .nest(ctx.indent_width)
+        } else {
+            self.uri.doc(ctx)
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for NamespacePreludeUri<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            NamespacePreludeUri::Str(str) => str.doc(ctx),
+            NamespacePreludeUri::Url(url) => url.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for PageSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let pseudo = Doc::list(self.pseudo.iter().map(|pseudo| pseudo.doc(ctx)).collect());
+        if let Some(name) = &self.name {
+            name.doc(ctx).append(pseudo)
+        } else {
+            pseudo
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for PageSelectorList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        use crate::config::BlockSelectorLineBreak;
+
+        Doc::list(
+            itertools::intersperse(
+                self.selectors.iter().map(|selector| selector.doc(ctx)),
+                Doc::text(",").append(match ctx.options.block_selector_linebreak {
+                    BlockSelectorLineBreak::Always => Doc::hard_line(),
+                    BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
+                    BlockSelectorLineBreak::Wrap => Doc::soft_line(),
+                }),
+            )
+            .collect(),
+        )
+        .group()
+        .nest(ctx.indent_width)
+    }
+}
+
+impl<'s> DocGen<'s> for PseudoPage<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text(":").append(self.name.doc(ctx))
     }
 }
 
