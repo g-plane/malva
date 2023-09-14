@@ -6,6 +6,7 @@ authors = ["Pig Fang <g-plane@hotmail.com>"]
 description = "CSS/SCSS/Sass/Less formatter."
 repository = "https://github.com/g-plane/malva"
 license = "MIT"
+exclude = ["/tests"]
 
 [dependencies]
 itertools = "0.11"
