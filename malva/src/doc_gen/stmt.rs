@@ -189,7 +189,7 @@ impl<'s> DocGen<'s> for Statement<'s> {
 
 impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let (mut stmts, _) = self.statements.iter().fold(
+        let (mut stmts, mut end) = self.statements.iter().fold(
             (
                 Vec::with_capacity(self.statements.len() * 2),
                 self.span.start,
@@ -226,10 +226,9 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
             },
         );
 
-        if let Some(last) = self.statements.last() {
-            let mut end = last.span().end;
-            let comments = ctx.get_comments_between(end, self.span.end);
-            comments.for_each(|comment| {
+        let comments = ctx.get_comments_between(end, self.span.end);
+        comments.for_each(|comment| {
+            if end > 0 {
                 match ctx.line_bounds.line_distance(end, comment.span.start) {
                     0 => stmts.push(Doc::space()),
                     1 => stmts.push(Doc::hard_line()),
@@ -238,10 +237,10 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
                         stmts.push(Doc::hard_line());
                     }
                 }
-                stmts.push(comment.doc(ctx));
-                end = comment.span.end;
-            });
-        }
+            }
+            stmts.push(comment.doc(ctx));
+            end = comment.span.end;
+        });
 
         stmts.push(Doc::empty_line());
 
