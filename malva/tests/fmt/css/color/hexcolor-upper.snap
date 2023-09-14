@@ -1,0 +1,14 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg hexCase = "upper" */
+.foo {
+  color: #AAA;
+  -o-color: #FABCD3;
+  -webkit-color: #873;
+  -moz-color: #6BCDEF;
+  -ms-color: #AABBCC;
+  color: #F09F;
+  color: #FF0099FF;
+}
+
