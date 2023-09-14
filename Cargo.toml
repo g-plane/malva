@@ -1,3 +1,3 @@
 [workspace]
-members = ["benchmark", "malva", "malva-cli"]
+members = ["benchmark", "malva", "malva-cli", "wasm"]
 resolver = "2"

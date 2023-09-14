@@ -1,0 +1,18 @@
+[package]
+name = "wasm"
+version = "0.1.0"
+edition = "2021"
+authors = ["Pig Fang <g-plane@hotmail.com>"]
+description = "WebAssembly build of Malva."
+repository = "https://github.com/g-plane/malva"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+malva = { path = "../malva", features = ["config_serde"] }
+serde = "1.0"
+serde-wasm-bindgen = "0.4"
+wasm-bindgen = "0.2"
