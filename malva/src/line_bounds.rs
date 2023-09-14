@@ -1,3 +1,5 @@
+use std::{cmp::Ordering, ops::ControlFlow};
+
 pub struct LineBounds(Vec<usize>);
 
 impl LineBounds {
@@ -6,13 +8,30 @@ impl LineBounds {
     }
 
     pub(crate) fn line_distance(&self, start: usize, end: usize) -> usize {
-        debug_assert!(end > start);
+        debug_assert!(end >= start);
 
-        let start = self.0.iter().position(|offset| start < *offset);
-        let end = self.0.iter().position(|offset| end < *offset);
-        start
-            .zip(end)
-            .map(|(start, end)| end - start)
-            .unwrap_or_default()
+        let start = self
+            .0
+            .iter()
+            .try_fold(0, |i, offset| match start.cmp(offset) {
+                Ordering::Less => ControlFlow::Break(i),
+                Ordering::Equal => ControlFlow::Continue(i),
+                Ordering::Greater => ControlFlow::Continue(i + 1),
+            });
+        let end = self
+            .0
+            .iter()
+            .try_fold(0, |i, offset| match end.cmp(offset) {
+                Ordering::Less => ControlFlow::Break(i),
+                Ordering::Equal => ControlFlow::Continue(i),
+                Ordering::Greater => ControlFlow::Continue(i + 1),
+            });
+
+        match (start, end) {
+            (ControlFlow::Break(start), ControlFlow::Break(end)) => end - start,
+            (ControlFlow::Break(start), ControlFlow::Continue(end)) => end - start,
+            (ControlFlow::Continue(start), ControlFlow::Break(end)) => end - start,
+            (ControlFlow::Continue(start), ControlFlow::Continue(end)) => end - start,
+        }
     }
 }

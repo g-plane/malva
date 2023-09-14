@@ -124,7 +124,7 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
 
                 let comments = ctx.get_comments_between(end, span.start);
                 comments.for_each(|comment| {
-                    match ctx.line_bounds.line_distance(end - 1, comment.span.start) {
+                    match ctx.line_bounds.line_distance(end, comment.span.start) {
                         0 => stmts.push(Doc::space()),
                         1 => stmts.push(Doc::hard_line()),
                         _ => {
@@ -136,7 +136,7 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
                     end = comment.span.end;
                 });
 
-                if ctx.line_bounds.line_distance(end - 1, span.start) <= 1 {
+                if ctx.line_bounds.line_distance(end, span.start) <= 1 {
                     stmts.push(Doc::hard_line());
                 } else {
                     stmts.push(Doc::empty_line());
@@ -200,7 +200,7 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
                 let comments = ctx.get_comments_between(end, span.start);
                 comments.for_each(|comment| {
                     if end > 0 {
-                        match ctx.line_bounds.line_distance(end - 1, comment.span.start) {
+                        match ctx.line_bounds.line_distance(end, comment.span.start) {
                             0 => stmts.push(Doc::space()),
                             1 => stmts.push(Doc::hard_line()),
                             _ => {
@@ -214,7 +214,7 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
                 });
 
                 if end > 0 {
-                    if ctx.line_bounds.line_distance(end - 1, span.start) <= 1 {
+                    if ctx.line_bounds.line_distance(end, span.start) <= 1 {
                         stmts.push(Doc::hard_line());
                     } else {
                         stmts.push(Doc::empty_line());
@@ -230,7 +230,7 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
             let mut end = last.span().end;
             let comments = ctx.get_comments_between(end, self.span.end);
             comments.for_each(|comment| {
-                match ctx.line_bounds.line_distance(end - 1, comment.span.start) {
+                match ctx.line_bounds.line_distance(end, comment.span.start) {
                     0 => stmts.push(Doc::space()),
                     1 => stmts.push(Doc::hard_line()),
                     _ => {
