@@ -208,12 +208,7 @@ impl<'s> DocGen<'s> for Nth<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let index = self.index.doc(ctx);
         if let Some(matcher) = &self.matcher {
-            let doc = index.append(Doc::text(" of"));
-            if let Some(selector) = &matcher.selector {
-                doc.append(Doc::space()).append(selector.doc(ctx))
-            } else {
-                doc
-            }
+            index.append(Doc::space()).append(matcher.doc(ctx))
         } else {
             index
         }
@@ -227,6 +222,17 @@ impl<'s> DocGen<'s> for NthIndex<'s> {
             Self::Odd(..) => Doc::text("odd"),
             Self::Even(..) => Doc::text("even"),
             Self::Integer(integer) => Doc::text((integer.value as i32).to_string()),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for NthMatcher<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let matcher = Doc::text("of");
+        if let Some(selector) = &self.selector {
+            matcher.append(Doc::space()).append(selector.doc(ctx))
+        } else {
+            matcher
         }
     }
 }
@@ -264,9 +270,11 @@ impl<'s> DocGen<'s> for PseudoClassSelectorArg<'s> {
             }
             PseudoClassSelectorArg::Nth(nth) => nth.doc(ctx),
             PseudoClassSelectorArg::Number(number) => number.doc(ctx),
-            PseudoClassSelectorArg::RelativeSelectorList(relative_selector_list) => todo!(),
+            PseudoClassSelectorArg::RelativeSelectorList(relative_selector_list) => {
+                relative_selector_list.doc(ctx)
+            }
             PseudoClassSelectorArg::SelectorList(selector_list) => selector_list.doc(ctx),
-            PseudoClassSelectorArg::LessExtendList(less_extend_list) => todo!(),
+            PseudoClassSelectorArg::LessExtendList(less_extend_list) => less_extend_list.doc(ctx),
             PseudoClassSelectorArg::TokenSeq(token_seq) => todo!(),
         }
     }
@@ -299,6 +307,31 @@ impl<'s> DocGen<'s> for PseudoElementSelectorArg<'s> {
             PseudoElementSelectorArg::Ident(ident) => ident.doc(ctx),
             PseudoElementSelectorArg::TokenSeq(token_seq) => todo!(),
         }
+    }
+}
+
+impl<'s> DocGen<'s> for RelativeSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        if let Some(combinator) = &self.combinator {
+            combinator
+                .doc(ctx)
+                .append(Doc::space())
+                .append(self.complex_selector.doc(ctx))
+        } else {
+            self.complex_selector.doc(ctx)
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for RelativeSelectorList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::list(
+            itertools::intersperse(
+                self.selectors.iter().map(|selector| selector.doc(ctx)),
+                Doc::text(", "),
+            )
+            .collect(),
+        )
     }
 }
 

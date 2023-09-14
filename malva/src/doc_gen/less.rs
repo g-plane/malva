@@ -9,6 +9,29 @@ impl<'s> DocGen<'s> for LessEscapedStr<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for LessExtend<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let selector = self.selector.doc(ctx);
+        if self.all.is_some() {
+            selector.append(Doc::text(" all"))
+        } else {
+            selector
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessExtendList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::list(
+            itertools::intersperse(
+                self.elements.iter().map(|extend| extend.doc(ctx)),
+                Doc::text(", "),
+            )
+            .collect(),
+        )
+    }
+}
+
 impl<'s> DocGen<'s> for LessFormatFunction {
     fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("%")
