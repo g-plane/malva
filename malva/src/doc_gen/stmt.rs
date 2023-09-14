@@ -225,6 +225,6 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
                 (stmts, span.end)
             },
         );
-        Doc::list(stmts)
+        Doc::list(stmts).append(Doc::empty_line())
     }
 }
