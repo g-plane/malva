@@ -1,12 +1,13 @@
 use super::DocGen;
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for SassConditionalClause<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.condition
             .doc(ctx)
+            .concat(ctx.start_padded_comments(self.condition.span().end, self.block.span.start))
             .append(Doc::space())
             .append(self.block.doc(ctx))
     }
@@ -21,7 +22,11 @@ impl<'s> DocGen<'s> for SassEach<'s> {
             )
             .collect(),
         )
+        .concat(
+            ctx.start_padded_comments(self.bindings.last().unwrap().span.end, self.in_span.start),
+        )
         .append(Doc::text(" in "))
+        .concat(ctx.end_padded_comments(self.in_span.end, self.expr.span().start))
         .append(self.expr.doc(ctx))
     }
 }
