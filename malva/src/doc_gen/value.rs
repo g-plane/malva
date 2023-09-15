@@ -292,6 +292,12 @@ impl<'s> DocGen<'s> for InterpolableStr<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for InterpolableUrlStaticPart<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text(self.raw)
+    }
+}
+
 impl<'s> DocGen<'s> for Number<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(format_number_raw(self.raw, ctx))
@@ -524,7 +530,7 @@ impl<'s> DocGen<'s> for UrlValue<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             UrlValue::Raw(raw) => raw.doc(ctx),
-            UrlValue::SassInterpolated(sass_interpolated) => todo!(),
+            UrlValue::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx),
             UrlValue::Str(str) => str.doc(ctx),
             UrlValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
         }

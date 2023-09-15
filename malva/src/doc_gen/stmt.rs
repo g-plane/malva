@@ -164,6 +164,7 @@ impl<'s> DocGen<'s> for Statement<'s> {
             Statement::Declaration(declaration) => declaration.doc(ctx),
             Statement::KeyframeBlock(keyframe_block) => keyframe_block.doc(ctx),
             Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx),
+            Statement::SassIfAtRule(sass_if_at_rule) => sass_if_at_rule.doc(ctx),
             _ => todo!(),
         };
         if ctx.syntax == Syntax::Sass {

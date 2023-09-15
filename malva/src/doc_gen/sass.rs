@@ -3,6 +3,44 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
+impl<'s> DocGen<'s> for SassConditionalClause<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.condition
+            .doc(ctx)
+            .append(Doc::space())
+            .append(self.block.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for SassEach<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::list(
+            itertools::intersperse(
+                self.bindings.iter().map(|binding| binding.doc(ctx)),
+                Doc::text(",").append(Doc::line_or_space()),
+            )
+            .collect(),
+        )
+        .append(Doc::text(" in "))
+        .append(self.expr.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for SassIfAtRule<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = vec![Doc::text("@if "), self.if_clause.doc(ctx)];
+        self.else_if_clauses.iter().for_each(|clause| {
+            docs.push(Doc::text(" @else if "));
+            docs.push(clause.doc(ctx));
+        });
+        if let Some(else_clause) = &self.else_clause {
+            docs.push(Doc::text(" @else "));
+            docs.push(else_clause.doc(ctx));
+        }
+        Doc::list(docs)
+    }
+}
+
 impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
@@ -11,6 +49,22 @@ impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
                 .map(|element| match element {
                     SassInterpolatedIdentElement::Static(s) => s.doc(ctx),
                     SassInterpolatedIdentElement::Expression(expr) => {
+                        Doc::text("#{").append(expr.doc(ctx)).append(Doc::text("}"))
+                    }
+                })
+                .collect(),
+        )
+    }
+}
+
+impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::list(
+            self.elements
+                .iter()
+                .map(|element| match element {
+                    SassInterpolatedUrlElement::Static(s) => s.doc(ctx),
+                    SassInterpolatedUrlElement::Expression(expr) => {
                         Doc::text("#{").append(expr.doc(ctx)).append(Doc::text("}"))
                     }
                 })
