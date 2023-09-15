@@ -248,35 +248,36 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
         if let Some(arg) = &self.arg {
             docs.reserve(3);
             docs.push(Doc::text("("));
-            docs.push(arg.doc(ctx));
+            docs.push(match arg {
+                PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
+                    compound_selector.doc(ctx)
+                }
+                PseudoClassSelectorArg::CompoundSelectorList(compound_selector_list) => {
+                    compound_selector_list.doc(ctx)
+                }
+                PseudoClassSelectorArg::Ident(ident) => ident.doc(ctx),
+                PseudoClassSelectorArg::LanguageRangeList(language_range_list) => {
+                    language_range_list.doc(ctx)
+                }
+                PseudoClassSelectorArg::Nth(nth) => nth.doc(ctx),
+                PseudoClassSelectorArg::Number(number) => number.doc(ctx),
+                PseudoClassSelectorArg::RelativeSelectorList(relative_selector_list) => {
+                    relative_selector_list.doc(ctx)
+                }
+                PseudoClassSelectorArg::SelectorList(selector_list) => selector_list.doc(ctx),
+                PseudoClassSelectorArg::LessExtendList(less_extend_list) => {
+                    less_extend_list.doc(ctx)
+                }
+                PseudoClassSelectorArg::TokenSeq(token_seq) => format_pseudo_selector_arg_tokens(
+                    token_seq,
+                    ctx,
+                    self.span.start,
+                    self.span.end,
+                ),
+            });
             docs.push(Doc::text(")"));
         }
         Doc::list(docs)
-    }
-}
-
-impl<'s> DocGen<'s> for PseudoClassSelectorArg<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
-                compound_selector.doc(ctx)
-            }
-            PseudoClassSelectorArg::CompoundSelectorList(compound_selector_list) => {
-                compound_selector_list.doc(ctx)
-            }
-            PseudoClassSelectorArg::Ident(ident) => ident.doc(ctx),
-            PseudoClassSelectorArg::LanguageRangeList(language_range_list) => {
-                language_range_list.doc(ctx)
-            }
-            PseudoClassSelectorArg::Nth(nth) => nth.doc(ctx),
-            PseudoClassSelectorArg::Number(number) => number.doc(ctx),
-            PseudoClassSelectorArg::RelativeSelectorList(relative_selector_list) => {
-                relative_selector_list.doc(ctx)
-            }
-            PseudoClassSelectorArg::SelectorList(selector_list) => selector_list.doc(ctx),
-            PseudoClassSelectorArg::LessExtendList(less_extend_list) => less_extend_list.doc(ctx),
-            PseudoClassSelectorArg::TokenSeq(token_seq) => todo!(),
-        }
     }
 }
 
@@ -291,22 +292,21 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
         if let Some(arg) = &self.arg {
             docs.reserve(3);
             docs.push(Doc::text("("));
-            docs.push(arg.doc(ctx));
+            docs.push(match arg {
+                PseudoElementSelectorArg::CompoundSelector(compound_selector) => {
+                    compound_selector.doc(ctx)
+                }
+                PseudoElementSelectorArg::Ident(ident) => ident.doc(ctx),
+                PseudoElementSelectorArg::TokenSeq(token_seq) => format_pseudo_selector_arg_tokens(
+                    token_seq,
+                    ctx,
+                    self.span.start,
+                    self.span.end,
+                ),
+            });
             docs.push(Doc::text(")"));
         }
         Doc::list(docs)
-    }
-}
-
-impl<'s> DocGen<'s> for PseudoElementSelectorArg<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            PseudoElementSelectorArg::CompoundSelector(compound_selector) => {
-                compound_selector.doc(ctx)
-            }
-            PseudoElementSelectorArg::Ident(ident) => ident.doc(ctx),
-            PseudoElementSelectorArg::TokenSeq(token_seq) => todo!(),
-        }
     }
 }
 
@@ -396,4 +396,44 @@ impl<'s> DocGen<'s> for WqName<'s> {
             self.name.doc(ctx)
         }
     }
+}
+
+fn format_pseudo_selector_arg_tokens<'a, 's: 'a>(
+    token_seq: &TokenSeq<'s>,
+    ctx: &Ctx<'a, 's>,
+    from: usize,
+    to: usize,
+) -> Doc<'s> {
+    use raffia::token::{Token, TokenWithSpan};
+
+    let mut end = from;
+    let mut docs = Vec::with_capacity(token_seq.tokens.len() * 2);
+    let mut iter = token_seq.tokens.iter().peekable();
+    while let Some(token) = iter.next() {
+        docs.extend(ctx.end_padded_comments(end, token.span.start));
+
+        docs.push(token.doc(ctx));
+        if let TokenWithSpan {
+            token: Token::Comma(..) | Token::Semicolon(..),
+            ..
+        } = token
+        {
+            docs.push(Doc::space());
+        } else {
+            match iter.peek() {
+                Some(TokenWithSpan {
+                    token: Token::Comma(..) | Token::Semicolon(..),
+                    ..
+                }) => {}
+                Some(next) if token.span.end < next.span.start => docs.push(Doc::space()),
+                _ => {}
+            }
+        }
+
+        end = token.span.end;
+    }
+
+    docs.extend(ctx.start_padded_comments(end, to));
+
+    Doc::list(docs)
 }
