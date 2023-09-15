@@ -1,6 +1,6 @@
 use super::super::DocGen;
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 mod container;
@@ -11,18 +11,27 @@ mod supports;
 impl<'s> DocGen<'s> for AtRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
+        let mut end = self.name.span.end;
+
         docs.push(Doc::text(format!(
             "@{}",
             self.name.raw.to_ascii_lowercase()
         )));
+
         if let Some(prelude) = &self.prelude {
+            let span = prelude.span();
+            docs.extend(ctx.start_padded_comments(end, span.start));
             docs.push(Doc::space());
             docs.push(prelude.doc(ctx));
+            end = span.end;
         }
+
         if let Some(block) = &self.block {
+            docs.extend(ctx.start_padded_comments(end, block.span.start));
             docs.push(Doc::space());
             docs.push(block.doc(ctx));
         }
+
         Doc::list(docs)
     }
 }

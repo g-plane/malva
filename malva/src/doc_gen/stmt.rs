@@ -23,7 +23,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.gen_comments_doc_inline(end, span.start));
+                    values.extend(ctx.end_padded_comments(end, span.start));
 
                     values.push(value.doc(ctx));
                     if let ComponentValue::TokenWithSpan(TokenWithSpan {
@@ -44,7 +44,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.gen_comments_doc_inline(end, span.start));
+                    values.extend(ctx.end_padded_comments(end, span.start));
 
                     values.push(value.doc(ctx));
                     if !matches!(

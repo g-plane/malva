@@ -24,7 +24,32 @@ impl<'a, 's> Ctx<'a, 's> {
             .filter(move |comment| comment.span.start >= start && comment.span.end <= end)
     }
 
-    pub(crate) fn gen_comments_doc_inline(
+    pub(crate) fn start_padded_comments(
+        &'a self,
+        start: usize,
+        end: usize,
+    ) -> impl Iterator<Item = Doc<'s>> + 'a {
+        self.get_comments_between(start, end)
+            .scan(CommentKind::Block, |kind, comment| {
+                Some(
+                    [
+                        match kind {
+                            CommentKind::Block => Doc::soft_line(),
+                            CommentKind::Line => Doc::nil(),
+                        },
+                        comment.doc(self),
+                        match comment.kind {
+                            CommentKind::Block => Doc::nil(),
+                            CommentKind::Line => Doc::hard_line(),
+                        },
+                    ]
+                    .into_iter(),
+                )
+            })
+            .flatten()
+    }
+
+    pub(crate) fn end_padded_comments(
         &'a self,
         start: usize,
         end: usize,
