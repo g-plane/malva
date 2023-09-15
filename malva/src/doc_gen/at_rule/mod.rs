@@ -1,6 +1,6 @@
 use super::super::DocGen;
 use crate::ctx::Ctx;
-use raffia::{ast::*, Spanned};
+use raffia::{ast::*, token::TokenWithSpan, Spanned};
 use tiny_pretty::Doc;
 
 mod container;
@@ -59,6 +59,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::SassExpr(sass_expr) => sass_expr.doc(ctx),
             AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),
             AtRulePrelude::Supports(supports) => supports.doc(ctx),
+            AtRulePrelude::Unknown(unknown) => unknown.doc(ctx),
             _ => todo!(),
         }
     }
@@ -245,6 +246,40 @@ impl<'s> DocGen<'s> for PageSelectorList<'s> {
 impl<'s> DocGen<'s> for PseudoPage<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(":").append(self.name.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            UnknownAtRulePrelude::ComponentValue(component_value) => component_value.doc(ctx),
+            UnknownAtRulePrelude::TokenSeq(token_seq) => {
+                use raffia::token::Token;
+
+                let mut end = token_seq.span.start;
+                let mut docs = Vec::with_capacity(token_seq.tokens.len());
+                let mut iter = token_seq.tokens.iter().peekable();
+                while let Some(token) = iter.next() {
+                    let span = token.span();
+                    docs.extend(ctx.start_padded_comments(end, span.start));
+
+                    docs.push(token.doc(ctx));
+                    if let TokenWithSpan {
+                        token: Token::Comma(..) | Token::Semicolon(..),
+                        ..
+                    } = token
+                    {
+                        docs.push(Doc::soft_line());
+                    } else if matches!(iter.peek(), Some(next) if token.span().end < next.span().start)
+                    {
+                        docs.push(Doc::soft_line());
+                    }
+
+                    end = span.end;
+                }
+                Doc::list(docs)
+            }
+        }
     }
 }
 
