@@ -30,10 +30,10 @@ impl<'a, 's> Ctx<'a, 's> {
         end: usize,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
         self.get_comments_between(start, end)
-            .scan(CommentKind::Block, |kind, comment| {
-                Some(
+            .scan(CommentKind::Block, |prev_kind, comment| {
+                let ret = Some(
                     [
-                        match kind {
+                        match prev_kind {
                             CommentKind::Block => Doc::soft_line(),
                             CommentKind::Line => Doc::nil(),
                         },
@@ -44,7 +44,9 @@ impl<'a, 's> Ctx<'a, 's> {
                         },
                     ]
                     .into_iter(),
-                )
+                );
+                *prev_kind = comment.kind.clone();
+                ret
             })
             .flatten()
     }

@@ -19,16 +19,16 @@ impl<'s> DocGen<'s> for AtRule<'s> {
         )));
 
         if let Some(prelude) = &self.prelude {
-            let span = prelude.span();
-            docs.extend(ctx.start_padded_comments(end, span.start));
             docs.push(Doc::space());
+            let span = prelude.span();
+            docs.extend(ctx.end_padded_comments(end, span.start));
             docs.push(prelude.doc(ctx));
             end = span.end;
         }
 
         if let Some(block) = &self.block {
-            docs.extend(ctx.start_padded_comments(end, block.span.start));
             docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(end, block.span.start));
             docs.push(block.doc(ctx));
         }
 
