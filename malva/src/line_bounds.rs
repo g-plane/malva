@@ -1,10 +1,14 @@
-use std::{cmp::Ordering, ops::ControlFlow};
+use std::{cmp::Ordering, iter, ops::ControlFlow};
 
 pub struct LineBounds(Vec<usize>);
 
 impl LineBounds {
     pub fn new(input: &str) -> Self {
-        Self(memchr::memchr_iter(b'\n', input.as_bytes()).collect())
+        Self(
+            iter::once(0)
+                .chain(memchr::memchr_iter(b'\n', input.as_bytes()))
+                .collect(),
+        )
     }
 
     pub(crate) fn line_distance(&self, start: usize, end: usize) -> usize {
