@@ -32,15 +32,20 @@ impl<'s> DocGen<'s> for SassEach<'s> {
 
 impl<'s> DocGen<'s> for SassIfAtRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let mut docs = vec![Doc::text("@if "), self.if_clause.doc(ctx)];
+        let mut docs = vec![Doc::text("@if ")];
+        docs.extend(ctx.end_padded_comments(self.span.start, self.if_clause.span.start));
+        docs.push(self.if_clause.doc(ctx));
+
         self.else_if_clauses.iter().for_each(|clause| {
             docs.push(Doc::text(" @else if "));
             docs.push(clause.doc(ctx));
         });
+
         if let Some(else_clause) = &self.else_clause {
             docs.push(Doc::text(" @else "));
             docs.push(else_clause.doc(ctx));
         }
+
         Doc::list(docs)
     }
 }
@@ -128,10 +133,13 @@ impl<'s> DocGen<'s> for SassNestingDeclaration<'s> {
 
 impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let expr_span = self.expr.span();
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
+                    .concat(ctx.end_padded_comments(self.span.start, expr_span.start))
                     .append(self.expr.doc(ctx))
+                    .concat(ctx.start_padded_comments(expr_span.end, self.span.end))
                     .nest(ctx.indent_width)
                     .append(Doc::line_or_nil())
                     .group(),

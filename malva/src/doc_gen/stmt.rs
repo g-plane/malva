@@ -106,6 +106,7 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
         )
         .group()
         .append(Doc::space())
+        .concat(ctx.end_padded_comments(self.selector.span.end, self.block.span.start))
         .append(self.block.doc(ctx))
     }
 }
