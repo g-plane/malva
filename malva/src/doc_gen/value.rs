@@ -127,6 +127,9 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::SassParenthesizedExpression(sass_parenthesized_expr) => {
                 sass_parenthesized_expr.doc(ctx)
             }
+            ComponentValue::SassParentSelector(sass_parent_selector) => {
+                sass_parent_selector.doc(ctx)
+            }
             ComponentValue::SassUnaryExpression(sass_unary_expr) => sass_unary_expr.doc(ctx),
             ComponentValue::SassVariable(sass_variable) => sass_variable.doc(ctx),
             ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx),
