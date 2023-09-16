@@ -80,6 +80,7 @@ impl<'s> DocGen<'s> for CustomMedia<'s> {
         self.name
             .doc(ctx)
             .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.name.span().end, self.value.span().start))
             .append(self.value.doc(ctx))
     }
 }

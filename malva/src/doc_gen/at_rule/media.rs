@@ -1,6 +1,6 @@
 use super::super::DocGen;
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for MediaAnd<'s> {
@@ -11,6 +11,9 @@ impl<'s> DocGen<'s> for MediaAnd<'s> {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("and"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::text("and"), Doc::line_or_space()],
         };
+        docs.extend(
+            ctx.end_padded_comments(self.keyword.span.end, self.media_in_parens.span.start),
+        );
         docs.push(self.media_in_parens.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
@@ -94,39 +97,47 @@ impl<'s> DocGen<'s> for MediaFeatureName<'s> {
 
 impl<'s> DocGen<'s> for MediaFeaturePlain<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(vec![
-            self.name.doc(ctx),
-            Doc::text(": "),
-            self.value.doc(ctx),
-        ])
+        self.name
+            .doc(ctx)
+            .concat(ctx.start_padded_comments(self.name.span().end, self.colon_span.start))
+            .append(Doc::text(": "))
+            .concat(ctx.end_padded_comments(self.colon_span.start, self.value.span().start))
+            .append(self.value.doc(ctx))
     }
 }
 
 impl<'s> DocGen<'s> for MediaFeatureRange<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(vec![
-            self.left.doc(ctx),
-            Doc::space(),
-            self.comparison.doc(ctx),
-            Doc::space(),
-            self.right.doc(ctx),
-        ])
+        self.left
+            .doc(ctx)
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.left.span().end, self.comparison.span.start))
+            .append(self.comparison.doc(ctx))
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.comparison.span.end, self.right.span().start))
+            .append(self.right.doc(ctx))
     }
 }
 
 impl<'s> DocGen<'s> for MediaFeatureRangeInterval<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(vec![
-            self.left.doc(ctx),
-            Doc::space(),
-            self.left_comparison.doc(ctx),
-            Doc::space(),
-            self.name.doc(ctx),
-            Doc::space(),
-            self.right_comparison.doc(ctx),
-            Doc::space(),
-            self.right.doc(ctx),
-        ])
+        let name_span = self.name.span();
+        self.left
+            .doc(ctx)
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.left.span().end, self.left_comparison.span.start))
+            .append(self.left_comparison.doc(ctx))
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.left_comparison.span.end, name_span.start))
+            .append(self.name.doc(ctx))
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(name_span.end, self.right_comparison.span.start))
+            .append(self.right_comparison.doc(ctx))
+            .append(Doc::space())
+            .concat(
+                ctx.end_padded_comments(self.right_comparison.span.end, self.right.span().start),
+            )
+            .append(self.right.doc(ctx))
     }
 }
 
@@ -136,7 +147,13 @@ impl<'s> DocGen<'s> for MediaInParens<'s> {
             MediaInParensKind::MediaCondition(media_condition) => media_condition.doc(ctx),
             MediaInParensKind::MediaFeature(media_feature) => media_feature.doc(ctx),
         };
-        Doc::list(vec![Doc::text("("), kind, Doc::text(")")])
+        let kind_span = self.kind.span();
+
+        Doc::text("(")
+            .concat(ctx.end_padded_comments(self.span.start, kind_span.start))
+            .append(kind)
+            .concat(ctx.start_padded_comments(kind_span.end, self.span.end))
+            .append(Doc::text(")"))
     }
 }
 
@@ -181,14 +198,18 @@ impl<'s> DocGen<'s> for MediaQuery<'s> {
 
 impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let media_type_span = self.media_type.span();
+
         let mut docs = Vec::with_capacity(5);
         if let Some(modifier) = &self.modifier {
             docs.push(modifier.doc(ctx));
             docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(modifier.span.end, media_type_span.start));
         }
         docs.push(self.media_type.doc(ctx));
         if let Some(condition) = &self.condition {
             docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(media_type_span.end, condition.span.start));
             docs.push(condition.doc(ctx));
         }
         Doc::list(docs)

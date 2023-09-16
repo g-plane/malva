@@ -11,6 +11,7 @@ impl<'s> DocGen<'s> for SupportsAnd<'s> {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("and"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::text("and"), Doc::line_or_space()],
         };
+        docs.extend(ctx.end_padded_comments(self.keyword.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
@@ -45,7 +46,9 @@ impl<'s> DocGen<'s> for SupportsConditionKind<'s> {
 impl<'s> DocGen<'s> for SupportsDecl<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("(")
+            .concat(ctx.end_padded_comments(self.span.start, self.decl.span.start))
             .append(self.decl.doc(ctx))
+            .concat(ctx.start_padded_comments(self.decl.span.end, self.span.end))
             .append(Doc::text(")"))
     }
 }
@@ -55,10 +58,14 @@ impl<'s> DocGen<'s> for SupportsInParens<'s> {
         match &self.kind {
             SupportsInParensKind::Feature(feature) => feature.doc(ctx),
             SupportsInParensKind::SupportsCondition(condition) => Doc::text("(")
+                .concat(ctx.end_padded_comments(self.span.start, condition.span.start))
                 .append(condition.doc(ctx))
+                .concat(ctx.start_padded_comments(condition.span.end, self.span.end))
                 .append(Doc::text(")")),
             SupportsInParensKind::Selector(selector) => Doc::text("selector(")
+                .concat(ctx.end_padded_comments(self.span.start, selector.span.start))
                 .append(selector.doc(ctx))
+                .concat(ctx.start_padded_comments(selector.span.end, self.span.end))
                 .append(Doc::text(")")),
             SupportsInParensKind::Function(function) => function.doc(ctx),
         }
