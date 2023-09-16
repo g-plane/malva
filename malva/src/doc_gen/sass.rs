@@ -7,8 +7,8 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.condition
             .doc(ctx)
-            .concat(ctx.start_padded_comments(self.condition.span().end, self.block.span.start))
             .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.condition.span().end, self.block.span.start))
             .append(self.block.doc(ctx))
     }
 }
@@ -22,10 +22,9 @@ impl<'s> DocGen<'s> for SassEach<'s> {
             )
             .collect(),
         )
-        .concat(
-            ctx.start_padded_comments(self.bindings.last().unwrap().span.end, self.in_span.start),
-        )
-        .append(Doc::text(" in "))
+        .append(Doc::space())
+        .concat(ctx.end_padded_comments(self.bindings.last().unwrap().span.end, self.in_span.start))
+        .append(Doc::text("in "))
         .concat(ctx.end_padded_comments(self.in_span.end, self.expr.span().start))
         .append(self.expr.doc(ctx))
     }
