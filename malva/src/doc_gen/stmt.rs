@@ -1,6 +1,8 @@
 use super::DocGen;
 use crate::ctx::Ctx;
+use itertools::{EitherOrBoth, Itertools};
 use raffia::{ast::*, token::TokenWithSpan, Spanned, Syntax};
+use std::mem;
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for Declaration<'s> {
@@ -95,13 +97,41 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
                 self.selector
                     .selectors
                     .iter()
-                    .map(|selector| selector.doc(ctx)),
-                Doc::text(",").append(match ctx.options.block_selector_linebreak {
-                    BlockSelectorLineBreak::Always => Doc::hard_line(),
-                    BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
-                    BlockSelectorLineBreak::Wrap => Doc::soft_line(),
-                }),
+                    .zip_longest(self.selector.comma_spans.iter())
+                    .scan(self.selector.span.start, |end, item| match item {
+                        EitherOrBoth::Both(selector, comma_span) => {
+                            let mut docs = ctx
+                                .end_padded_comments(
+                                    mem::replace(end, comma_span.end),
+                                    selector.span.start,
+                                )
+                                .collect::<Vec<_>>();
+                            docs.push(selector.doc(ctx));
+                            docs.extend(
+                                ctx.start_padded_comments(selector.span.end, comma_span.start),
+                            );
+                            Some(docs.into_iter())
+                        }
+                        EitherOrBoth::Left(selector) => {
+                            let mut docs = ctx
+                                .end_padded_comments(*end, selector.span.start)
+                                .collect::<Vec<_>>();
+                            docs.push(selector.doc(ctx));
+                            Some(docs.into_iter())
+                        }
+                        EitherOrBoth::Right(..) => unreachable!(),
+                    }),
+                vec![
+                    Doc::text(","),
+                    match ctx.options.block_selector_linebreak {
+                        BlockSelectorLineBreak::Always => Doc::hard_line(),
+                        BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
+                        BlockSelectorLineBreak::Wrap => Doc::soft_line(),
+                    },
+                ]
+                .into_iter(),
             )
+            .flatten()
             .collect(),
         )
         .group()
