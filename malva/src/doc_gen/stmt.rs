@@ -9,6 +9,11 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         docs.push(self.name.doc(ctx));
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx));
+            docs.extend(
+                ctx.start_padded_comments(less_property_merge.span.end, self.colon_span.start),
+            );
+        } else {
+            docs.extend(ctx.start_padded_comments(self.name.span().end, self.colon_span.start));
         }
         docs.push(Doc::text(": "));
 
