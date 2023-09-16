@@ -120,7 +120,7 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
             docs.push(Doc::text("{"));
         }
 
-        let (stmts, _) = self.statements.iter().fold(
+        let (mut stmts, mut end) = self.statements.iter().fold(
             (
                 Vec::with_capacity(self.statements.len() * 2),
                 self.span.start,
@@ -128,19 +128,19 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
             |(mut stmts, mut end), stmt| {
                 let span = stmt.span();
 
-                let comments = ctx.get_comments_between(end, span.start);
-                comments.for_each(|comment| {
-                    match ctx.line_bounds.line_distance(end, comment.span.start) {
-                        0 => stmts.push(Doc::space()),
-                        1 => stmts.push(Doc::hard_line()),
-                        _ => {
-                            stmts.push(Doc::empty_line());
-                            stmts.push(Doc::hard_line());
+                ctx.get_comments_between(end, span.start)
+                    .for_each(|comment| {
+                        match ctx.line_bounds.line_distance(end, comment.span.start) {
+                            0 => stmts.push(Doc::space()),
+                            1 => stmts.push(Doc::hard_line()),
+                            _ => {
+                                stmts.push(Doc::empty_line());
+                                stmts.push(Doc::hard_line());
+                            }
                         }
-                    }
-                    stmts.push(comment.doc(ctx));
-                    end = comment.span.end;
-                });
+                        stmts.push(comment.doc(ctx));
+                        end = comment.span.end;
+                    });
 
                 if ctx.line_bounds.line_distance(end, span.start) <= 1 {
                     stmts.push(Doc::hard_line());
@@ -152,6 +152,21 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
                 (stmts, span.end)
             },
         );
+
+        ctx.get_comments_between(end, self.span.end)
+            .for_each(|comment| {
+                match ctx.line_bounds.line_distance(end, comment.span.start) {
+                    0 => stmts.push(Doc::space()),
+                    1 => stmts.push(Doc::hard_line()),
+                    _ => {
+                        stmts.push(Doc::empty_line());
+                        stmts.push(Doc::hard_line());
+                    }
+                }
+                stmts.push(comment.doc(ctx));
+                end = comment.span.end;
+            });
+
         docs.push(Doc::list(stmts).nest(ctx.indent_width));
         docs.push(Doc::hard_line());
 
@@ -204,21 +219,21 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
             |(mut stmts, mut end), stmt| {
                 let span = stmt.span();
 
-                let comments = ctx.get_comments_between(end, span.start);
-                comments.for_each(|comment| {
-                    if end > 0 {
-                        match ctx.line_bounds.line_distance(end, comment.span.start) {
-                            0 => stmts.push(Doc::space()),
-                            1 => stmts.push(Doc::hard_line()),
-                            _ => {
-                                stmts.push(Doc::empty_line());
-                                stmts.push(Doc::hard_line());
+                ctx.get_comments_between(end, span.start)
+                    .for_each(|comment| {
+                        if end > 0 {
+                            match ctx.line_bounds.line_distance(end, comment.span.start) {
+                                0 => stmts.push(Doc::space()),
+                                1 => stmts.push(Doc::hard_line()),
+                                _ => {
+                                    stmts.push(Doc::empty_line());
+                                    stmts.push(Doc::hard_line());
+                                }
                             }
                         }
-                    }
-                    stmts.push(comment.doc(ctx));
-                    end = comment.span.end;
-                });
+                        stmts.push(comment.doc(ctx));
+                        end = comment.span.end;
+                    });
 
                 if end > 0 {
                     if ctx.line_bounds.line_distance(end, span.start) <= 1 {
@@ -233,21 +248,21 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
             },
         );
 
-        let comments = ctx.get_comments_between(end, self.span.end);
-        comments.for_each(|comment| {
-            if end > 0 {
-                match ctx.line_bounds.line_distance(end, comment.span.start) {
-                    0 => stmts.push(Doc::space()),
-                    1 => stmts.push(Doc::hard_line()),
-                    _ => {
-                        stmts.push(Doc::empty_line());
-                        stmts.push(Doc::hard_line());
+        ctx.get_comments_between(end, self.span.end)
+            .for_each(|comment| {
+                if end > 0 {
+                    match ctx.line_bounds.line_distance(end, comment.span.start) {
+                        0 => stmts.push(Doc::space()),
+                        1 => stmts.push(Doc::hard_line()),
+                        _ => {
+                            stmts.push(Doc::empty_line());
+                            stmts.push(Doc::hard_line());
+                        }
                     }
                 }
-            }
-            stmts.push(comment.doc(ctx));
-            end = comment.span.end;
-        });
+                stmts.push(comment.doc(ctx));
+                end = comment.span.end;
+            });
 
         stmts.push(Doc::empty_line());
 
