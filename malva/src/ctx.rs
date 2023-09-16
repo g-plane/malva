@@ -3,6 +3,7 @@ use raffia::{
     token::{Comment, CommentKind},
     Syntax,
 };
+use std::mem;
 use tiny_pretty::Doc;
 
 pub(crate) struct Ctx<'a, 's: 'a> {
@@ -31,9 +32,9 @@ impl<'a, 's> Ctx<'a, 's> {
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
         self.get_comments_between(start, end)
             .scan(CommentKind::Block, |prev_kind, comment| {
-                let ret = Some(
+                Some(
                     [
-                        match prev_kind {
+                        match mem::replace(prev_kind, comment.kind.clone()) {
                             CommentKind::Block => Doc::soft_line(),
                             CommentKind::Line => Doc::nil(),
                         },
@@ -44,9 +45,7 @@ impl<'a, 's> Ctx<'a, 's> {
                         },
                     ]
                     .into_iter(),
-                );
-                *prev_kind = comment.kind.clone();
-                ret
+                )
             })
             .flatten()
     }
