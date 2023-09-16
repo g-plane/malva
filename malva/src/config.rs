@@ -60,6 +60,7 @@ pub struct LanguageOptions {
     pub block_selector_linebreak: BlockSelectorLineBreak,
     pub omit_zero_before_dot: bool,
     pub trailing_comma: bool,
+    pub pad_comments: bool,
 }
 
 #[derive(Clone, Debug, Default)]
