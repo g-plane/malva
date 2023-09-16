@@ -1,6 +1,6 @@
 use super::super::DocGen;
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for SupportsAnd<'s> {
@@ -9,7 +9,7 @@ impl<'s> DocGen<'s> for SupportsAnd<'s> {
 
         let mut docs = match ctx.options.operator_linebreak {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("and"), Doc::space()],
-            OperatorLineBreak::After => vec![Doc::text("and"), Doc::line_or_space()],
+            OperatorLineBreak::After => vec![Doc::space(), Doc::text("and"), Doc::line_or_space()],
         };
         docs.extend(ctx.end_padded_comments(self.keyword.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
@@ -21,11 +21,18 @@ impl<'s> DocGen<'s> for SupportsAnd<'s> {
 impl<'s> DocGen<'s> for SupportsCondition<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::list(
-            itertools::intersperse(
-                self.conditions.iter().map(|condition| condition.doc(ctx)),
-                Doc::space(),
-            )
-            .collect(),
+            self.conditions
+                .iter()
+                .fold(
+                    (Vec::with_capacity(self.conditions.len()), self.span.start),
+                    |(mut docs, end), condition| {
+                        let span = condition.span();
+                        docs.extend(ctx.start_padded_comments(end, span.start));
+                        docs.push(condition.doc(ctx));
+                        (docs, span.end)
+                    },
+                )
+                .0,
         )
     }
 }
@@ -92,7 +99,7 @@ impl<'s> DocGen<'s> for SupportsOr<'s> {
 
         let mut docs = match ctx.options.operator_linebreak {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("or"), Doc::space()],
-            OperatorLineBreak::After => vec![Doc::text("or"), Doc::line_or_space()],
+            OperatorLineBreak::After => vec![Doc::space(), Doc::text("or"), Doc::line_or_space()],
         };
         docs.push(self.condition.doc(ctx));
 

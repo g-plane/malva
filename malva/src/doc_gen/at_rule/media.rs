@@ -9,7 +9,7 @@ impl<'s> DocGen<'s> for MediaAnd<'s> {
 
         let mut docs = match ctx.options.operator_linebreak {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("and"), Doc::space()],
-            OperatorLineBreak::After => vec![Doc::text("and"), Doc::line_or_space()],
+            OperatorLineBreak::After => vec![Doc::space(), Doc::text("and"), Doc::line_or_space()],
         };
         docs.extend(
             ctx.end_padded_comments(self.keyword.span.end, self.media_in_parens.span.start),
@@ -188,7 +188,7 @@ impl<'s> DocGen<'s> for MediaOr<'s> {
 
         let mut docs = match ctx.options.operator_linebreak {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("or"), Doc::space()],
-            OperatorLineBreak::After => vec![Doc::text("or"), Doc::line_or_space()],
+            OperatorLineBreak::After => vec![Doc::space(), Doc::text("or"), Doc::line_or_space()],
         };
         docs.extend(
             ctx.end_padded_comments(self.keyword.span.end, self.media_in_parens.span.start),
@@ -205,7 +205,7 @@ impl<'s> DocGen<'s> for MediaQuery<'s> {
             MediaQuery::ConditionOnly(media_condition) => media_condition.doc(ctx),
             MediaQuery::WithType(media_query_with_type) => media_query_with_type.doc(ctx),
             MediaQuery::LessVariable(less_variable) => less_variable.doc(ctx),
-            MediaQuery::LessNamespaceValue(less_namespace_value) => todo!(),
+            MediaQuery::LessNamespaceValue(..) => todo!(),
         }
     }
 }

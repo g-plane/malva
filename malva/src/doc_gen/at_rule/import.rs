@@ -1,22 +1,33 @@
 use super::super::DocGen;
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for ImportPrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         docs.push(self.href.doc(ctx));
+        let mut end = self.href.span().end;
+
         if let Some(layer) = &self.layer {
+            let span = layer.span();
             docs.push(Doc::line_or_space());
+            docs.extend(ctx.end_padded_comments(end, span.start));
             docs.push(layer.doc(ctx));
+            end = span.end;
         }
+
         if let Some(supports) = &self.supports {
+            let span = supports.span();
             docs.push(Doc::line_or_space());
+            docs.extend(ctx.end_padded_comments(end, span.start));
             docs.push(supports.doc(ctx));
+            end = span.end;
         }
+
         if let Some(media) = &self.media {
             docs.push(Doc::line_or_space());
+            docs.extend(ctx.end_padded_comments(end, media.span.start));
             docs.push(media.doc(ctx));
         }
 

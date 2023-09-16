@@ -18,6 +18,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         docs.push(Doc::text(": "));
 
         let mut values = Vec::with_capacity(self.value.len() * 2);
+        let mut end = self.colon_span.end;
 
         let mut iter = self.value.iter().peekable();
         match &self.name {
@@ -25,7 +26,6 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 if name.starts_with("--") || name.eq_ignore_ascii_case("filter") =>
             {
                 use raffia::token::Token;
-                let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
                     let span = value.span();
                     values.extend(ctx.end_padded_comments(end, span.start));
@@ -46,7 +46,6 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 }
             }
             _ => {
-                let mut end = self.colon_span.end;
                 while let Some(value) = iter.next() {
                     let span = value.span();
                     values.extend(ctx.end_padded_comments(end, span.start));
@@ -69,6 +68,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
 
         if let Some(important) = &self.important {
             values.push(Doc::soft_line());
+            values.extend(ctx.end_padded_comments(end, important.span.start));
             values.push(important.doc(ctx));
         }
 
