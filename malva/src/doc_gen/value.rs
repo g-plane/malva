@@ -484,7 +484,6 @@ impl<'s> DocGen<'s> for Url<'s> {
 
         let mut args = Vec::with_capacity(1);
         if let Some(value) = &self.value {
-            args.push(Doc::line_or_nil());
             args.push(value.doc(ctx));
 
             if !self.modifiers.is_empty() {
@@ -499,12 +498,7 @@ impl<'s> DocGen<'s> for Url<'s> {
             }
         }
 
-        docs.push(
-            Doc::list(args)
-                .nest(ctx.indent_width)
-                .append(Doc::line_or_nil())
-                .group(),
-        );
+        docs.push(Doc::list(args).group().nest(ctx.indent_width));
         docs.push(Doc::text(")"));
 
         Doc::list(docs)
