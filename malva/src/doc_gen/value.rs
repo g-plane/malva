@@ -1,6 +1,6 @@
 use super::DocGen;
 use crate::ctx::Ctx;
-use raffia::{ast::*, token::TokenWithSpan};
+use raffia::{ast::*, token::TokenWithSpan, Spanned};
 use std::borrow::Cow;
 use tiny_pretty::Doc;
 
@@ -85,11 +85,13 @@ impl<'s> DocGen<'s> for Calc<'s> {
             OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
             OperatorLineBreak::After => Doc::space(),
         })
+        .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
         .append(self.op.doc(ctx))
         .append(match ctx.options.operator_linebreak {
             OperatorLineBreak::Before => Doc::space(),
             OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
         })
+        .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
         .append(right)
     }
 }

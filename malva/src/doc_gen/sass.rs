@@ -5,12 +5,20 @@ use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        use crate::config::OperatorLineBreak;
+
         self.left
             .doc(ctx)
-            .append(Doc::space())
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
+                OperatorLineBreak::After => Doc::space(),
+            })
             .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
             .append(self.op.doc(ctx))
-            .append(Doc::space())
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::space(),
+                OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
+            })
             .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
             .append(self.right.doc(ctx))
     }
