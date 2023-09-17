@@ -135,6 +135,9 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::Number(number) => number.doc(ctx),
             ComponentValue::Percentage(percentage) => percentage.doc(ctx),
             ComponentValue::Ratio(ratio) => ratio.doc(ctx),
+            ComponentValue::SassArbitraryArgument(sass_arbitrary_arg) => {
+                sass_arbitrary_arg.doc(ctx)
+            }
             ComponentValue::SassBinaryExpression(sass_binary_expr) => sass_binary_expr.doc(ctx),
             ComponentValue::SassList(sass_list) => sass_list.doc(ctx),
             ComponentValue::SassMap(sass_map) => sass_map.doc(ctx),

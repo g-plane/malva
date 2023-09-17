@@ -4,6 +4,12 @@ use raffia::{ast::*, Spanned};
 use std::{iter, mem};
 use tiny_pretty::Doc;
 
+impl<'s> DocGen<'s> for SassArbitraryArgument<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.value.doc(ctx).append(Doc::text("..."))
+    }
+}
+
 impl<'s> DocGen<'s> for SassAtRoot<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match &self.kind {
