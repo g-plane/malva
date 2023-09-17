@@ -1,0 +1,20 @@
+[package]
+name = "dprint_plugin_malva"
+version = "0.0.0"
+edition = "2021"
+authors = ["Pig Fang <g-plane@hotmail.com>"]
+description = "Malva as dprint plugin."
+repository = "https://github.com/g-plane/malva"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+anyhow = "1.0"
+dprint-core = { version = "0.63", default-features = false, features = [
+    "wasm",
+] }
+malva = { path = "../malva", features = ["config_serde"] }
+serde_json = "1.0"
