@@ -18,7 +18,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         docs.push(Doc::text(": "));
 
         let mut values = Vec::with_capacity(self.value.len() * 2);
-        let mut end = self.colon_span.end;
+        let mut pos = self.colon_span.end;
 
         let mut iter = self.value.iter().peekable();
         match &self.name {
@@ -28,7 +28,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 use raffia::token::Token;
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.end_padded_comments(end, span.start));
+                    values.extend(ctx.end_padded_comments(pos, span.start));
 
                     values.push(value.doc(ctx));
                     if let ComponentValue::TokenWithSpan(TokenWithSpan {
@@ -42,13 +42,13 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                         values.push(Doc::soft_line());
                     }
 
-                    end = span.end;
+                    pos = span.end;
                 }
             }
             _ => {
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.end_padded_comments(end, span.start));
+                    values.extend(ctx.end_padded_comments(pos, span.start));
 
                     values.push(value.doc(ctx));
                     if !matches!(
@@ -61,14 +61,14 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                         values.push(Doc::soft_line());
                     }
 
-                    end = span.end;
+                    pos = span.end;
                 }
             }
         }
 
         if let Some(important) = &self.important {
             values.push(Doc::soft_line());
-            values.extend(ctx.end_padded_comments(end, important.span.start));
+            values.extend(ctx.end_padded_comments(pos, important.span.start));
             values.push(important.doc(ctx));
         }
 
@@ -110,17 +110,17 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
             docs.push(Doc::text("{"));
         }
 
-        let (mut stmts, mut end) = self.statements.iter().fold(
+        let (mut stmts, mut pos) = self.statements.iter().fold(
             (
                 Vec::with_capacity(self.statements.len() * 2),
                 self.span.start,
             ),
-            |(mut stmts, mut end), stmt| {
+            |(mut stmts, mut pos), stmt| {
                 let span = stmt.span();
 
-                ctx.get_comments_between(end, span.start)
+                ctx.get_comments_between(pos, span.start)
                     .for_each(|comment| {
-                        match ctx.line_bounds.line_distance(end, comment.span.start) {
+                        match ctx.line_bounds.line_distance(pos, comment.span.start) {
                             0 => stmts.push(Doc::space()),
                             1 => stmts.push(Doc::hard_line()),
                             _ => {
@@ -129,10 +129,10 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
                             }
                         }
                         stmts.push(comment.doc(ctx));
-                        end = comment.span.end;
+                        pos = comment.span.end;
                     });
 
-                if ctx.line_bounds.line_distance(end, span.start) <= 1 {
+                if ctx.line_bounds.line_distance(pos, span.start) <= 1 {
                     stmts.push(Doc::hard_line());
                 } else {
                     stmts.push(Doc::empty_line());
@@ -143,9 +143,9 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
             },
         );
 
-        ctx.get_comments_between(end, self.span.end)
+        ctx.get_comments_between(pos, self.span.end)
             .for_each(|comment| {
-                match ctx.line_bounds.line_distance(end, comment.span.start) {
+                match ctx.line_bounds.line_distance(pos, comment.span.start) {
                     0 => stmts.push(Doc::space()),
                     1 => stmts.push(Doc::hard_line()),
                     _ => {
@@ -154,7 +154,7 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
                     }
                 }
                 stmts.push(comment.doc(ctx));
-                end = comment.span.end;
+                pos = comment.span.end;
             });
 
         docs.push(Doc::list(stmts).nest(ctx.indent_width));
@@ -201,18 +201,18 @@ impl<'s> DocGen<'s> for Statement<'s> {
 
 impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let (mut stmts, mut end) = self.statements.iter().fold(
+        let (mut stmts, mut pos) = self.statements.iter().fold(
             (
                 Vec::with_capacity(self.statements.len() * 2),
                 self.span.start,
             ),
-            |(mut stmts, mut end), stmt| {
+            |(mut stmts, mut pos), stmt| {
                 let span = stmt.span();
 
-                ctx.get_comments_between(end, span.start)
+                ctx.get_comments_between(pos, span.start)
                     .for_each(|comment| {
-                        if end > 0 {
-                            match ctx.line_bounds.line_distance(end, comment.span.start) {
+                        if pos > 0 {
+                            match ctx.line_bounds.line_distance(pos, comment.span.start) {
                                 0 => stmts.push(Doc::space()),
                                 1 => stmts.push(Doc::hard_line()),
                                 _ => {
@@ -222,11 +222,11 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
                             }
                         }
                         stmts.push(comment.doc(ctx));
-                        end = comment.span.end;
+                        pos = comment.span.end;
                     });
 
-                if end > 0 {
-                    if ctx.line_bounds.line_distance(end, span.start) <= 1 {
+                if pos > 0 {
+                    if ctx.line_bounds.line_distance(pos, span.start) <= 1 {
                         stmts.push(Doc::hard_line());
                     } else {
                         stmts.push(Doc::empty_line());
@@ -238,10 +238,10 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
             },
         );
 
-        ctx.get_comments_between(end, self.span.end)
+        ctx.get_comments_between(pos, self.span.end)
             .for_each(|comment| {
-                if end > 0 {
-                    match ctx.line_bounds.line_distance(end, comment.span.start) {
+                if pos > 0 {
+                    match ctx.line_bounds.line_distance(pos, comment.span.start) {
                         0 => stmts.push(Doc::space()),
                         1 => stmts.push(Doc::hard_line()),
                         _ => {
@@ -251,7 +251,7 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
                     }
                 }
                 stmts.push(comment.doc(ctx));
-                end = comment.span.end;
+                pos = comment.span.end;
             });
 
         stmts.push(Doc::empty_line());

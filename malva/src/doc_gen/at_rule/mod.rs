@@ -11,7 +11,7 @@ mod supports;
 impl<'s> DocGen<'s> for AtRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
-        let mut end = self.name.span.end;
+        let mut pos = self.name.span.end;
 
         docs.push(Doc::text(format!(
             "@{}",
@@ -21,14 +21,14 @@ impl<'s> DocGen<'s> for AtRule<'s> {
         if let Some(prelude) = &self.prelude {
             docs.push(Doc::space());
             let span = prelude.span();
-            docs.extend(ctx.end_padded_comments(end, span.start));
+            docs.extend(ctx.end_padded_comments(pos, span.start));
             docs.push(prelude.doc(ctx));
-            end = span.end;
+            pos = span.end;
         }
 
         if let Some(block) = &self.block {
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(end, block.span.start));
+            docs.extend(ctx.end_padded_comments(pos, block.span.start));
             docs.push(block.doc(ctx));
         }
 
@@ -252,12 +252,12 @@ impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
             UnknownAtRulePrelude::TokenSeq(token_seq) => {
                 use raffia::token::Token;
 
-                let mut end = token_seq.span.start;
+                let mut pos = token_seq.span.start;
                 let mut docs = Vec::with_capacity(token_seq.tokens.len());
                 let mut iter = token_seq.tokens.iter().peekable();
                 while let Some(token) = iter.next() {
                     let span = token.span();
-                    docs.extend(ctx.start_padded_comments(end, span.start));
+                    docs.extend(ctx.start_padded_comments(pos, span.start));
 
                     docs.push(token.doc(ctx));
                     if let TokenWithSpan {
@@ -271,7 +271,7 @@ impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
                         docs.push(Doc::soft_line());
                     }
 
-                    end = span.end;
+                    pos = span.end;
                 }
                 Doc::list(docs)
             }

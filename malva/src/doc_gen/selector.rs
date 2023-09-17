@@ -406,11 +406,11 @@ fn format_pseudo_selector_arg_tokens<'a, 's: 'a>(
 ) -> Doc<'s> {
     use raffia::token::{Token, TokenWithSpan};
 
-    let mut end = from;
+    let mut pos = from;
     let mut docs = Vec::with_capacity(token_seq.tokens.len() * 2);
     let mut iter = token_seq.tokens.iter().peekable();
     while let Some(token) = iter.next() {
-        docs.extend(ctx.end_padded_comments(end, token.span.start));
+        docs.extend(ctx.end_padded_comments(pos, token.span.start));
 
         docs.push(token.doc(ctx));
         if let TokenWithSpan {
@@ -430,10 +430,10 @@ fn format_pseudo_selector_arg_tokens<'a, 's: 'a>(
             }
         }
 
-        end = token.span.end;
+        pos = token.span.end;
     }
 
-    docs.extend(ctx.start_padded_comments(end, to));
+    docs.extend(ctx.start_padded_comments(pos, to));
 
     Doc::list(docs)
 }

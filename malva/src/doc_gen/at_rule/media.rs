@@ -27,9 +27,9 @@ impl<'s> DocGen<'s> for MediaCondition<'s> {
                 .iter()
                 .fold(
                     (Vec::with_capacity(self.conditions.len()), self.span.start),
-                    |(mut docs, end), condition| {
+                    |(mut docs, pos), condition| {
                         let span = condition.span();
-                        docs.extend(ctx.start_padded_comments(end, span.start));
+                        docs.extend(ctx.start_padded_comments(pos, span.start));
                         docs.push(condition.doc(ctx));
                         (docs, span.end)
                     },
