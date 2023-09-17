@@ -56,6 +56,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::Page(page) => page.doc(ctx),
             AtRulePrelude::PositionFallback(position_fallback) => position_fallback.doc(ctx),
             AtRulePrelude::Property(property) => property.doc(ctx),
+            AtRulePrelude::SassAtRoot(sass_at_root) => sass_at_root.doc(ctx),
             AtRulePrelude::SassEach(sass_each) => sass_each.doc(ctx),
             AtRulePrelude::SassExpr(sass_expr) => sass_expr.doc(ctx),
             AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),

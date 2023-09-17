@@ -1,7 +1,70 @@
 use super::DocGen;
 use crate::ctx::Ctx;
 use raffia::{ast::*, Spanned};
+use std::{iter, mem};
 use tiny_pretty::Doc;
+
+impl<'s> DocGen<'s> for SassAtRoot<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match &self.kind {
+            SassAtRootKind::Selector(selector) => selector.doc(ctx),
+            SassAtRootKind::Query(query) => query.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for SassAtRootQuery<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = Vec::with_capacity(7);
+        docs.push(Doc::text("("));
+        docs.extend(ctx.end_padded_comments(self.span.start, self.modifier.span.start));
+
+        docs.push(self.modifier.doc(ctx));
+        docs.extend(ctx.start_padded_comments(self.modifier.span.end, self.colon_span.start));
+        docs.push(Doc::text(": "));
+
+        docs.extend(
+            itertools::intersperse(
+                self.rules.iter().scan(self.colon_span.start, |pos, rule| {
+                    let rule_span = rule.span();
+                    Some(
+                        ctx.end_padded_comments(mem::replace(pos, rule_span.end), rule_span.start)
+                            .chain(iter::once(rule.doc(ctx)))
+                            .collect::<Vec<_>>()
+                            .into_iter(),
+                    )
+                }),
+                vec![Doc::soft_line()].into_iter(),
+            )
+            .flatten(),
+        );
+
+        if let Some(last) = self.rules.last() {
+            docs.extend(ctx.start_padded_comments(last.span().end, self.span.end));
+        }
+
+        docs.push(Doc::text(")"));
+        Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for SassAtRootQueryModifier {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        match self.kind {
+            SassAtRootQueryModifierKind::With => Doc::text("with"),
+            SassAtRootQueryModifierKind::Without => Doc::text("without"),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for SassAtRootQueryRule<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            SassAtRootQueryRule::Ident(ident) => ident.doc(ctx),
+            SassAtRootQueryRule::Str(str) => str.doc(ctx),
+        }
+    }
+}
 
 impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
