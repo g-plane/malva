@@ -52,33 +52,67 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
 
 impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            self.elements
-                .iter()
-                .map(|element| match element {
-                    SassInterpolatedIdentElement::Static(s) => s.doc(ctx),
-                    SassInterpolatedIdentElement::Expression(expr) => {
-                        Doc::text("#{").append(expr.doc(ctx)).append(Doc::text("}"))
-                    }
-                })
-                .collect(),
-        )
+        let mut docs = Vec::with_capacity(self.elements.len());
+        let mut iter = self.elements.iter().peekable();
+        let mut pos = self.span.start;
+        while let Some(element) = iter.next() {
+            match element {
+                SassInterpolatedIdentElement::Static(s) => {
+                    pos = s.span.end;
+                    docs.push(s.doc(ctx));
+                }
+                SassInterpolatedIdentElement::Expression(expr) => {
+                    let expr_span = expr.span();
+                    docs.push(Doc::text("#{"));
+                    docs.extend(ctx.end_padded_comments(pos, expr_span.start));
+                    docs.push(expr.doc(ctx));
+                    docs.extend(
+                        ctx.start_padded_comments(
+                            expr_span.end,
+                            iter.peek()
+                                .map(|element| element.span().start)
+                                .unwrap_or(self.span.end),
+                        ),
+                    );
+                    docs.push(Doc::text("}"));
+                }
+            }
+        }
+
+        Doc::list(docs)
     }
 }
 
 impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            self.elements
-                .iter()
-                .map(|element| match element {
-                    SassInterpolatedUrlElement::Static(s) => s.doc(ctx),
-                    SassInterpolatedUrlElement::Expression(expr) => {
-                        Doc::text("#{").append(expr.doc(ctx)).append(Doc::text("}"))
-                    }
-                })
-                .collect(),
-        )
+        let mut docs = Vec::with_capacity(self.elements.len());
+        let mut iter = self.elements.iter().peekable();
+        let mut pos = self.span.start;
+        while let Some(element) = iter.next() {
+            match element {
+                SassInterpolatedUrlElement::Static(s) => {
+                    pos = s.span.end;
+                    docs.push(s.doc(ctx));
+                }
+                SassInterpolatedUrlElement::Expression(expr) => {
+                    let expr_span = expr.span();
+                    docs.push(Doc::text("#{"));
+                    docs.extend(ctx.end_padded_comments(pos, expr_span.start));
+                    docs.push(expr.doc(ctx));
+                    docs.extend(
+                        ctx.start_padded_comments(
+                            expr_span.end,
+                            iter.peek()
+                                .map(|element| element.span().start)
+                                .unwrap_or(self.span.end),
+                        ),
+                    );
+                    docs.push(Doc::text("}"));
+                }
+            }
+        }
+
+        Doc::list(docs)
     }
 }
 

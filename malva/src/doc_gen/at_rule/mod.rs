@@ -198,6 +198,7 @@ impl<'s> DocGen<'s> for NamespacePrelude<'s> {
             prefix
                 .doc(ctx)
                 .append(Doc::line_or_space())
+                .concat(ctx.end_padded_comments(prefix.span().end, self.uri.span().start))
                 .append(self.uri.doc(ctx))
                 .group()
                 .nest(ctx.indent_width)

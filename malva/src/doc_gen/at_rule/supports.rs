@@ -87,6 +87,7 @@ impl<'s> DocGen<'s> for SupportsNot<'s> {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("not"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::text("not"), Doc::line_or_space()],
         };
+        docs.extend(ctx.end_padded_comments(self.keyword.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
@@ -101,6 +102,7 @@ impl<'s> DocGen<'s> for SupportsOr<'s> {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("or"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::space(), Doc::text("or"), Doc::line_or_space()],
         };
+        docs.extend(ctx.end_padded_comments(self.keyword.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
