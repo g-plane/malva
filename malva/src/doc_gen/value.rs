@@ -119,10 +119,24 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::InterpolableIdent(interpolable_ident) => interpolable_ident.doc(ctx),
             ComponentValue::InterpolableStr(interpolable_str) => interpolable_str.doc(ctx),
             ComponentValue::LayerName(layer_name) => layer_name.doc(ctx),
+            ComponentValue::LessList(less_list) => less_list.doc(ctx),
+            ComponentValue::LessPercentKeyword(less_percent_keyword) => {
+                less_percent_keyword.doc(ctx)
+            }
+            ComponentValue::LessPropertyVariable(less_property_variable) => {
+                less_property_variable.doc(ctx)
+            }
+            ComponentValue::LessVariable(less_variable) => less_variable.doc(ctx),
+            ComponentValue::LessVariableVariable(less_variable_variable) => {
+                less_variable_variable.doc(ctx)
+            }
             ComponentValue::Number(number) => number.doc(ctx),
             ComponentValue::Percentage(percentage) => percentage.doc(ctx),
             ComponentValue::Ratio(ratio) => ratio.doc(ctx),
+            ComponentValue::SassBinaryExpression(sass_binary_expr) => sass_binary_expr.doc(ctx),
+            ComponentValue::SassList(sass_list) => sass_list.doc(ctx),
             ComponentValue::SassMap(sass_map) => sass_map.doc(ctx),
+            ComponentValue::SassQualifiedName(sass_qualified_name) => sass_qualified_name.doc(ctx),
             ComponentValue::SassNestingDeclaration(sass_nesting_decl) => sass_nesting_decl.doc(ctx),
             ComponentValue::SassParenthesizedExpression(sass_parenthesized_expr) => {
                 sass_parenthesized_expr.doc(ctx)

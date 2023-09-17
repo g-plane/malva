@@ -53,9 +53,21 @@ impl<'s> DocGen<'s> for LessInterpolatedIdent<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for LessList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        super::format_values_list(&self.elements, self.comma_spans.as_deref(), &self.span, ctx)
+    }
+}
+
 impl<'s> DocGen<'s> for LessListFunction {
     fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("~")
+    }
+}
+
+impl<'s> DocGen<'s> for LessPercentKeyword {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("%")
     }
 }
 

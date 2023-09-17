@@ -176,6 +176,10 @@ impl<'s> DocGen<'s> for Statement<'s> {
             Statement::KeyframeBlock(keyframe_block) => keyframe_block.doc(ctx),
             Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx),
             Statement::SassIfAtRule(sass_if_at_rule) => sass_if_at_rule.doc(ctx),
+            Statement::SassVariableDeclaration(sass_variable_declaration) => {
+                sass_variable_declaration.doc(ctx)
+            }
+            Statement::UnknownSassAtRule(unknown_sass_at_rule) => unknown_sass_at_rule.doc(ctx),
             _ => todo!(),
         };
         if ctx.syntax == Syntax::Sass {
@@ -190,6 +194,12 @@ impl<'s> DocGen<'s> for Statement<'s> {
                         decl.value.last(),
                         Some(ComponentValue::SassNestingDeclaration(..))
                     ) =>
+                {
+                    stmt.append(Doc::text(";"))
+                }
+                Statement::SassVariableDeclaration(..) => stmt.append(Doc::text(";")),
+                Statement::UnknownSassAtRule(unknown_sass_at_rule)
+                    if unknown_sass_at_rule.block.is_none() =>
                 {
                     stmt.append(Doc::text(";"))
                 }

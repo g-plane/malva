@@ -3,6 +3,39 @@ use crate::ctx::Ctx;
 use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
+impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.left
+            .doc(ctx)
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
+            .append(self.op.doc(ctx))
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
+            .append(self.right.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for SassBinaryOperator {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text(match self.kind {
+            SassBinaryOperatorKind::Multiply => "*",
+            SassBinaryOperatorKind::Division => "/",
+            SassBinaryOperatorKind::Modulo => "%",
+            SassBinaryOperatorKind::Plus => "+",
+            SassBinaryOperatorKind::Minus => "-",
+            SassBinaryOperatorKind::GreaterThan => ">",
+            SassBinaryOperatorKind::GreaterThanOrEqual => ">=",
+            SassBinaryOperatorKind::LessThan => "<",
+            SassBinaryOperatorKind::LessThanOrEqual => "<=",
+            SassBinaryOperatorKind::EqualsEquals => "==",
+            SassBinaryOperatorKind::ExclamationEquals => "!=",
+            SassBinaryOperatorKind::And => "and",
+            SassBinaryOperatorKind::Or => "or",
+        })
+    }
+}
+
 impl<'s> DocGen<'s> for SassConditionalClause<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.condition
@@ -116,6 +149,12 @@ impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassList<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        super::format_values_list(&self.elements, self.comma_spans.as_deref(), &self.span, ctx)
+    }
+}
+
 impl<'s> DocGen<'s> for SassMap<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("(")
@@ -217,5 +256,56 @@ impl<'s> DocGen<'s> for SassUnaryOperator {
 impl<'s> DocGen<'s> for SassVariable<'s> {
     fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(format!("${}", self.name.raw))
+    }
+}
+
+impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = Vec::with_capacity(3);
+
+        if let Some(namespace) = &self.namespace {
+            docs.push(namespace.doc(ctx));
+            docs.push(Doc::text("."));
+        }
+        docs.push(self.name.doc(ctx));
+
+        docs.push(Doc::text(": "));
+
+        docs.push(self.value.doc(ctx));
+
+        if self.overridable {
+            docs.push(Doc::text("!default"));
+        }
+        if self.force_global {
+            docs.push(Doc::text("!global"));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for UnknownSassAtRule<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = Vec::with_capacity(6);
+        let mut pos = self.name.span().end;
+
+        docs.push(Doc::text("@"));
+        docs.push(self.name.doc(ctx));
+
+        if let Some(prelude) = &self.prelude {
+            docs.push(Doc::space());
+            let span = prelude.span();
+            docs.extend(ctx.end_padded_comments(pos, span.start));
+            docs.push(prelude.doc(ctx));
+            pos = span.end;
+        }
+
+        if let Some(block) = &self.block {
+            docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(pos, block.span.start));
+            docs.push(block.doc(ctx));
+        }
+
+        Doc::list(docs)
     }
 }
