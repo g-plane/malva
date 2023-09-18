@@ -10,6 +10,12 @@ impl<'s> DocGen<'s> for SassArbitraryArgument<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassArbitraryParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.name.doc(ctx).append(Doc::text("..."))
+    }
+}
+
 impl<'s> DocGen<'s> for SassAtRoot<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match &self.kind {
@@ -144,6 +150,12 @@ impl<'s> DocGen<'s> for SassEach<'s> {
 impl<'s> DocGen<'s> for SassFlag<'s> {
     fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(format!("!{}", self.keyword.raw))
+    }
+}
+
+impl<'s> DocGen<'s> for SassFunction<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.name.doc(ctx).append(self.parameters.doc(ctx))
     }
 }
 
@@ -303,6 +315,17 @@ impl<'s> DocGen<'s> for SassMapItem<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassMixin<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let name = self.name.doc(ctx);
+        if let Some(parameters) = &self.parameters {
+            name.append(parameters.doc(ctx))
+        } else {
+            name
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for SassModuleMemberName<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
@@ -315,6 +338,87 @@ impl<'s> DocGen<'s> for SassModuleMemberName<'s> {
 impl<'s> DocGen<'s> for SassNestingDeclaration<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.block.doc(ctx)
+    }
+}
+
+impl<'s> DocGen<'s> for SassParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let name = self.name.doc(ctx);
+        if let Some(default_value) = &self.default_value {
+            name.concat(ctx.start_padded_comments(self.name.span.end, default_value.span.start))
+                .append(default_value.doc(ctx))
+        } else {
+            name
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for SassParameterDefaultValue<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text(": ")
+            .concat(ctx.end_padded_comments(self.colon_span.end, self.value.span().start))
+            .append(self.value.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for SassParameters<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        enum ParameterOrArbitrary<'a, 's> {
+            Parameter(&'a SassParameter<'s>),
+            Arbitrary(&'a SassArbitraryParameter<'s>),
+        }
+        impl Spanned for ParameterOrArbitrary<'_, '_> {
+            fn span(&self) -> &raffia::Span {
+                match self {
+                    ParameterOrArbitrary::Parameter(p) => p.span(),
+                    ParameterOrArbitrary::Arbitrary(a) => a.span(),
+                }
+            }
+        }
+        impl<'s> DocGen<'s> for ParameterOrArbitrary<'_, 's> {
+            fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+                match self {
+                    ParameterOrArbitrary::Parameter(p) => p.doc(ctx),
+                    ParameterOrArbitrary::Arbitrary(a) => a.doc(ctx),
+                }
+            }
+        }
+
+        let params = self
+            .params
+            .iter()
+            .map(ParameterOrArbitrary::Parameter)
+            .chain(
+                self.arbitrary_param
+                    .iter()
+                    .map(ParameterOrArbitrary::Arbitrary),
+            )
+            .collect::<Vec<_>>();
+        Doc::text("(")
+            .append(
+                Doc::line_or_nil()
+                    .append(super::format_comma_separated_list_with_trailing(
+                        &params,
+                        &self.comma_spans,
+                        self.span.start,
+                        Doc::line_or_space(),
+                        ctx,
+                    ))
+                    .concat(
+                        ctx.start_padded_comments(
+                            self.comma_spans
+                                .get(params.len() - 1)
+                                .or_else(|| params.last().map(|param| param.span()))
+                                .map(|span| span.end)
+                                .unwrap_or(self.span.end),
+                            self.span.end,
+                        ),
+                    )
+                    .nest(ctx.indent_width)
+                    .append(Doc::line_or_nil())
+                    .group(),
+            )
+            .append(Doc::text(")"))
     }
 }
 

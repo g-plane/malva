@@ -86,6 +86,8 @@ where
     )
 }
 
+/// Remember to call `.group()` if use this,
+/// otherwise it can't decide whether to add trailing comma or not.
 fn format_comma_separated_list_with_trailing<'s, N>(
     list: &[N],
     comma_spans: &[Span],
@@ -98,7 +100,7 @@ where
 {
     format_comma_separated_list(list, comma_spans, start, space_after_comma, ctx).append(
         if ctx.options.trailing_comma {
-            Doc::flat_or_break(Doc::nil(), Doc::text(",")).group()
+            Doc::flat_or_break(Doc::nil(), Doc::text(","))
         } else {
             Doc::nil()
         },
