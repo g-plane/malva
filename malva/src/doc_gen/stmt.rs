@@ -51,7 +51,15 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     values.extend(ctx.end_padded_comments(pos, span.start));
 
                     values.push(value.doc(ctx));
-                    if !matches!(
+                    if matches!(
+                        value,
+                        ComponentValue::Delimiter(Delimiter {
+                            kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                            ..
+                        })
+                    ) {
+                        values.push(Doc::line_or_space());
+                    } else if !matches!(
                         iter.peek(),
                         Some(ComponentValue::Delimiter(Delimiter {
                             kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
