@@ -156,8 +156,11 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
                 pos = comment.span.end;
             });
 
+        let has_stmts = !stmts.is_empty();
         docs.push(Doc::list(stmts).nest(ctx.indent_width));
-        docs.push(Doc::hard_line());
+        if has_stmts {
+            docs.push(Doc::hard_line());
+        }
 
         if !is_sass {
             docs.push(Doc::text("}"));
