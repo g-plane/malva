@@ -140,6 +140,12 @@ impl<'s> DocGen<'s> for SassEach<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassFlag<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text(format!("!{}", self.keyword.raw))
+    }
+}
+
 impl<'s> DocGen<'s> for SassIfAtRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = vec![Doc::text("@if ")];
@@ -350,12 +356,11 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
 
         docs.push(self.value.doc(ctx));
 
-        if self.overridable {
-            docs.push(Doc::text("!default"));
-        }
-        if self.force_global {
-            docs.push(Doc::text("!global"));
-        }
+        docs.extend(
+            self.flags
+                .iter()
+                .map(|flag| Doc::space().append(flag.doc(ctx))),
+        );
 
         Doc::list(docs)
     }
