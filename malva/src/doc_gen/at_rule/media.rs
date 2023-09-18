@@ -232,12 +232,12 @@ impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
 
 impl<'s> DocGen<'s> for MediaQueryList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.queries.iter().map(|query| query.doc(ctx)),
-                Doc::text(",").append(Doc::line_or_space()),
-            )
-            .collect(),
+        super::super::format_comma_separated_list(
+            &self.queries,
+            &self.comma_spans,
+            self.span.start,
+            Doc::line_or_space(),
+            ctx,
         )
         .group()
         .nest(ctx.indent_width)

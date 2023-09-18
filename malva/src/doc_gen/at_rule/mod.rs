@@ -98,12 +98,12 @@ impl<'s> DocGen<'s> for CustomMediaValue<'s> {
 
 impl<'s> DocGen<'s> for DocumentPrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.matchers.iter().map(|matcher| matcher.doc(ctx)),
-                Doc::text(",").append(Doc::line_or_space()),
-            )
-            .collect(),
+        super::format_comma_separated_list(
+            &self.matchers,
+            &self.comma_spans,
+            self.span.start,
+            Doc::line_or_space(),
+            ctx,
         )
         .group()
         .nest(ctx.indent_width)
@@ -130,21 +130,22 @@ impl<'s> DocGen<'s> for FontFamilyName<'s> {
 
 impl<'s> DocGen<'s> for KeyframeBlock<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        use crate::config::BlockSelectorLineBreak;
-
-        Doc::list(
-            itertools::intersperse(
-                self.selectors.iter().map(|selector| selector.doc(ctx)),
-                Doc::text(",").append(match ctx.options.block_selector_linebreak {
-                    BlockSelectorLineBreak::Always => Doc::hard_line(),
-                    BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
-                    BlockSelectorLineBreak::Wrap => Doc::soft_line(),
-                }),
-            )
-            .collect(),
+        super::format_selectors_before_block(
+            &self.selectors,
+            &self.comma_spans,
+            self.span.start,
+            ctx,
         )
-        .group()
         .append(Doc::space())
+        .concat(
+            ctx.end_padded_comments(
+                self.selectors
+                    .last()
+                    .map(|selector| selector.span().end)
+                    .unwrap_or(self.span.start),
+                self.block.span.start,
+            ),
+        )
         .append(self.block.doc(ctx))
     }
 }
@@ -235,7 +236,6 @@ impl<'s> DocGen<'s> for PageSelectorList<'s> {
             self.span.start,
             ctx,
         )
-        .group()
         .nest(ctx.indent_width)
     }
 }

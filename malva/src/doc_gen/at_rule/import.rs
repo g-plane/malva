@@ -55,13 +55,16 @@ impl<'s> DocGen<'s> for ImportPreludeLayer<'s> {
 
 impl<'s> DocGen<'s> for ImportPreludeSupports<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let kind_span = self.kind.span();
         Doc::text("supports(")
+            .concat(ctx.end_padded_comments(self.span.start, kind_span.start))
             .append(match &self.kind {
                 ImportPreludeSupportsKind::SupportsCondition(supports_condition) => {
                     supports_condition.doc(ctx)
                 }
                 ImportPreludeSupportsKind::Declaration(declaration) => declaration.doc(ctx),
             })
+            .concat(ctx.start_padded_comments(kind_span.end, self.span.end))
             .append(Doc::text(")"))
     }
 }

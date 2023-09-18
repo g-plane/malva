@@ -125,13 +125,14 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
 
 impl<'s> DocGen<'s> for SassEach<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.bindings.iter().map(|binding| binding.doc(ctx)),
-                Doc::text(",").append(Doc::line_or_space()),
-            )
-            .collect(),
+        super::format_comma_separated_list(
+            &self.bindings,
+            &self.comma_spans,
+            self.span.start,
+            Doc::line_or_space(),
+            ctx,
         )
+        .group()
         .append(Doc::space())
         .concat(ctx.end_padded_comments(self.bindings.last().unwrap().span.end, self.in_span.start))
         .append(Doc::text("in "))
@@ -151,14 +152,38 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
         let mut docs = vec![Doc::text("@if ")];
         docs.extend(ctx.end_padded_comments(self.span.start, self.if_clause.span.start));
         docs.push(self.if_clause.doc(ctx));
+        let mut pos = self.if_clause.span.end;
 
-        self.else_if_clauses.iter().for_each(|clause| {
-            docs.push(Doc::text(" @else if "));
-            docs.push(clause.doc(ctx));
-        });
+        docs.extend(
+            self.else_if_clauses
+                .iter()
+                .zip(self.else_spans.iter())
+                .scan(&mut pos, |pos, (clause, elseif_span)| {
+                    Some(
+                        iter::once(Doc::space())
+                            .chain(ctx.end_padded_comments(
+                                mem::replace(*pos, elseif_span.end),
+                                elseif_span.start,
+                            ))
+                            .chain(iter::once(Doc::text("@else if ")))
+                            .chain(ctx.end_padded_comments(
+                                mem::replace(*pos, clause.span.end),
+                                clause.span.start,
+                            ))
+                            .chain(iter::once(clause.doc(ctx))),
+                    )
+                })
+                .flatten(),
+        );
 
-        if let Some(else_clause) = &self.else_clause {
-            docs.push(Doc::text(" @else "));
+        if let Some((else_clause, else_span)) =
+            self.else_clause.as_ref().zip(self.else_spans.last())
+        {
+            docs.reserve(3);
+            docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(pos, else_span.start));
+            docs.push(Doc::text("@else "));
+            docs.extend(ctx.end_padded_comments(else_span.end, else_clause.span.start));
             docs.push(else_clause.doc(ctx));
         }
 
@@ -243,21 +268,25 @@ impl<'s> DocGen<'s> for SassMap<'s> {
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
-                    .append(Doc::list(
-                        itertools::intersperse(
-                            self.items.iter().map(|item| item.doc(ctx)),
-                            Doc::text(",").append(Doc::line_or_space()),
-                        )
-                        .collect(),
+                    .append(super::format_comma_separated_list_with_trailing(
+                        &self.items,
+                        &self.comma_spans,
+                        self.span.start,
+                        Doc::line_or_space(),
+                        ctx,
                     ))
-                    .append(if ctx.options.trailing_comma {
-                        Doc::flat_or_break(Doc::nil(), Doc::text(","))
-                    } else {
-                        Doc::nil()
-                    })
                     .nest(ctx.indent_width)
                     .append(Doc::line_or_nil())
                     .group(),
+            )
+            .concat(
+                ctx.start_padded_comments(
+                    self.items
+                        .last()
+                        .map(|item| item.span.end)
+                        .unwrap_or(self.span.start),
+                    self.span.end,
+                ),
             )
             .append(Doc::text(")"))
     }
@@ -267,7 +296,9 @@ impl<'s> DocGen<'s> for SassMapItem<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.key
             .doc(ctx)
+            .concat(ctx.start_padded_comments(self.key.span().end, self.colon_span.start))
             .append(Doc::text(": "))
+            .concat(ctx.end_padded_comments(self.colon_span.end, self.value.span().start))
             .append(self.value.doc(ctx))
     }
 }
@@ -345,6 +376,7 @@ impl<'s> DocGen<'s> for SassVariable<'s> {
 impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
+        let value_span = self.value.span();
 
         if let Some(namespace) = &self.namespace {
             docs.push(namespace.doc(ctx));
@@ -352,14 +384,28 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
         }
         docs.push(self.name.doc(ctx));
 
+        docs.extend(ctx.start_padded_comments(self.name.span.end, self.colon_span.start));
         docs.push(Doc::text(": "));
+        docs.extend(ctx.end_padded_comments(self.colon_span.end, value_span.start));
 
         docs.push(self.value.doc(ctx));
 
         docs.extend(
             self.flags
                 .iter()
-                .map(|flag| Doc::space().append(flag.doc(ctx))),
+                .scan(value_span.end, |pos, flag| {
+                    Some(
+                        iter::once(Doc::soft_line())
+                            .chain(ctx.end_padded_comments(
+                                mem::replace(pos, flag.span.end),
+                                flag.span.start,
+                            ))
+                            .chain(iter::once(flag.doc(ctx)))
+                            .collect::<Vec<_>>()
+                            .into_iter(),
+                    )
+                })
+                .flatten(),
         );
 
         Doc::list(docs)
