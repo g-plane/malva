@@ -20,7 +20,18 @@ fn fmt_snapshot() {
             .syntax(syntax)
             .comments(&mut comments)
             .build();
-        parser.parse::<Stylesheet>().unwrap();
+        parser
+            .parse::<Stylesheet>()
+            .map_err(|error| {
+                format!(
+                    "failed to parse '{}': {} from {} to {}",
+                    path.display(),
+                    error.kind,
+                    error.span.start,
+                    error.span.end
+                )
+            })
+            .unwrap();
         let options = if let Some(config) = comments
             .first()
             .and_then(|comment| comment.content.strip_prefix("cfg"))
