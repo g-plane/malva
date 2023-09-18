@@ -129,6 +129,36 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassContent<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("(")
+            .append(
+                Doc::line_or_nil()
+                    .append(super::format_comma_separated_list_with_trailing(
+                        &self.args,
+                        &self.comma_spans,
+                        self.span.start,
+                        Doc::line_or_space(),
+                        ctx,
+                    ))
+                    .concat(
+                        ctx.start_padded_comments(
+                            self.comma_spans
+                                .get(self.args.len() - 1)
+                                .or_else(|| self.args.last().map(|param| param.span()))
+                                .map(|span| span.end)
+                                .unwrap_or(self.span.end),
+                            self.span.end,
+                        ),
+                    )
+                    .nest(ctx.indent_width)
+                    .append(Doc::line_or_nil())
+                    .group(),
+            )
+            .append(Doc::text(")"))
+    }
+}
+
 impl<'s> DocGen<'s> for SassEach<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         super::format_comma_separated_list(
@@ -144,6 +174,19 @@ impl<'s> DocGen<'s> for SassEach<'s> {
         .append(Doc::text("in "))
         .concat(ctx.end_padded_comments(self.in_span.end, self.expr.span().start))
         .append(self.expr.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for SassExtend<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let selectors = self.selectors.doc(ctx);
+        if let Some(optional) = &self.optional {
+            selectors
+                .append(Doc::space())
+                .concat(ctx.end_padded_comments(self.selectors.span().end, optional.span.start))
+        } else {
+            selectors
+        }
     }
 }
 
@@ -266,6 +309,17 @@ impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
         }
 
         Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for SassKeywordArgument<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.name
+            .doc(ctx)
+            .concat(ctx.start_padded_comments(self.name.span.start, self.colon_span.start))
+            .append(Doc::text(": "))
+            .concat(ctx.end_padded_comments(self.colon_span.end, self.value.span().start))
+            .append(self.value.doc(ctx))
     }
 }
 

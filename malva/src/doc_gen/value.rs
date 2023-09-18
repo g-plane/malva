@@ -139,6 +139,7 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
                 sass_arbitrary_arg.doc(ctx)
             }
             ComponentValue::SassBinaryExpression(sass_binary_expr) => sass_binary_expr.doc(ctx),
+            ComponentValue::SassKeywordArgument(sass_keyword_arg) => sass_keyword_arg.doc(ctx),
             ComponentValue::SassList(sass_list) => sass_list.doc(ctx),
             ComponentValue::SassMap(sass_map) => sass_map.doc(ctx),
             ComponentValue::SassQualifiedName(sass_qualified_name) => sass_qualified_name.doc(ctx),
