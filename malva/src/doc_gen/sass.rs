@@ -380,6 +380,57 @@ impl<'s> DocGen<'s> for SassMixin<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassModuleConfig<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("with ")
+            .concat(ctx.end_padded_comments(self.with_span.end, self.lparen_span.start))
+            .append(Doc::text("("))
+            .append(
+                Doc::line_or_nil()
+                    .append(super::format_comma_separated_list_with_trailing(
+                        &self.items,
+                        &self.comma_spans,
+                        self.lparen_span.end,
+                        Doc::line_or_space(),
+                        ctx,
+                    ))
+                    .nest(ctx.indent_width)
+                    .append(Doc::line_or_nil())
+                    .group(),
+            )
+            .append(Doc::text(")"))
+    }
+}
+
+impl<'s> DocGen<'s> for SassModuleConfigItem<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let value_span = self.value.span();
+        self.variable
+            .doc(ctx)
+            .concat(ctx.start_padded_comments(self.variable.span.end, self.colon_span.start))
+            .append(Doc::text(": "))
+            .concat(ctx.end_padded_comments(self.colon_span.end, value_span.start))
+            .append(self.value.doc(ctx))
+            .concat(
+                self.flags
+                    .iter()
+                    .scan(value_span.end, |pos, flag| {
+                        Some(
+                            iter::once(Doc::soft_line())
+                                .chain(ctx.end_padded_comments(
+                                    mem::replace(pos, flag.span.end),
+                                    flag.span.start,
+                                ))
+                                .chain(iter::once(flag.doc(ctx)))
+                                .collect::<Vec<_>>()
+                                .into_iter(),
+                        )
+                    })
+                    .flatten(),
+            )
+    }
+}
+
 impl<'s> DocGen<'s> for SassModuleMemberName<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
@@ -522,6 +573,47 @@ impl<'s> DocGen<'s> for SassUnaryOperator {
             SassUnaryOperatorKind::Minus => Doc::text("-"),
             SassUnaryOperatorKind::Not => Doc::text("not "),
         }
+    }
+}
+
+impl<'s> DocGen<'s> for SassUnnamedNamespace {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("*")
+    }
+}
+
+impl<'s> DocGen<'s> for SassUse<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = vec![self.path.doc(ctx)];
+        let mut pos = self.path.span().end;
+
+        if let Some(namespace) = &self.namespace {
+            docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(
+                mem::replace(&mut pos, namespace.span.end),
+                namespace.span.start,
+            ));
+            docs.push(namespace.doc(ctx));
+        }
+
+        if let Some(config) = &self.config {
+            docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(pos, config.span.start));
+            docs.push(config.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for SassUseNamespace<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("as ")
+            .concat(ctx.end_padded_comments(self.as_span.end, self.kind.span().start))
+            .append(match &self.kind {
+                SassUseNamespaceKind::Named(named) => named.doc(ctx),
+                SassUseNamespaceKind::Unnamed(unnamed) => unnamed.doc(ctx),
+            })
     }
 }
 

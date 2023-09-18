@@ -63,6 +63,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::SassExtend(sass_extend) => sass_extend.doc(ctx),
             AtRulePrelude::SassFunction(sass_function) => sass_function.doc(ctx),
             AtRulePrelude::SassMixin(sass_mixin) => sass_mixin.doc(ctx),
+            AtRulePrelude::SassUse(sass_use) => sass_use.doc(ctx),
             AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),
             AtRulePrelude::Supports(supports) => supports.doc(ctx),
             AtRulePrelude::Unknown(unknown) => unknown.doc(ctx),
