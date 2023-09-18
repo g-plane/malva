@@ -56,11 +56,11 @@ impl<'s> DocGen<'s> for ImportPreludeLayer<'s> {
 impl<'s> DocGen<'s> for ImportPreludeSupports<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("supports(")
-            .append(match self {
-                ImportPreludeSupports::SupportsCondition(supports_condition) => {
+            .append(match &self.kind {
+                ImportPreludeSupportsKind::SupportsCondition(supports_condition) => {
                     supports_condition.doc(ctx)
                 }
-                ImportPreludeSupports::Declaration(declaration) => declaration.doc(ctx),
+                ImportPreludeSupportsKind::Declaration(declaration) => declaration.doc(ctx),
             })
             .append(Doc::text(")"))
     }
