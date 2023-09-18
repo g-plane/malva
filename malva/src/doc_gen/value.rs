@@ -553,7 +553,7 @@ impl<'s> DocGen<'s> for UrlValue<'s> {
     }
 }
 
-fn format_hex_raw<'s>(raw: &str, ctx: &Ctx<'_, 's>) -> String {
+fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
     use crate::config::HexCase;
 
     match ctx.options.hex_case {
@@ -563,7 +563,8 @@ fn format_hex_raw<'s>(raw: &str, ctx: &Ctx<'_, 's>) -> String {
     }
 }
 
-fn format_number_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
+fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
+    #[allow(clippy::collapsible_else_if)]
     let number: Cow<_> = if ctx.options.omit_zero_before_dot {
         if let Some(raw) = raw.strip_prefix("0.") {
             format!(".{raw}").into()
@@ -593,7 +594,7 @@ fn format_number_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
     }
 }
 
-fn format_str_raw<'a, 's>(raw: &'s str, ctx: &'a Ctx) -> Cow<'s, str> {
+fn format_str_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
     use crate::config::Quotes;
 
     let (left, right) = raw.split_at(1);

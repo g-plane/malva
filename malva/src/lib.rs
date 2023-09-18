@@ -12,7 +12,7 @@ use raffia::{ast::Stylesheet, token::Comment, ParserBuilder};
 pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Result<String, Error> {
     let line_bounds = LineBounds::new(input);
     let mut comments = vec![];
-    let mut parser = ParserBuilder::new(&input)
+    let mut parser = ParserBuilder::new(input)
         .syntax(syntax)
         .comments(&mut comments)
         .build();
@@ -42,7 +42,7 @@ pub fn print_stylesheet<'a, 's>(
     let ctx = Ctx {
         syntax,
         options: &options.language,
-        comments: &comments,
+        comments,
         indent_width: options.layout.indent_width,
         line_bounds,
     };
