@@ -656,7 +656,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "malva-cli"
+name = "malva_cli"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -745,6 +745,16 @@ name = "pin-utils"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
+
+[[package]]
+name = "playground_wasm"
+version = "0.1.0"
+dependencies = [
+ "malva",
+ "serde",
+ "serde-wasm-bindgen",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "plotters"
@@ -1102,16 +1112,6 @@ checksum = "d71d857dc86794ca4c280d616f7da00d2dbfd8cd788846559a6813e6aa4b54ee"
 dependencies = [
  "same-file",
  "winapi-util",
-]
-
-[[package]]
-name = "wasm"
-version = "0.1.0"
-dependencies = [
- "malva",
- "serde",
- "serde-wasm-bindgen",
- "wasm-bindgen",
 ]
 
 [[package]]
