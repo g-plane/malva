@@ -196,6 +196,34 @@ impl<'s> DocGen<'s> for SassFlag<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassFor<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let start_value_span = self.start.span();
+        self.binding
+            .doc(ctx)
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.binding.span.end, self.from_span.start))
+            .append(Doc::text("from "))
+            .concat(ctx.end_padded_comments(self.from_span.end, start_value_span.start))
+            .append(self.start.doc(ctx))
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(start_value_span.end, self.boundary.span.start))
+            .append(self.boundary.doc(ctx))
+            .append(Doc::space())
+            .concat(ctx.end_padded_comments(self.boundary.span.end, self.end.span().start))
+            .append(self.end.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for SassForBoundary {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        match self.kind {
+            SassForBoundaryKind::Exclusive => Doc::text("to"),
+            SassForBoundaryKind::Inclusive => Doc::text("through"),
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for SassFunction<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name.doc(ctx).append(self.parameters.doc(ctx))
@@ -243,6 +271,18 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
         }
 
         Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for SassImportPrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        super::format_comma_separated_list(
+            &self.paths,
+            &self.comma_spans,
+            self.span.start,
+            Doc::line_or_space(),
+            ctx,
+        )
     }
 }
 
