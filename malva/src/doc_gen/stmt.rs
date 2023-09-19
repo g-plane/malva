@@ -117,7 +117,7 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
             docs.push(Doc::text("{"));
         }
 
-        let mut stmts = vec![];
+        let mut stmt_docs = vec![];
         if !self.statements.is_empty()
             || ctx
                 .get_comments_between(
@@ -130,13 +130,13 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
                 .count()
                 > 0
         {
-            stmts.push(Doc::hard_line());
+            stmt_docs.push(Doc::hard_line());
         }
 
-        format_statements(&mut stmts, &self.statements, &self.span, ctx);
+        format_statements(&mut stmt_docs, &self.statements, &self.span, ctx);
 
-        let has_stmts = !stmts.is_empty();
-        docs.push(Doc::list(stmts).nest(ctx.indent_width));
+        let has_stmts = !stmt_docs.is_empty();
+        docs.push(Doc::list(stmt_docs).nest(ctx.indent_width));
         if has_stmts {
             docs.push(Doc::hard_line());
         }
