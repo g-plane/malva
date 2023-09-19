@@ -192,10 +192,10 @@ impl<'s> DocGen<'s> for Statement<'s> {
 
 impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let mut stmts = vec![];
-        format_statements(&mut stmts, &self.statements, &self.span, ctx);
-        stmts.push(Doc::empty_line());
-        Doc::list(stmts)
+        let mut stmt_docs = vec![];
+        format_statements(&mut stmt_docs, &self.statements, &self.span, ctx);
+        stmt_docs.push(Doc::empty_line());
+        Doc::list(stmt_docs)
     }
 }
 
