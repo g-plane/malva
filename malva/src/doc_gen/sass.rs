@@ -224,6 +224,85 @@ impl<'s> DocGen<'s> for SassForBoundary {
     }
 }
 
+impl<'s> DocGen<'s> for SassForward<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = vec![self.path.doc(ctx)];
+        let mut pos = self.path.span().end;
+
+        if let Some(prefix) = &self.prefix {
+            docs.reserve(2);
+            docs.push(Doc::space());
+            docs.extend(
+                ctx.end_padded_comments(mem::replace(&mut pos, prefix.span.end), prefix.span.start),
+            );
+            docs.push(prefix.doc(ctx));
+        }
+
+        if let Some(visibility) = &self.visibility {
+            docs.reserve(2);
+            docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(
+                mem::replace(&mut pos, visibility.span.end),
+                visibility.span.start,
+            ));
+            docs.push(visibility.doc(ctx));
+        }
+
+        if let Some(config) = &self.config {
+            docs.reserve(2);
+            docs.push(Doc::space());
+            docs.extend(
+                ctx.end_padded_comments(mem::replace(&mut pos, config.span.end), config.span.start),
+            );
+            docs.push(config.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for SassForwardMember<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            SassForwardMember::Ident(ident) => ident.doc(ctx),
+            SassForwardMember::Variable(variable) => variable.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for SassForwardPrefix<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("as ")
+            .concat(ctx.end_padded_comments(self.as_span.end, self.name.span.start))
+            .append(self.name.doc(ctx))
+            .append(Doc::text("*"))
+    }
+}
+
+impl<'s> DocGen<'s> for SassForwardVisibility<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.modifier
+            .doc(ctx)
+            .append(Doc::space())
+            .append(super::format_comma_separated_list(
+                &self.members,
+                &self.comma_spans,
+                self.modifier.span.end,
+                Doc::soft_line(),
+                ctx,
+            ))
+    }
+}
+
+impl<'s> DocGen<'s> for SassForwardVisibilityModifier {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        match self.kind {
+            SassForwardVisibilityModifierKind::Hide => Doc::text("hide"),
+            SassForwardVisibilityModifierKind::Show => Doc::text("show"),
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for SassFunction<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name.doc(ctx).append(self.parameters.doc(ctx))
