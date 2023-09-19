@@ -1,0 +1,7 @@
+---
+source: malva/tests/fmt.rs
+---
+.clusterPlannerDialog input[type="text"], .clusterPlannerDialog .uiTypeahead {
+  width: 220px;
+}
+

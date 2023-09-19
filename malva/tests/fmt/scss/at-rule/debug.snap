@@ -1,0 +1,15 @@
+---
+source: malva/tests/fmt.rs
+---
+@debug 10em + 12em;
+@debug 10em + 12em;
+@debug 10em + 12em;
+@debug 10em + 12em;
+
+@debug 10em + 12em;
+
+@debug 10em + 12em;
+
+@debug $very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var +
+  $very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var;
+
