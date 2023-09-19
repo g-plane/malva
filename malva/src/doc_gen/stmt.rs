@@ -1,4 +1,4 @@
-use super::DocGen;
+use super::{helpers, DocGen};
 use crate::ctx::Ctx;
 use raffia::{ast::*, token::TokenWithSpan, Spanned, Syntax};
 use tiny_pretty::Doc;
@@ -96,7 +96,7 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         // we don't use `SelectorList::doc` here
         // because it's a special case for qualified rule
-        super::format_selectors_before_block(
+        helpers::format_selectors_before_block(
             &self.selector.selectors,
             &self.selector.comma_spans,
             self.selector.span.start,

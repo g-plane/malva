@@ -1,4 +1,4 @@
-use super::super::DocGen;
+use super::{super::DocGen, helpers};
 use crate::ctx::Ctx;
 use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
@@ -232,7 +232,7 @@ impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
 
 impl<'s> DocGen<'s> for MediaQueryList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::super::format_comma_separated_list(
+        helpers::format_comma_separated_list(
             &self.queries,
             &self.comma_spans,
             self.span.start,

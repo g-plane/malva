@@ -1,4 +1,4 @@
-use super::super::DocGen;
+use super::{super::DocGen, helpers};
 use crate::ctx::Ctx;
 use raffia::{ast::*, token::TokenWithSpan, Spanned};
 use tiny_pretty::Doc;
@@ -107,7 +107,7 @@ impl<'s> DocGen<'s> for CustomMediaValue<'s> {
 
 impl<'s> DocGen<'s> for DocumentPrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::format_comma_separated_list(
+        helpers::format_comma_separated_list(
             &self.matchers,
             &self.comma_spans,
             self.span.start,
@@ -139,7 +139,7 @@ impl<'s> DocGen<'s> for FontFamilyName<'s> {
 
 impl<'s> DocGen<'s> for KeyframeBlock<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::format_selectors_before_block(
+        helpers::format_selectors_before_block(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
@@ -239,7 +239,7 @@ impl<'s> DocGen<'s> for PageSelector<'s> {
 
 impl<'s> DocGen<'s> for PageSelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::format_selectors_before_block(
+        helpers::format_selectors_before_block(
             &self.selectors,
             &self.comma_spans,
             self.span.start,

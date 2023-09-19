@@ -1,4 +1,4 @@
-use super::DocGen;
+use super::{helpers, DocGen};
 use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
@@ -55,7 +55,7 @@ impl<'s> DocGen<'s> for LessInterpolatedIdent<'s> {
 
 impl<'s> DocGen<'s> for LessList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::format_values_list(&self.elements, self.comma_spans.as_deref(), &self.span, ctx)
+        helpers::format_values_list(&self.elements, self.comma_spans.as_deref(), &self.span, ctx)
     }
 }
 

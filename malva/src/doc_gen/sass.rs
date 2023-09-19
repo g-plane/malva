@@ -1,4 +1,4 @@
-use super::DocGen;
+use super::{helpers, DocGen};
 use crate::ctx::Ctx;
 use raffia::{ast::*, Spanned};
 use std::{iter, mem};
@@ -134,7 +134,7 @@ impl<'s> DocGen<'s> for SassContent<'s> {
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
-                    .append(super::format_comma_separated_list_with_trailing(
+                    .append(helpers::format_comma_separated_list_with_trailing(
                         &self.args,
                         &self.comma_spans,
                         self.span.start,
@@ -161,7 +161,7 @@ impl<'s> DocGen<'s> for SassContent<'s> {
 
 impl<'s> DocGen<'s> for SassEach<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::format_comma_separated_list(
+        helpers::format_comma_separated_list(
             &self.bindings,
             &self.comma_spans,
             self.span.start,
@@ -284,7 +284,7 @@ impl<'s> DocGen<'s> for SassForwardVisibility<'s> {
         self.modifier
             .doc(ctx)
             .append(Doc::space())
-            .append(super::format_comma_separated_list(
+            .append(helpers::format_comma_separated_list(
                 &self.members,
                 &self.comma_spans,
                 self.modifier.span.end,
@@ -355,7 +355,7 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
 
 impl<'s> DocGen<'s> for SassImportPrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::format_comma_separated_list(
+        helpers::format_comma_separated_list(
             &self.paths,
             &self.comma_spans,
             self.span.start,
@@ -397,7 +397,7 @@ impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
-                    .append(super::format_comma_separated_list_with_trailing(
+                    .append(helpers::format_comma_separated_list_with_trailing(
                         &self.args,
                         &self.comma_spans,
                         self.span.start,
@@ -509,7 +509,7 @@ impl<'s> DocGen<'s> for SassKeywordArgument<'s> {
 
 impl<'s> DocGen<'s> for SassList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        super::format_values_list(&self.elements, self.comma_spans.as_deref(), &self.span, ctx)
+        helpers::format_values_list(&self.elements, self.comma_spans.as_deref(), &self.span, ctx)
     }
 }
 
@@ -518,7 +518,7 @@ impl<'s> DocGen<'s> for SassMap<'s> {
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
-                    .append(super::format_comma_separated_list_with_trailing(
+                    .append(helpers::format_comma_separated_list_with_trailing(
                         &self.items,
                         &self.comma_spans,
                         self.span.start,
@@ -571,7 +571,7 @@ impl<'s> DocGen<'s> for SassModuleConfig<'s> {
             .append(Doc::text("("))
             .append(
                 Doc::line_or_nil()
-                    .append(super::format_comma_separated_list_with_trailing(
+                    .append(helpers::format_comma_separated_list_with_trailing(
                         &self.items,
                         &self.comma_spans,
                         self.lparen_span.end,
@@ -686,7 +686,7 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
-                    .append(super::format_comma_separated_list_with_trailing(
+                    .append(helpers::format_comma_separated_list_with_trailing(
                         &params,
                         &self.comma_spans,
                         self.span.start,
