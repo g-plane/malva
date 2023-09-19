@@ -8,6 +8,7 @@ mod less;
 mod sass;
 mod selector;
 mod stmt;
+mod str;
 mod value;
 
 pub(super) trait DocGen<'s> {

@@ -1,4 +1,11 @@
-use super::{helpers, DocGen};
+use super::{
+    helpers,
+    str::{
+        format_str, InterpolatedFirstStrRawFormatter, InterpolatedLastStrRawFormatter,
+        InterpolatedMidStrRawFormatter,
+    },
+    DocGen,
+};
 use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
@@ -50,6 +57,43 @@ impl<'s> DocGen<'s> for LessInterpolatedIdent<'s> {
                 })
                 .collect(),
         )
+    }
+}
+
+impl<'s> DocGen<'s> for LessInterpolatedStr<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        if let [LessInterpolatedStrElement::Static(first), mid @ .., LessInterpolatedStrElement::Static(last)] =
+            &self.elements[..]
+        {
+            let allow_prefer = is_preferred_quote_allowed(self, ctx);
+
+            let mut docs = Vec::with_capacity(self.elements.len());
+            docs.push(Doc::text(format_str(
+                first.raw,
+                InterpolatedFirstStrRawFormatter::new(first.raw),
+                allow_prefer,
+                ctx,
+            )));
+            docs.extend(mid.iter().map(|element| match element {
+                LessInterpolatedStrElement::Static(s) => Doc::text(format_str(
+                    s.raw,
+                    InterpolatedMidStrRawFormatter::new(s.raw),
+                    allow_prefer,
+                    ctx,
+                )),
+                LessInterpolatedStrElement::Variable(variable) => variable.doc(ctx),
+                LessInterpolatedStrElement::Property(property) => property.doc(ctx),
+            }));
+            docs.push(Doc::text(format_str(
+                last.raw,
+                InterpolatedLastStrRawFormatter::new(last.raw),
+                allow_prefer,
+                ctx,
+            )));
+            Doc::list(docs)
+        } else {
+            unreachable!()
+        }
     }
 }
 
@@ -107,5 +151,35 @@ impl<'s> DocGen<'s> for LessVariableInterpolation<'s> {
 impl<'s> DocGen<'s> for LessVariableVariable<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("@@").append(self.variable.name.doc(ctx))
+    }
+}
+
+fn is_preferred_quote_allowed(interpolated_str: &LessInterpolatedStr, ctx: &Ctx) -> bool {
+    use crate::config::Quotes;
+
+    match ctx.options.quotes {
+        Quotes::AlwaysDouble | Quotes::AlwaysSingle => false,
+        Quotes::PreferDouble => interpolated_str
+            .elements
+            .iter()
+            .any(|element| match element {
+                LessInterpolatedStrElement::Static(InterpolableStrStaticPart {
+                    raw,
+                    value,
+                    ..
+                }) => value.contains('"') && !raw.contains("\\\""),
+                _ => false,
+            }),
+        Quotes::PreferSingle => interpolated_str
+            .elements
+            .iter()
+            .any(|element| match element {
+                LessInterpolatedStrElement::Static(InterpolableStrStaticPart {
+                    raw,
+                    value,
+                    ..
+                }) => value.contains('\'') && !raw.contains("\\'"),
+                _ => false,
+            }),
     }
 }

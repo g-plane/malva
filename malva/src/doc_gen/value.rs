@@ -1,4 +1,7 @@
-use super::DocGen;
+use super::{
+    str::{format_str, CssStrRawFormatter},
+    DocGen,
+};
 use crate::ctx::Ctx;
 use raffia::{ast::*, token::TokenWithSpan, Spanned};
 use std::borrow::Cow;
@@ -310,7 +313,8 @@ impl<'s> DocGen<'s> for InterpolableStr<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             InterpolableStr::Literal(literal) => literal.doc(ctx),
-            _ => todo!(),
+            InterpolableStr::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx),
+            InterpolableStr::LessInterpolated(less_interpolated) => less_interpolated.doc(ctx),
         }
     }
 }
@@ -344,7 +348,12 @@ impl<'s> DocGen<'s> for Ratio<'s> {
 
 impl<'s> DocGen<'s> for Str<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text(format_str_raw(self.raw, ctx))
+        Doc::text(format_str(
+            self.raw,
+            CssStrRawFormatter::new(self.raw),
+            is_preferred_quote_allowed(self.raw, ctx),
+            ctx,
+        ))
     }
 }
 
@@ -479,7 +488,12 @@ impl<'s> DocGen<'s> for TokenWithSpan<'s> {
             Token::RParen(..) => Doc::text(")"),
             Token::Semicolon(..) => Doc::text(";"),
             Token::Solidus(..) => Doc::text("/"),
-            Token::Str(str) => Doc::text(format_str_raw(str.raw, ctx)),
+            Token::Str(str) => Doc::text(format_str(
+                str.raw,
+                CssStrRawFormatter::new(str.raw),
+                is_preferred_quote_allowed(str.raw, ctx),
+                ctx,
+            )),
             Token::StrTemplate(..) => unreachable!(),
             Token::Tilde(..) => Doc::text("~"),
             Token::TildeEqual(..) => Doc::text("~="),
@@ -595,40 +609,12 @@ fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
     }
 }
 
-fn format_str_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
+fn is_preferred_quote_allowed(raw: &str, ctx: &Ctx) -> bool {
     use crate::config::Quotes;
 
-    let (left, right) = raw.split_at(1);
-    let inner = &right[0..right.len() - 1];
-
     match ctx.options.quotes {
-        Quotes::AlwaysDouble => {
-            if left == "\"" {
-                raw.into()
-            } else {
-                format!("\"{}\"", inner.replace('"', "\\\"")).into()
-            }
-        }
-        Quotes::AlwaysSingle => {
-            if left == "\'" {
-                raw.into()
-            } else {
-                format!("'{}'", inner.replace('\'', "\\'")).into()
-            }
-        }
-        Quotes::PreferDouble => {
-            if left == "\"" || inner.contains("\\\"") {
-                raw.into()
-            } else {
-                format!("\"{inner}\"").into()
-            }
-        }
-        Quotes::PreferSingle => {
-            if left == "\'" || inner.contains("\\\'") {
-                raw.into()
-            } else {
-                format!("'{inner}'").into()
-            }
-        }
+        Quotes::AlwaysDouble | Quotes::AlwaysSingle => false,
+        Quotes::PreferDouble => raw.contains('"') && !raw.contains("\\\""),
+        Quotes::PreferSingle => raw.contains('\'') && !raw.contains("\\'"),
     }
 }

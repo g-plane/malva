@@ -1,4 +1,11 @@
-use super::{helpers, DocGen};
+use super::{
+    helpers,
+    str::{
+        format_str, InterpolatedFirstStrRawFormatter, InterpolatedLastStrRawFormatter,
+        InterpolatedMidStrRawFormatter,
+    },
+    DocGen,
+};
 use crate::ctx::Ctx;
 use raffia::{ast::*, Spanned};
 use std::{iter, mem};
@@ -463,6 +470,63 @@ impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassInterpolatedStr<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        if let [SassInterpolatedStrElement::Static(first), mid @ .., SassInterpolatedStrElement::Static(last)] =
+            &self.elements[..]
+        {
+            let allow_prefer = is_preferred_quote_allowed(self, ctx);
+
+            let mut docs = Vec::with_capacity(self.elements.len());
+            docs.push(Doc::text(format_str(
+                first.raw,
+                InterpolatedFirstStrRawFormatter::new(first.raw),
+                allow_prefer,
+                ctx,
+            )));
+            let mut iter = mid.iter().peekable();
+            let mut pos = first.span.end;
+            while let Some(element) = iter.next() {
+                match element {
+                    SassInterpolatedStrElement::Static(s) => {
+                        pos = s.span.end;
+                        docs.push(Doc::text(format_str(
+                            s.raw,
+                            InterpolatedMidStrRawFormatter::new(s.raw),
+                            allow_prefer,
+                            ctx,
+                        )));
+                    }
+                    SassInterpolatedStrElement::Expression(expr) => {
+                        let expr_span = expr.span();
+                        docs.push(Doc::text("#{"));
+                        docs.extend(ctx.end_padded_comments(pos, expr_span.start));
+                        docs.push(expr.doc(ctx));
+                        docs.extend(
+                            ctx.start_padded_comments(
+                                expr_span.end,
+                                iter.peek()
+                                    .map(|element| element.span().start)
+                                    .unwrap_or(self.span.end),
+                            ),
+                        );
+                        docs.push(Doc::text("}"));
+                    }
+                }
+            }
+            docs.push(Doc::text(format_str(
+                last.raw,
+                InterpolatedLastStrRawFormatter::new(last.raw),
+                allow_prefer,
+                ctx,
+            )));
+            Doc::list(docs)
+        } else {
+            unreachable!()
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.elements.len());
@@ -869,5 +933,35 @@ impl<'s> DocGen<'s> for UnknownSassAtRule<'s> {
         }
 
         Doc::list(docs)
+    }
+}
+
+fn is_preferred_quote_allowed(interpolated_str: &SassInterpolatedStr, ctx: &Ctx) -> bool {
+    use crate::config::Quotes;
+
+    match ctx.options.quotes {
+        Quotes::AlwaysDouble | Quotes::AlwaysSingle => false,
+        Quotes::PreferDouble => interpolated_str
+            .elements
+            .iter()
+            .any(|element| match element {
+                SassInterpolatedStrElement::Static(InterpolableStrStaticPart {
+                    raw,
+                    value,
+                    ..
+                }) => value.contains('"') && !raw.contains("\\\""),
+                SassInterpolatedStrElement::Expression(_) => false,
+            }),
+        Quotes::PreferSingle => interpolated_str
+            .elements
+            .iter()
+            .any(|element| match element {
+                SassInterpolatedStrElement::Static(InterpolableStrStaticPart {
+                    raw,
+                    value,
+                    ..
+                }) => value.contains('\'') && !raw.contains("\\'"),
+                SassInterpolatedStrElement::Expression(_) => false,
+            }),
     }
 }
