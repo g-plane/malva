@@ -365,6 +365,71 @@ impl<'s> DocGen<'s> for SassImportPrelude<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for SassInclude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = vec![self.name.doc(ctx)];
+        let mut pos = self.name.span().end;
+
+        if let Some(arguments) = &self.arguments {
+            docs.extend(ctx.end_padded_comments(
+                mem::replace(&mut pos, arguments.span.end),
+                arguments.span.start,
+            ));
+            docs.push(arguments.doc(ctx));
+        }
+
+        if let Some(content_block_params) = &self.content_block_params {
+            docs.reserve(2);
+            docs.push(Doc::space());
+            docs.extend(ctx.end_padded_comments(
+                mem::replace(&mut pos, content_block_params.span.end),
+                content_block_params.span.start,
+            ));
+            docs.push(content_block_params.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("(")
+            .append(
+                Doc::line_or_nil()
+                    .append(super::format_comma_separated_list_with_trailing(
+                        &self.args,
+                        &self.comma_spans,
+                        self.span.start,
+                        Doc::line_or_space(),
+                        ctx,
+                    ))
+                    .concat(
+                        ctx.start_padded_comments(
+                            self.comma_spans
+                                .get(self.args.len() - 1)
+                                .or_else(|| self.args.last().map(|param| param.span()))
+                                .map(|span| span.end)
+                                .unwrap_or(self.span.end),
+                            self.span.end,
+                        ),
+                    )
+                    .nest(ctx.indent_width)
+                    .append(Doc::line_or_nil())
+                    .group(),
+            )
+            .append(Doc::text(")"))
+    }
+}
+
+impl<'s> DocGen<'s> for SassIncludeContentBlockParams<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("using ")
+            .concat(ctx.end_padded_comments(self.using_span.end, self.params.span.start))
+            .append(self.params.doc(ctx))
+    }
+}
+
 impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.elements.len());

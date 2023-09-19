@@ -65,6 +65,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::SassForward(sass_forward) => sass_forward.doc(ctx),
             AtRulePrelude::SassFunction(sass_function) => sass_function.doc(ctx),
             AtRulePrelude::SassImport(sass_import) => sass_import.doc(ctx),
+            AtRulePrelude::SassInclude(sass_include) => sass_include.doc(ctx),
             AtRulePrelude::SassMixin(sass_mixin) => sass_mixin.doc(ctx),
             AtRulePrelude::SassUse(sass_use) => sass_use.doc(ctx),
             AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),
