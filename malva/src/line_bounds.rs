@@ -12,7 +12,10 @@ impl LineBounds {
     }
 
     pub(crate) fn line_distance(&self, start: usize, end: usize) -> usize {
-        debug_assert!(end >= start);
+        debug_assert!(
+            end >= start,
+            "end {end} must be greater than or equal start {start}"
+        );
 
         let start = self
             .0
