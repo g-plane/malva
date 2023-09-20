@@ -168,6 +168,8 @@ impl<'s> DocGen<'s> for SassContent<'s> {
 
 impl<'s> DocGen<'s> for SassEach<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        use crate::config::OperatorLineBreak;
+
         helpers::format_comma_separated_list(
             &self.bindings,
             &self.comma_spans,
@@ -176,9 +178,17 @@ impl<'s> DocGen<'s> for SassEach<'s> {
             ctx,
         )
         .group()
-        .append(Doc::space())
+        .nest(ctx.indent_width)
+        .append(match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
+            OperatorLineBreak::After => Doc::space(),
+        })
         .concat(ctx.end_padded_comments(self.bindings.last().unwrap().span.end, self.in_span.start))
-        .append(Doc::text("in "))
+        .append(Doc::text("in"))
+        .append(match ctx.options.operator_linebreak {
+            OperatorLineBreak::Before => Doc::space(),
+            OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
+        })
         .concat(ctx.end_padded_comments(self.in_span.end, self.expr.span().start))
         .append(self.expr.doc(ctx))
     }
