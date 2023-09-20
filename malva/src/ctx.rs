@@ -30,6 +30,8 @@ impl<'a, 's> Ctx<'a, 's> {
         start: usize,
         end: usize,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
+        debug_assert!(start <= end);
+
         self.get_comments_between(start, end)
             .scan(CommentKind::Block, |prev_kind, comment| {
                 Some(
@@ -55,6 +57,8 @@ impl<'a, 's> Ctx<'a, 's> {
         start: usize,
         end: usize,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
+        debug_assert!(start <= end);
+
         self.get_comments_between(start, end).flat_map(|comment| {
             [
                 comment.doc(self),
