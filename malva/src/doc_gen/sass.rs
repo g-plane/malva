@@ -191,6 +191,7 @@ impl<'s> DocGen<'s> for SassExtend<'s> {
             selectors
                 .append(Doc::space())
                 .concat(ctx.end_padded_comments(self.selectors.span().end, optional.span.start))
+                .append(optional.doc(ctx))
         } else {
             selectors
         }
