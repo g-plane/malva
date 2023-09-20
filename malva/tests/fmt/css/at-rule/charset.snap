@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+@charset "UTF-8";
+@charset "iso-8859-15";
+@charset "iso-8859-15";
+@charset "UTF-8";
+@charset "UTF-8";
+
