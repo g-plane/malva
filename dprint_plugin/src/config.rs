@@ -136,6 +136,12 @@ pub(crate) fn resolve_config(
                 global_config.use_tabs.unwrap_or_default(),
                 &mut diagnostics,
             ),
+            declaration_name_linebreak: get_value(
+                &mut config,
+                "declarationNameLinebreak",
+                false,
+                &mut diagnostics,
+            ),
         },
     };
 

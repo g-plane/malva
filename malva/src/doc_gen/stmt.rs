@@ -15,7 +15,12 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         } else {
             docs.extend(ctx.start_padded_comments(self.name.span().end, self.colon_span.start));
         }
-        docs.push(Doc::text(": "));
+        docs.push(Doc::text(":"));
+        if ctx.options.declaration_name_linebreak {
+            docs.push(Doc::line_or_space().nest(ctx.indent_width));
+        } else {
+            docs.push(Doc::space());
+        }
 
         let mut values = Vec::with_capacity(self.value.len() * 2);
         let mut pos = self.colon_span.end;
@@ -82,7 +87,12 @@ impl<'s> DocGen<'s> for Declaration<'s> {
 
         docs.push(Doc::list(values).group().nest(ctx.indent_width));
 
-        Doc::list(docs)
+        let doc = Doc::list(docs);
+        if ctx.options.declaration_name_linebreak {
+            doc.group()
+        } else {
+            doc
+        }
     }
 }
 
