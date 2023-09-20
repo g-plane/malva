@@ -577,7 +577,7 @@ fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
 
 fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
     #[allow(clippy::collapsible_else_if)]
-    let number: Cow<_> = if ctx.options.omit_zero_before_dot {
+    let number: Cow<_> = if ctx.options.omit_number_leading_zero {
         if let Some(raw) = raw.strip_prefix("0.") {
             format!(".{raw}").into()
         } else if let Some(raw) = raw.strip_prefix("-0.") {

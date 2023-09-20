@@ -58,7 +58,7 @@ pub struct LanguageOptions {
     pub quotes: Quotes,
     pub operator_linebreak: OperatorLineBreak,
     pub block_selector_linebreak: BlockSelectorLineBreak,
-    pub omit_zero_before_dot: bool,
+    pub omit_number_leading_zero: bool,
     pub trailing_comma: bool,
     pub pad_comments: bool,
     pub declaration_name_linebreak: bool,

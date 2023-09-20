@@ -118,9 +118,9 @@ pub(crate) fn resolve_config(
                     BlockSelectorLineBreak::Consistent
                 }
             },
-            omit_zero_before_dot: get_value(
+            omit_number_leading_zero: get_value(
                 &mut config,
-                "omitZeroBeforeDot",
+                "omitNumberLeadingZero",
                 false,
                 &mut diagnostics,
             ),
