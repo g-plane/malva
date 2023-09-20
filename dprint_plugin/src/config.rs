@@ -121,21 +121,11 @@ pub(crate) fn resolve_config(
             omit_zero_before_dot: get_value(
                 &mut config,
                 "omitZeroBeforeDot",
-                global_config.use_tabs.unwrap_or_default(),
+                false,
                 &mut diagnostics,
             ),
-            trailing_comma: get_value(
-                &mut config,
-                "trailingComma",
-                global_config.use_tabs.unwrap_or_default(),
-                &mut diagnostics,
-            ),
-            pad_comments: get_value(
-                &mut config,
-                "padComments",
-                global_config.use_tabs.unwrap_or_default(),
-                &mut diagnostics,
-            ),
+            trailing_comma: get_value(&mut config, "trailingComma", false, &mut diagnostics),
+            pad_comments: get_value(&mut config, "padComments", false, &mut diagnostics),
             declaration_name_linebreak: get_value(
                 &mut config,
                 "declarationNameLinebreak",
