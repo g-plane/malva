@@ -168,3 +168,21 @@ pub(super) fn format_values_list<'s>(
         Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
+
+pub(super) fn format_operator_prefix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    use crate::config::OperatorLineBreak;
+
+    match ctx.options.operator_linebreak {
+        OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
+        OperatorLineBreak::After => Doc::space(),
+    }
+}
+
+pub(super) fn format_operator_suffix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    use crate::config::OperatorLineBreak;
+
+    match ctx.options.operator_linebreak {
+        OperatorLineBreak::Before => Doc::space(),
+        OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
+    }
+}

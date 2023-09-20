@@ -87,20 +87,12 @@ impl<'s> DocGen<'s> for SassAtRootQueryRule<'s> {
 
 impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        use crate::config::OperatorLineBreak;
-
         self.left
             .doc(ctx)
-            .append(match ctx.options.operator_linebreak {
-                OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
-                OperatorLineBreak::After => Doc::space(),
-            })
+            .append(helpers::format_operator_prefix_space(ctx))
             .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
             .append(self.op.doc(ctx))
-            .append(match ctx.options.operator_linebreak {
-                OperatorLineBreak::Before => Doc::space(),
-                OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
-            })
+            .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
             .append(self.right.doc(ctx))
     }
@@ -168,8 +160,6 @@ impl<'s> DocGen<'s> for SassContent<'s> {
 
 impl<'s> DocGen<'s> for SassEach<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        use crate::config::OperatorLineBreak;
-
         helpers::format_comma_separated_list(
             &self.bindings,
             &self.comma_spans,
@@ -179,16 +169,10 @@ impl<'s> DocGen<'s> for SassEach<'s> {
         )
         .group()
         .nest(ctx.indent_width)
-        .append(match ctx.options.operator_linebreak {
-            OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
-            OperatorLineBreak::After => Doc::space(),
-        })
+        .append(helpers::format_operator_prefix_space(ctx))
         .concat(ctx.end_padded_comments(self.bindings.last().unwrap().span.end, self.in_span.start))
         .append(Doc::text("in"))
-        .append(match ctx.options.operator_linebreak {
-            OperatorLineBreak::Before => Doc::space(),
-            OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
-        })
+        .append(helpers::format_operator_suffix_space(ctx))
         .concat(ctx.end_padded_comments(self.in_span.end, self.expr.span().start))
         .append(self.expr.doc(ctx))
     }
@@ -226,15 +210,16 @@ impl<'s> DocGen<'s> for SassFor<'s> {
         let start_value_span = self.start.span();
         self.binding
             .doc(ctx)
-            .append(Doc::space())
+            .append(helpers::format_operator_prefix_space(ctx))
             .concat(ctx.end_padded_comments(self.binding.span.end, self.from_span.start))
-            .append(Doc::text("from "))
+            .append(Doc::text("from"))
+            .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_padded_comments(self.from_span.end, start_value_span.start))
             .append(self.start.doc(ctx))
-            .append(Doc::space())
+            .append(helpers::format_operator_prefix_space(ctx))
             .concat(ctx.end_padded_comments(start_value_span.end, self.boundary.span.start))
             .append(self.boundary.doc(ctx))
-            .append(Doc::space())
+            .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_padded_comments(self.boundary.span.end, self.end.span().start))
             .append(self.end.doc(ctx))
     }

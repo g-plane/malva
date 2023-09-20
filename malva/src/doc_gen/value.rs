@@ -1,4 +1,5 @@
 use super::{
+    helpers,
     str::{format_str, CssStrRawFormatter},
     DocGen,
 };
@@ -22,8 +23,6 @@ impl<'s> DocGen<'s> for BracketBlock<'s> {
 
 impl<'s> DocGen<'s> for Calc<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        use crate::config::OperatorLineBreak;
-
         let left = if let (
             ComponentValue::Calc(Calc {
                 op:
@@ -84,18 +83,12 @@ impl<'s> DocGen<'s> for Calc<'s> {
             self.right.doc(ctx)
         };
 
-        left.append(match ctx.options.operator_linebreak {
-            OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
-            OperatorLineBreak::After => Doc::space(),
-        })
-        .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
-        .append(self.op.doc(ctx))
-        .append(match ctx.options.operator_linebreak {
-            OperatorLineBreak::Before => Doc::space(),
-            OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
-        })
-        .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
-        .append(right)
+        left.append(helpers::format_operator_prefix_space(ctx))
+            .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
+            .append(self.op.doc(ctx))
+            .append(helpers::format_operator_suffix_space(ctx))
+            .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
+            .append(right)
     }
 }
 
