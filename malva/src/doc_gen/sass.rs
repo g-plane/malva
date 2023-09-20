@@ -196,7 +196,14 @@ impl<'s> DocGen<'s> for SassEach<'s> {
 
 impl<'s> DocGen<'s> for SassExtend<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let selectors = self.selectors.doc(ctx);
+        let selectors = helpers::format_comma_separated_list(
+            &self.selectors.selectors,
+            &self.selectors.comma_spans,
+            self.selectors.span.start,
+            Doc::line_or_space().nest(ctx.indent_width),
+            ctx,
+        )
+        .group();
         if let Some(optional) = &self.optional {
             selectors
                 .append(Doc::space())
