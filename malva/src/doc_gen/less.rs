@@ -10,6 +10,12 @@ use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
+impl<'s> DocGen<'s> for LessDetachedRuleset<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.block.doc(ctx)
+    }
+}
+
 impl<'s> DocGen<'s> for LessEscapedStr<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("~").append(self.str.doc(ctx))
@@ -93,6 +99,24 @@ impl<'s> DocGen<'s> for LessInterpolatedStr<'s> {
             Doc::list(docs)
         } else {
             unreachable!()
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessJavaScriptSnippet<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        let code = Doc::text("`")
+            .concat(itertools::intersperse(
+                self.raw
+                    .split('\n')
+                    .map(|s| Doc::text(s.strip_suffix('\r').unwrap_or(s))),
+                Doc::empty_line(),
+            ))
+            .append(Doc::text("`"));
+        if self.escaped {
+            Doc::text("~").append(code)
+        } else {
+            code
         }
     }
 }

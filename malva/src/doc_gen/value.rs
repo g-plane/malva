@@ -124,6 +124,10 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::InterpolableIdent(interpolable_ident) => interpolable_ident.doc(ctx),
             ComponentValue::InterpolableStr(interpolable_str) => interpolable_str.doc(ctx),
             ComponentValue::LayerName(layer_name) => layer_name.doc(ctx),
+            ComponentValue::LessDetachedRuleset(less_detached_ruleset) => {
+                less_detached_ruleset.doc(ctx)
+            }
+            ComponentValue::LessJavaScriptSnippet(less_js_snippet) => less_js_snippet.doc(ctx),
             ComponentValue::LessList(less_list) => less_list.doc(ctx),
             ComponentValue::LessPercentKeyword(less_percent_keyword) => {
                 less_percent_keyword.doc(ctx)
