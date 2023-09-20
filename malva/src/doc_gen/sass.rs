@@ -384,9 +384,10 @@ impl<'s> DocGen<'s> for SassImportPrelude<'s> {
             &self.paths,
             &self.comma_spans,
             self.span.start,
-            Doc::line_or_space(),
+            Doc::line_or_space().nest(ctx.indent_width),
             ctx,
         )
+        .group()
     }
 }
 
