@@ -142,11 +142,13 @@ impl<'s> DocGen<'s> for SassContent<'s> {
                     ))
                     .concat(
                         ctx.start_padded_comments(
-                            self.comma_spans
-                                .get(self.args.len() - 1)
+                            self.args
+                                .len()
+                                .checked_sub(1)
+                                .and_then(|i| self.comma_spans.get(i))
                                 .or_else(|| self.args.last().map(|param| param.span()))
                                 .map(|span| span.end)
-                                .unwrap_or(self.span.end),
+                                .unwrap_or(self.span.start),
                             self.span.end,
                         ),
                     )
@@ -417,11 +419,13 @@ impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
                     ))
                     .concat(
                         ctx.start_padded_comments(
-                            self.comma_spans
-                                .get(self.args.len() - 1)
+                            self.args
+                                .len()
+                                .checked_sub(1)
+                                .and_then(|i| self.comma_spans.get(i))
                                 .or_else(|| self.args.last().map(|param| param.span()))
                                 .map(|span| span.end)
-                                .unwrap_or(self.span.end),
+                                .unwrap_or(self.span.start),
                             self.span.end,
                         ),
                     )
@@ -763,11 +767,13 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
                     ))
                     .concat(
                         ctx.start_padded_comments(
-                            self.comma_spans
-                                .get(params.len() - 1)
-                                .or_else(|| params.last().map(|param| param.span()))
+                            self.params
+                                .len()
+                                .checked_sub(1)
+                                .and_then(|i| self.comma_spans.get(i))
+                                .or_else(|| self.params.last().map(|param| param.span()))
                                 .map(|span| span.end)
-                                .unwrap_or(self.span.end),
+                                .unwrap_or(self.span.start),
                             self.span.end,
                         ),
                     )
