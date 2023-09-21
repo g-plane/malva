@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+.foo {
+  color: red;
+}
+
+/*# sourceMappingURL=file.css.map */
+

@@ -1,0 +1,11 @@
+---
+source: malva/tests/fmt.rs
+---
+.x .y {}
+.x > .y {}
+.x ~ .y {}
+.x + .y {}
+.x.y {}
+.x .y {}
+.x .y {}
+

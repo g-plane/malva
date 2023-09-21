@@ -1,0 +1,7 @@
+---
+source: malva/tests/fmt.rs
+---
+div {
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+

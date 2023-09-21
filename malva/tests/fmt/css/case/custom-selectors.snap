@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+@custom-selector :--camelCase .my-css-selector;
+
+:--camelCase {
+  content: red;
+}
+

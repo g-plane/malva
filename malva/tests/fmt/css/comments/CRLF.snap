@@ -1,0 +1,23 @@
+---
+source: malva/tests/fmt.rs
+---
+/*
+ * Comment 1
+ */
+#header {
+  /*
+   * Comment 2
+   */
+  color: red;
+}
+
+@media only screen and (max-width: 600px) {
+  /*
+   * Comment 3
+   */
+  body {
+    background-color: lightblue; /* Comment 4 */
+    color: red; /* Comment 5 */
+  }
+}
+
