@@ -390,10 +390,15 @@ impl<'s> DocGen<'s> for UniversalSelector<'s> {
 
 impl<'s> DocGen<'s> for WqName<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        if let Some(prefix) = &self.prefix {
-            prefix.doc(ctx).append(self.name.doc(ctx))
+        let name = if let InterpolableIdent::Literal(ident) = &self.name {
+            Doc::text(ident.raw.to_ascii_lowercase())
         } else {
             self.name.doc(ctx)
+        };
+        if let Some(prefix) = &self.prefix {
+            prefix.doc(ctx).append(name)
+        } else {
+            name
         }
     }
 }

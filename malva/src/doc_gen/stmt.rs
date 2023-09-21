@@ -6,7 +6,13 @@ use tiny_pretty::Doc;
 impl<'s> DocGen<'s> for Declaration<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
-        docs.push(self.name.doc(ctx));
+        docs.push(match &self.name {
+            InterpolableIdent::Literal(ident) if !ident.name.starts_with("--") => {
+                Doc::text(ident.raw.to_ascii_lowercase())
+            }
+            name => name.doc(ctx),
+        });
+
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx));
             docs.extend(
@@ -15,6 +21,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         } else {
             docs.extend(ctx.start_padded_comments(self.name.span().end, self.colon_span.start));
         }
+
         docs.push(Doc::text(":"));
         if ctx.options.declaration_name_linebreak {
             docs.push(Doc::line_or_space().nest(ctx.indent_width));

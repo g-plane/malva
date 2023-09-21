@@ -77,7 +77,7 @@ svg|a {}
 /* This matches both XHTML and SVG <a> elements */
 *|a {}
 
-|B {}
+|b {}
 
 ns|* {}
 

@@ -78,10 +78,10 @@ source: malva/tests/fmt.rs
 @supports selector(:after) {}
 @supports selector(:focus) {}
 @supports selector(:focus-visible) {}
-@supports selector(A > B) {}
-@supports selector(A > B) {}
-@supports selector(A > B) {}
-@supports selector(A > B) {}
+@supports selector(a > b) {}
+@supports selector(a > b) {}
+@supports selector(a > b) {}
+@supports selector(a > b) {}
 @supports selector(.a:not(.b)) {}
 @supports selector(:not(.b)) {}
 @supports not selector(:after) {}
@@ -112,7 +112,7 @@ source: malva/tests/fmt.rs
 @supports selector(.parent ~ .child) {}
 @supports selector(ns|*) {}
 @supports selector(svg|a) {}
-@supports selector(|B) {}
+@supports selector(|b) {}
 @supports selector(*|*) {}
 @supports selector(|*) {}
 @supports selector(.a, .b, :not(asdasldaskdhjkashdahsdkjahskdjhakj, asdasldaskdhjkashdahsdkjahskdjhakj)) {}

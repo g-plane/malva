@@ -97,6 +97,11 @@ impl<'s> DocGen<'s> for MediaFeatureComparison {
 impl<'s> DocGen<'s> for MediaFeatureName<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
+            MediaFeatureName::Ident(InterpolableIdent::Literal(ident))
+                if !ident.name.starts_with("--") =>
+            {
+                Doc::text(ident.raw.to_ascii_lowercase())
+            }
             MediaFeatureName::Ident(ident) => ident.doc(ctx),
             MediaFeatureName::SassVariable(sass_variable) => sass_variable.doc(ctx),
         }
