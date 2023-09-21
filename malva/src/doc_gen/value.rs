@@ -5,7 +5,7 @@ use super::{
 };
 use crate::ctx::Ctx;
 use raffia::{ast::*, token::TokenWithSpan, Spanned};
-use std::borrow::Cow;
+use std::{borrow::Cow, mem};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for BracketBlock<'s> {
@@ -205,6 +205,7 @@ impl<'s> DocGen<'s> for Function<'s> {
         docs.push(self.name.doc(ctx));
         docs.push(Doc::text("("));
 
+        let mut pos = self.name.span().end;
         let mut arg_docs = Vec::with_capacity(self.args.len() * 2);
         arg_docs.push(Doc::line_or_nil());
 
@@ -221,6 +222,31 @@ impl<'s> DocGen<'s> for Function<'s> {
             })
             .collect::<Vec<_>>();
 
+        fn format_group<'s>(
+            group: &[ComponentValue<'s>],
+            pos: &mut usize,
+            separator: Doc<'s>,
+            ctx: &Ctx<'_, 's>,
+        ) -> Doc<'s> {
+            Doc::list(
+                itertools::intersperse(
+                    group.iter().map(|arg| {
+                        let arg_span = arg.span();
+                        Doc::list(
+                            ctx.end_padded_comments(
+                                mem::replace(pos, arg_span.end),
+                                arg_span.start,
+                            )
+                            .collect(),
+                        )
+                        .append(arg.doc(ctx))
+                    }),
+                    separator,
+                )
+                .collect(),
+            )
+        }
+
         let separator = if args_groups.len() == 1 {
             Doc::line_or_space()
         } else {
@@ -228,33 +254,27 @@ impl<'s> DocGen<'s> for Function<'s> {
         };
         arg_docs.extend(itertools::intersperse(
             args_groups.iter().map(|group| {
-                if let Some(ComponentValue::Delimiter(
+                if let [group @ .., ComponentValue::Delimiter(
                     delimiter @ Delimiter {
                         kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
-                        ..
+                        span: delimiter_span,
                     },
-                )) = group.last()
+                )] = group
                 {
-                    Doc::list(
-                        itertools::intersperse(
-                            group.iter().take(group.len() - 1).map(|arg| arg.doc(ctx)),
-                            separator.clone(),
-                        )
-                        .collect(),
-                    )
-                    .append(delimiter.doc(ctx))
+                    format_group(group, &mut pos, separator.clone(), ctx)
+                        .concat(ctx.start_padded_comments(
+                            mem::replace(&mut pos, delimiter_span.end),
+                            delimiter_span.start,
+                        ))
+                        .append(delimiter.doc(ctx))
                 } else {
-                    Doc::list(
-                        itertools::intersperse(
-                            group.iter().map(|arg| arg.doc(ctx)),
-                            separator.clone(),
-                        )
-                        .collect(),
-                    )
+                    format_group(group, &mut pos, separator.clone(), ctx)
                 }
             }),
             Doc::line_or_space(),
         ));
+        arg_docs.extend(ctx.start_padded_comments(pos, self.span.end));
+
         docs.push(
             Doc::list(arg_docs)
                 .nest(ctx.indent_width)
