@@ -19,13 +19,30 @@ impl<'s> DocGen<'s> for Comment<'s> {
                     docs.push(Doc::space());
                 }
 
-                docs.extend(itertools::intersperse(
-                    // we don't use `str::lines()` since it uses `split_inclusive`
-                    self.content
-                        .split('\n')
-                        .map(|s| Doc::text(s.strip_suffix('\r').unwrap_or(s))),
-                    Doc::empty_line(),
-                ));
+                // we don't use `str::lines()` since it uses `split_inclusive`
+                let mut lines = self
+                    .content
+                    .split('\n')
+                    .map(|s| s.strip_suffix('\r').unwrap_or(s));
+
+                let is_jsdoc_like = lines.clone().skip(1).all(|line| {
+                    let trimmed = line.trim_start();
+                    trimmed.is_empty() || trimmed.starts_with('*')
+                });
+
+                if is_jsdoc_like {
+                    if let Some(first) = lines.next() {
+                        docs.push(Doc::text(first));
+                    };
+                    docs.extend(
+                        lines.map(|line| Doc::hard_line().append(Doc::text(line.trim_start()))),
+                    );
+                } else {
+                    docs.extend(itertools::intersperse(
+                        lines.map(Doc::text),
+                        Doc::empty_line(),
+                    ));
+                }
 
                 if ctx.options.pad_comments
                     && !self
@@ -39,7 +56,11 @@ impl<'s> DocGen<'s> for Comment<'s> {
                 }
                 docs.push(Doc::text("*/"));
 
-                Doc::list(docs)
+                if is_jsdoc_like {
+                    Doc::list(docs).nest(1)
+                } else {
+                    Doc::list(docs)
+                }
             }
             CommentKind::Line => {
                 let content = self.content.trim_end();
