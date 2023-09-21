@@ -6,12 +6,7 @@ use tiny_pretty::Doc;
 impl<'s> DocGen<'s> for Declaration<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
-        docs.push(match &self.name {
-            InterpolableIdent::Literal(ident) if !ident.name.starts_with("--") => {
-                Doc::text(ident.raw.to_ascii_lowercase())
-            }
-            name => name.doc(ctx),
-        });
+        docs.push(helpers::ident_to_lowercase(&self.name, ctx));
 
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx));

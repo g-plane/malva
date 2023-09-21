@@ -1,4 +1,4 @@
-use super::DocGen;
+use super::{helpers, DocGen};
 use crate::ctx::Ctx;
 use raffia::ast::*;
 use tiny_pretty::Doc;
@@ -239,11 +239,7 @@ impl<'s> DocGen<'s> for NthMatcher<'s> {
 
 impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let name = match &self.name {
-            InterpolableIdent::Literal(literal) => Doc::text(literal.raw.to_ascii_lowercase()),
-            _ => self.name.doc(ctx),
-        };
-        let mut docs = vec![Doc::text(":"), name];
+        let mut docs = vec![Doc::text(":"), helpers::ident_to_lowercase(&self.name, ctx)];
 
         if let Some(arg) = &self.arg {
             docs.reserve(3);
@@ -283,11 +279,10 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
 
 impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let name = match &self.name {
-            InterpolableIdent::Literal(literal) => Doc::text(literal.raw.to_ascii_lowercase()),
-            _ => self.name.doc(ctx),
-        };
-        let mut docs = vec![Doc::text("::"), name];
+        let mut docs = vec![
+            Doc::text("::"),
+            helpers::ident_to_lowercase(&self.name, ctx),
+        ];
 
         if let Some(arg) = &self.arg {
             docs.reserve(3);

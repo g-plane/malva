@@ -186,3 +186,15 @@ pub(super) fn format_operator_suffix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
         OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
     }
 }
+
+pub(super) fn ident_to_lowercase<'s>(
+    interpolable_ident: &InterpolableIdent<'s>,
+    ctx: &Ctx<'_, 's>,
+) -> Doc<'s> {
+    match &interpolable_ident {
+        InterpolableIdent::Literal(ident) if !ident.name.starts_with("--") => {
+            Doc::text(ident.raw.to_ascii_lowercase())
+        }
+        name => name.doc(ctx),
+    }
+}
