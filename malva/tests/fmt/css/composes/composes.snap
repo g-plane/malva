@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+.reference {
+  composes: selector from
+    "a/long/file/path/exceeding/the/maximum/length/forcing/a/line-wrap/file.css";
+}
+

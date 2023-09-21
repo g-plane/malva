@@ -1,0 +1,10 @@
+---
+source: malva/tests/fmt.rs
+---
+details[open] {}
+
+div {
+  box-sizing: border-box;
+  color: red;
+}
+

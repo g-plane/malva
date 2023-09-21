@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+.blah {
+  /* hloow <|> */
+  background-color: white;
+}
+
