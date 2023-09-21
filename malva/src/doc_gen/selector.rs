@@ -115,11 +115,13 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                 ..
             }) => docs,
             ComplexSelectorChild::Combinator(combinator) => {
-                docs.push(Doc::space());
+                docs.push(Doc::line_or_space());
                 docs.push(combinator.doc(ctx));
                 docs
             }
         }))
+        .group()
+        .nest(ctx.indent_width)
     }
 }
 
