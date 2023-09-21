@@ -126,12 +126,6 @@ pub(crate) fn resolve_config(
             ),
             trailing_comma: get_value(&mut config, "trailingComma", false, &mut diagnostics),
             pad_comments: get_value(&mut config, "padComments", false, &mut diagnostics),
-            declaration_name_linebreak: get_value(
-                &mut config,
-                "declarationNameLinebreak",
-                false,
-                &mut diagnostics,
-            ),
         },
     };
 

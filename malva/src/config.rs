@@ -61,7 +61,6 @@ pub struct LanguageOptions {
     pub omit_number_leading_zero: bool,
     pub trailing_comma: bool,
     pub pad_comments: bool,
-    pub declaration_name_linebreak: bool,
 }
 
 #[derive(Clone, Debug, Default)]

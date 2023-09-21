@@ -18,7 +18,16 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         }
 
         docs.push(Doc::text(":"));
-        if ctx.options.declaration_name_linebreak {
+        let can_break_before_value = self.value.iter().any(|value| {
+            matches!(
+                value,
+                ComponentValue::Delimiter(Delimiter {
+                    kind: DelimiterKind::Comma,
+                    ..
+                })
+            )
+        });
+        if can_break_before_value {
             docs.push(Doc::line_or_space().nest(ctx.indent_width));
         } else {
             docs.push(Doc::space());
@@ -90,7 +99,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         docs.push(Doc::list(values).group().nest(ctx.indent_width));
 
         let doc = Doc::list(docs);
-        if ctx.options.declaration_name_linebreak {
+        if can_break_before_value {
             doc.group()
         } else {
             doc
