@@ -67,22 +67,35 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     values.extend(ctx.end_padded_comments(pos, span.start));
 
                     values.push(value.doc(ctx));
-                    if matches!(
-                        value,
+                    match value {
                         ComponentValue::Delimiter(Delimiter {
                             kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
                             ..
-                        })
-                    ) {
-                        values.push(Doc::line_or_space());
-                    } else if !matches!(
-                        iter.peek(),
-                        Some(ComponentValue::Delimiter(Delimiter {
-                            kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
-                            ..
-                        })) | None
-                    ) {
-                        values.push(Doc::soft_line());
+                        }) => values.push(Doc::line_or_space()),
+                        ComponentValue::Delimiter(Delimiter {
+                            kind: DelimiterKind::Solidus,
+                            span,
+                        }) => {
+                            if pos < span.start {
+                                values.push(Doc::soft_line());
+                            }
+                        }
+                        _ => match iter.peek() {
+                            Some(ComponentValue::Delimiter(Delimiter {
+                                kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                                ..
+                            }))
+                            | None => {}
+                            Some(ComponentValue::Delimiter(Delimiter {
+                                kind: DelimiterKind::Solidus,
+                                span: next_span,
+                            })) => {
+                                if span.end < next_span.start {
+                                    values.push(Doc::soft_line());
+                                }
+                            }
+                            _ => values.push(Doc::soft_line()),
+                        },
                     }
 
                     pos = span.end;
