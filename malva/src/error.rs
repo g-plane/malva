@@ -1,7 +1,9 @@
 use std::fmt::Display;
 
+/// The error type for Malva.
 #[derive(Clone, Debug)]
 pub enum Error {
+    /// Error from the parser, usually related to syntax error.
     Parser(raffia::error::Error),
 }
 

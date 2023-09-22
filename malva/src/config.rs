@@ -1,6 +1,9 @@
+//! Types about configuration.
+
 #[cfg(feature = "config_serde")]
 use serde::{Deserialize, Serialize};
 
+/// The whole configuration of Malva.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
@@ -11,6 +14,7 @@ pub struct FormatOptions {
     pub language: LanguageOptions,
 }
 
+/// Configuration related to layout, such as indentation or print width.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
@@ -50,6 +54,7 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
     }
 }
 
+/// Configuration related to syntax.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
@@ -67,6 +72,7 @@ pub struct LanguageOptions {
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
 pub enum HexCase {
+    /// Keep the color hex case as-is.
     Ignore,
     #[default]
     Lower,
@@ -77,10 +83,14 @@ pub enum HexCase {
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
 pub enum Quotes {
+    /// Make all strings to double quoted.
     #[default]
     AlwaysDouble,
+    /// Make all strings to single quoted.
     AlwaysSingle,
+    /// Make string to double quoted unless it contains single quotes inside.
     PreferDouble,
+    /// Make string to single quoted unless it contains double quotes inside.
     PreferSingle,
 }
 
@@ -97,8 +107,13 @@ pub enum OperatorLineBreak {
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
 pub enum BlockSelectorLineBreak {
+    /// Always insert linebreaks after all commas.
     Always,
     #[default]
+    /// Put selectors at one line as possible.
+    /// If exceeded print width, insert linebreaks after all commas.
     Consistent,
+    /// Put selectors at one line as possible.
+    /// If exceeded print width, insert one linebreak where it exceeds.
     Wrap,
 }

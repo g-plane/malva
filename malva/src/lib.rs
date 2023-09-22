@@ -9,6 +9,7 @@ pub use crate::{error::Error, line_bounds::LineBounds};
 pub use raffia::Syntax;
 use raffia::{ast::Stylesheet, token::Comment, ParserBuilder};
 
+/// Format the given source code.
 pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Result<String, Error> {
     let line_bounds = LineBounds::new(input);
     let mut comments = vec![];
@@ -30,6 +31,8 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
     ))
 }
 
+/// Print the given stylesheet AST.
+/// You may use this when you already have the parsed AST.
 pub fn print_stylesheet<'a, 's>(
     stylesheet: &'a Stylesheet<'s>,
     comments: &'a [Comment<'s>],

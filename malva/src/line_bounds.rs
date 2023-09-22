@@ -1,8 +1,11 @@
 use std::{cmp::Ordering, iter, ops::ControlFlow};
 
+/// `LineBounds` is used to compute line distance.
+/// This is for internal use only.
 pub struct LineBounds(Vec<usize>);
 
 impl LineBounds {
+    /// Generate line bounds from input.
     pub fn new(input: &str) -> Self {
         Self(
             iter::once(0)
