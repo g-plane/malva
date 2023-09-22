@@ -1,6 +1,6 @@
 use super::{helpers, DocGen};
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for AnPlusB {
@@ -26,13 +26,20 @@ impl<'s> DocGen<'s> for AttributeSelector<'s> {
         docs.push(Doc::text("["));
         docs.push(self.name.doc(ctx));
         if let Some((matcher, value)) = self.matcher.as_ref().zip(self.value.as_ref()) {
+            docs.extend(ctx.end_padded_comments(self.name.span.end, matcher.span.start));
             docs.push(matcher.doc(ctx));
+
+            let value_span = value.span();
+            docs.extend(ctx.end_padded_comments(matcher.span.end, value_span.start));
             docs.push(value.doc(ctx));
             if let Some(modifier) = &self.modifier {
                 docs.reserve(2);
                 docs.push(Doc::space());
+                docs.extend(ctx.end_padded_comments(value_span.end, modifier.span.start));
                 docs.push(modifier.doc(ctx));
             }
+        } else {
+            docs.extend(ctx.start_padded_comments(self.name.span.end, self.span.end));
         }
         docs.push(Doc::text("]"));
         Doc::list(docs)
@@ -138,12 +145,12 @@ impl<'s> DocGen<'s> for CompoundSelector<'s> {
 
 impl<'s> DocGen<'s> for CompoundSelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.selectors.iter().map(|selector| selector.doc(ctx)),
-                Doc::text(", "),
-            )
-            .collect(),
+        helpers::format_comma_separated_list(
+            &self.selectors,
+            &self.comma_spans,
+            self.span.start,
+            Doc::space(),
+            ctx,
         )
     }
 }
@@ -244,8 +251,11 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
         let mut docs = vec![Doc::text(":"), helpers::ident_to_lowercase(&self.name, ctx)];
 
         if let Some(arg) = &self.arg {
+            let arg_span = arg.span();
+
             docs.reserve(3);
             docs.push(Doc::text("("));
+            docs.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
             docs.push(match arg {
                 PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
@@ -273,6 +283,7 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                     self.span.end,
                 ),
             });
+            docs.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
             docs.push(Doc::text(")"));
         }
         Doc::list(docs)
@@ -287,8 +298,11 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
         ];
 
         if let Some(arg) = &self.arg {
+            let arg_span = arg.span();
+
             docs.reserve(3);
             docs.push(Doc::text("("));
+            docs.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
             docs.push(match arg {
                 PseudoElementSelectorArg::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
@@ -301,6 +315,7 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
                     self.span.end,
                 ),
             });
+            docs.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
             docs.push(Doc::text(")"));
         }
         Doc::list(docs)
@@ -322,12 +337,12 @@ impl<'s> DocGen<'s> for RelativeSelector<'s> {
 
 impl<'s> DocGen<'s> for RelativeSelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.selectors.iter().map(|selector| selector.doc(ctx)),
-                Doc::text(", "),
-            )
-            .collect(),
+        helpers::format_comma_separated_list(
+            &self.selectors,
+            &self.comma_spans,
+            self.span.start,
+            Doc::space(),
+            ctx,
         )
     }
 }
@@ -349,12 +364,12 @@ impl<'s> DocGen<'s> for SimpleSelector<'s> {
 
 impl<'s> DocGen<'s> for SelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.selectors.iter().map(|selector| selector.doc(ctx)),
-                Doc::text(", "),
-            )
-            .collect(),
+        helpers::format_comma_separated_list(
+            &self.selectors,
+            &self.comma_spans,
+            self.span.start,
+            Doc::space(),
+            ctx,
         )
     }
 }
