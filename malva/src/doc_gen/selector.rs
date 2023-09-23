@@ -102,6 +102,7 @@ impl<'s> DocGen<'s> for Combinator {
 impl<'s> DocGen<'s> for ComplexSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.children.len() * 2);
+        let mut pos = self.span.start;
 
         let mut children = self.children.iter();
         if let Some(first) = children.next() {
@@ -109,24 +110,31 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                 ComplexSelectorChild::CompoundSelector(selector) => selector.doc(ctx),
                 ComplexSelectorChild::Combinator(combinator) => combinator.doc(ctx),
             });
+            pos = first.span().end;
         }
 
-        Doc::list(children.fold(docs, |mut docs, child| match child {
-            ComplexSelectorChild::CompoundSelector(selector) => {
-                docs.push(Doc::space());
-                docs.push(selector.doc(ctx));
-                docs
-            }
-            ComplexSelectorChild::Combinator(Combinator {
-                kind: CombinatorKind::Descendant,
-                ..
-            }) => docs,
-            ComplexSelectorChild::Combinator(combinator) => {
-                docs.push(Doc::line_or_space().nest(ctx.indent_width));
-                docs.push(combinator.doc(ctx));
-                docs
-            }
-        }))
+        Doc::list(
+            children
+                .fold((docs, pos), |(mut docs, pos), child| match child {
+                    ComplexSelectorChild::CompoundSelector(selector) => {
+                        docs.push(Doc::space());
+                        docs.extend(ctx.end_padded_comments(pos, selector.span.start));
+                        docs.push(selector.doc(ctx));
+                        (docs, selector.span.end)
+                    }
+                    ComplexSelectorChild::Combinator(Combinator {
+                        kind: CombinatorKind::Descendant,
+                        ..
+                    }) => (docs, pos),
+                    ComplexSelectorChild::Combinator(combinator) => {
+                        docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                        docs.extend(ctx.end_padded_comments(pos, combinator.span.start));
+                        docs.push(combinator.doc(ctx));
+                        (docs, combinator.span.end)
+                    }
+                })
+                .0,
+        )
         .group()
     }
 }
