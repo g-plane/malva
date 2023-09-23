@@ -122,13 +122,12 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                 ..
             }) => docs,
             ComplexSelectorChild::Combinator(combinator) => {
-                docs.push(Doc::line_or_space());
+                docs.push(Doc::line_or_space().nest(ctx.indent_width));
                 docs.push(combinator.doc(ctx));
                 docs
             }
         }))
         .group()
-        .nest(ctx.indent_width)
     }
 }
 
@@ -251,12 +250,17 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
         let mut docs = vec![Doc::text(":"), helpers::ident_to_lowercase(&self.name, ctx)];
 
         if let Some(arg) = &self.arg {
-            let arg_span = arg.span();
-
-            docs.reserve(3);
             docs.push(Doc::text("("));
-            docs.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
-            docs.push(match arg {
+
+            let arg_span = arg.span();
+            let mut arg_doc = vec![];
+
+            if ctx.options.linebreak_in_pseudo_parens {
+                arg_doc.push(Doc::line_or_nil());
+            }
+
+            arg_doc.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
+            arg_doc.push(match arg {
                 PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
                 }
@@ -283,9 +287,21 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                     self.span.end,
                 ),
             });
-            docs.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
+
+            arg_doc.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
+            if ctx.options.linebreak_in_pseudo_parens {
+                docs.push(
+                    Doc::list(arg_doc)
+                        .nest(ctx.indent_width)
+                        .append(Doc::line_or_nil())
+                        .group(),
+                );
+            } else {
+                docs.append(&mut arg_doc);
+            }
             docs.push(Doc::text(")"));
         }
+
         Doc::list(docs)
     }
 }
@@ -298,12 +314,17 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
         ];
 
         if let Some(arg) = &self.arg {
-            let arg_span = arg.span();
-
-            docs.reserve(3);
             docs.push(Doc::text("("));
-            docs.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
-            docs.push(match arg {
+
+            let arg_span = arg.span();
+            let mut arg_doc = vec![];
+
+            if ctx.options.linebreak_in_pseudo_parens {
+                arg_doc.push(Doc::line_or_nil());
+            }
+
+            arg_doc.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
+            arg_doc.push(match arg {
                 PseudoElementSelectorArg::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
                 }
@@ -315,9 +336,21 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
                     self.span.end,
                 ),
             });
-            docs.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
+
+            arg_doc.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
+            if ctx.options.linebreak_in_pseudo_parens {
+                docs.push(
+                    Doc::list(arg_doc)
+                        .nest(ctx.indent_width)
+                        .append(Doc::line_or_nil())
+                        .group(),
+                );
+            } else {
+                docs.append(&mut arg_doc);
+            }
             docs.push(Doc::text(")"));
         }
+
         Doc::list(docs)
     }
 }
