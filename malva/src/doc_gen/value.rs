@@ -534,7 +534,10 @@ impl<'s> DocGen<'s> for UnicodeRange<'s> {
 impl<'s> DocGen<'s> for Url<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
-        docs.push(Doc::text("url("));
+        docs.push(Doc::text(format!(
+            "{}(",
+            self.name.raw.to_ascii_lowercase()
+        )));
 
         let mut args = Vec::with_capacity(1);
         if let Some(value) = &self.value {
