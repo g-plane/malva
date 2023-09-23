@@ -599,31 +599,36 @@ fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
 }
 
 fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
+    let number = raw.strip_suffix('.').unwrap_or(raw);
     #[allow(clippy::collapsible_else_if)]
     let number: Cow<_> = if ctx.options.omit_number_leading_zero {
-        if let Some(raw) = raw.strip_prefix("0.") {
-            format!(".{raw}").into()
-        } else if let Some(raw) = raw.strip_prefix("-0.") {
-            format!("-.{raw}").into()
-        } else if let Some(raw) = raw.strip_prefix("+0.") {
-            format!("+.{raw}").into()
+        if let Some(number) = number.strip_prefix("0.") {
+            format!(".{number}").into()
+        } else if let Some(number) = number.strip_prefix("-0.") {
+            format!("-.{number}").into()
+        } else if let Some(number) = number.strip_prefix("+0.") {
+            format!("+.{number}").into()
         } else {
-            raw.into()
+            number.into()
         }
     } else {
-        if let Some(raw) = raw.strip_prefix('.') {
-            format!("0.{raw}").into()
-        } else if let Some(raw) = raw.strip_prefix("-.") {
-            format!("-0.{raw}").into()
-        } else if let Some(raw) = raw.strip_prefix("+.") {
-            format!("+0.{raw}").into()
+        if let Some(number) = number.strip_prefix('.') {
+            format!("0.{number}").into()
+        } else if let Some(number) = number.strip_prefix("-.") {
+            format!("-0.{number}").into()
+        } else if let Some(number) = number.strip_prefix("+.") {
+            format!("+0.{number}").into()
         } else {
-            raw.into()
+            number.into()
         }
     };
 
-    if let Some((coefficient, exponent)) = number.split_once('E') {
-        format!("{coefficient}e{exponent}").into()
+    if let Some((coefficient, exponent)) = number.split_once(['e', 'E']) {
+        format!(
+            "{}e{exponent}",
+            coefficient.strip_suffix('.').unwrap_or(coefficient)
+        )
+        .into()
     } else {
         number
     }
