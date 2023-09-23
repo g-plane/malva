@@ -12,7 +12,7 @@ impl<'s> DocGen<'s> for ImportPrelude<'s> {
         if let Some(layer) = &self.layer {
             let span = layer.span();
             docs.push(Doc::line_or_space());
-            docs.extend(ctx.end_padded_comments(pos, span.start));
+            docs.extend(ctx.end_spaced_comments(pos, span.start));
             docs.push(layer.doc(ctx));
             pos = span.end;
         }
@@ -20,14 +20,14 @@ impl<'s> DocGen<'s> for ImportPrelude<'s> {
         if let Some(supports) = &self.supports {
             let span = supports.span();
             docs.push(Doc::line_or_space());
-            docs.extend(ctx.end_padded_comments(pos, span.start));
+            docs.extend(ctx.end_spaced_comments(pos, span.start));
             docs.push(supports.doc(ctx));
             pos = span.end;
         }
 
         if let Some(media) = &self.media {
             docs.push(Doc::line_or_space());
-            docs.extend(ctx.end_padded_comments(pos, media.span.start));
+            docs.extend(ctx.end_spaced_comments(pos, media.span.start));
             docs.push(media.doc(ctx));
         }
 
@@ -57,14 +57,14 @@ impl<'s> DocGen<'s> for ImportPreludeSupports<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let kind_span = self.kind.span();
         Doc::text("supports(")
-            .concat(ctx.end_padded_comments(self.span.start, kind_span.start))
+            .concat(ctx.end_spaced_comments(self.span.start, kind_span.start))
             .append(match &self.kind {
                 ImportPreludeSupportsKind::SupportsCondition(supports_condition) => {
                     supports_condition.doc(ctx)
                 }
                 ImportPreludeSupportsKind::Declaration(declaration) => declaration.doc(ctx),
             })
-            .concat(ctx.start_padded_comments(kind_span.end, self.span.end))
+            .concat(ctx.start_spaced_comments(kind_span.end, self.span.end))
             .append(Doc::text(")"))
     }
 }

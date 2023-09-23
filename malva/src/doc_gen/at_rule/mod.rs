@@ -21,14 +21,14 @@ impl<'s> DocGen<'s> for AtRule<'s> {
         if let Some(prelude) = &self.prelude {
             docs.push(Doc::space());
             let span = prelude.span();
-            docs.extend(ctx.end_padded_comments(pos, span.start));
+            docs.extend(ctx.end_spaced_comments(pos, span.start));
             docs.push(prelude.doc(ctx));
             pos = span.end;
         }
 
         if let Some(block) = &self.block {
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(pos, block.span.start));
+            docs.extend(ctx.end_spaced_comments(pos, block.span.start));
             docs.push(block.doc(ctx));
         }
 
@@ -90,7 +90,7 @@ impl<'s> DocGen<'s> for CustomMedia<'s> {
         self.name
             .doc(ctx)
             .append(Doc::space())
-            .concat(ctx.end_padded_comments(self.name.span().end, self.value.span().start))
+            .concat(ctx.end_spaced_comments(self.name.span().end, self.value.span().start))
             .append(self.value.doc(ctx))
     }
 }
@@ -147,7 +147,7 @@ impl<'s> DocGen<'s> for KeyframeBlock<'s> {
         )
         .append(Doc::space())
         .concat(
-            ctx.end_padded_comments(
+            ctx.end_spaced_comments(
                 self.selectors
                     .last()
                     .map(|selector| selector.span().end)
@@ -207,7 +207,7 @@ impl<'s> DocGen<'s> for NamespacePrelude<'s> {
             prefix
                 .doc(ctx)
                 .append(Doc::line_or_space())
-                .concat(ctx.end_padded_comments(prefix.span().end, self.uri.span().start))
+                .concat(ctx.end_spaced_comments(prefix.span().end, self.uri.span().start))
                 .append(self.uri.doc(ctx))
                 .group()
                 .nest(ctx.indent_width)
@@ -267,7 +267,7 @@ impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
                 let mut iter = token_seq.tokens.iter().peekable();
                 while let Some(token) = iter.next() {
                     let span = token.span();
-                    docs.extend(ctx.start_padded_comments(pos, span.start));
+                    docs.extend(ctx.start_spaced_comments(pos, span.start));
 
                     docs.push(token.doc(ctx));
                     if let TokenWithSpan {

@@ -26,20 +26,20 @@ impl<'s> DocGen<'s> for AttributeSelector<'s> {
         docs.push(Doc::text("["));
         docs.push(self.name.doc(ctx));
         if let Some((matcher, value)) = self.matcher.as_ref().zip(self.value.as_ref()) {
-            docs.extend(ctx.end_padded_comments(self.name.span.end, matcher.span.start));
+            docs.extend(ctx.end_spaced_comments(self.name.span.end, matcher.span.start));
             docs.push(matcher.doc(ctx));
 
             let value_span = value.span();
-            docs.extend(ctx.end_padded_comments(matcher.span.end, value_span.start));
+            docs.extend(ctx.end_spaced_comments(matcher.span.end, value_span.start));
             docs.push(value.doc(ctx));
             if let Some(modifier) = &self.modifier {
                 docs.reserve(2);
                 docs.push(Doc::space());
-                docs.extend(ctx.end_padded_comments(value_span.end, modifier.span.start));
+                docs.extend(ctx.end_spaced_comments(value_span.end, modifier.span.start));
                 docs.push(modifier.doc(ctx));
             }
         } else {
-            docs.extend(ctx.start_padded_comments(self.name.span.end, self.span.end));
+            docs.extend(ctx.start_spaced_comments(self.name.span.end, self.span.end));
         }
         docs.push(Doc::text("]"));
         Doc::list(docs)
@@ -118,7 +118,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                 .fold((docs, pos), |(mut docs, pos), child| match child {
                     ComplexSelectorChild::CompoundSelector(selector) => {
                         docs.push(Doc::space());
-                        docs.extend(ctx.end_padded_comments(pos, selector.span.start));
+                        docs.extend(ctx.end_spaced_comments(pos, selector.span.start));
                         docs.push(selector.doc(ctx));
                         (docs, selector.span.end)
                     }
@@ -128,7 +128,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                     }) => (docs, pos),
                     ComplexSelectorChild::Combinator(combinator) => {
                         docs.push(Doc::line_or_space().nest(ctx.indent_width));
-                        docs.extend(ctx.end_padded_comments(pos, combinator.span.start));
+                        docs.extend(ctx.end_spaced_comments(pos, combinator.span.start));
                         docs.push(combinator.doc(ctx));
                         (docs, combinator.span.end)
                     }
@@ -267,7 +267,7 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                 arg_doc.push(Doc::line_or_nil());
             }
 
-            arg_doc.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
+            arg_doc.extend(ctx.end_spaced_comments(self.span.start, arg_span.start));
             arg_doc.push(match arg {
                 PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
@@ -296,7 +296,7 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                 ),
             });
 
-            arg_doc.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
+            arg_doc.extend(ctx.start_spaced_comments(arg_span.end, self.span.end));
             if ctx.options.linebreak_in_pseudo_parens {
                 docs.push(
                     Doc::list(arg_doc)
@@ -331,7 +331,7 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
                 arg_doc.push(Doc::line_or_nil());
             }
 
-            arg_doc.extend(ctx.end_padded_comments(self.span.start, arg_span.start));
+            arg_doc.extend(ctx.end_spaced_comments(self.span.start, arg_span.start));
             arg_doc.push(match arg {
                 PseudoElementSelectorArg::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
@@ -345,7 +345,7 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
                 ),
             });
 
-            arg_doc.extend(ctx.start_padded_comments(arg_span.end, self.span.end));
+            arg_doc.extend(ctx.start_spaced_comments(arg_span.end, self.span.end));
             if ctx.options.linebreak_in_pseudo_parens {
                 docs.push(
                     Doc::list(arg_doc)
@@ -468,7 +468,7 @@ fn format_pseudo_selector_arg_tokens<'a, 's: 'a>(
     let mut docs = Vec::with_capacity(token_seq.tokens.len() * 2);
     let mut iter = token_seq.tokens.iter().peekable();
     while let Some(token) = iter.next() {
-        docs.extend(ctx.end_padded_comments(pos, token.span.start));
+        docs.extend(ctx.end_spaced_comments(pos, token.span.start));
 
         docs.push(token.doc(ctx));
         if let TokenWithSpan {
@@ -491,7 +491,7 @@ fn format_pseudo_selector_arg_tokens<'a, 's: 'a>(
         pos = token.span.end;
     }
 
-    docs.extend(ctx.start_padded_comments(pos, to));
+    docs.extend(ctx.start_spaced_comments(pos, to));
 
     Doc::list(docs)
 }

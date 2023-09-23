@@ -25,7 +25,7 @@ impl<'a, 's> Ctx<'a, 's> {
             .filter(move |comment| comment.span.start >= start && comment.span.end <= end)
     }
 
-    pub(crate) fn start_padded_comments(
+    pub(crate) fn start_spaced_comments(
         &'a self,
         start: usize,
         end: usize,
@@ -52,7 +52,7 @@ impl<'a, 's> Ctx<'a, 's> {
             .flatten()
     }
 
-    pub(crate) fn end_padded_comments(
+    pub(crate) fn end_spaced_comments(
         &'a self,
         start: usize,
         end: usize,

@@ -48,20 +48,20 @@ where
                     EitherOrBoth::Both(list_item, comma_span) => {
                         let list_item_span = list_item.span();
                         let mut docs = ctx
-                            .end_padded_comments(
+                            .end_spaced_comments(
                                 mem::replace(pos, comma_span.end),
                                 list_item_span.start,
                             )
                             .collect::<Vec<_>>();
                         docs.push(list_item.doc(ctx));
                         docs.extend(
-                            ctx.start_padded_comments(list_item_span.end, comma_span.start),
+                            ctx.start_spaced_comments(list_item_span.end, comma_span.start),
                         );
                         Some(docs.into_iter())
                     }
                     EitherOrBoth::Left(list_item) => {
                         let mut docs = ctx
-                            .end_padded_comments(*pos, list_item.span().start)
+                            .end_spaced_comments(*pos, list_item.span().start)
                             .collect::<Vec<_>>();
                         docs.push(list_item.doc(ctx));
                         Some(docs.into_iter())
@@ -113,20 +113,20 @@ pub(super) fn format_values_list<'s>(
                         EitherOrBoth::Both(value, comma_span) => {
                             let value_span = value.span();
                             let mut docs = ctx
-                                .end_padded_comments(
+                                .end_spaced_comments(
                                     mem::replace(pos, comma_span.end),
                                     value_span.start,
                                 )
                                 .collect::<Vec<_>>();
                             docs.push(value.doc(ctx));
                             docs.extend(
-                                ctx.start_padded_comments(value_span.end, comma_span.start),
+                                ctx.start_spaced_comments(value_span.end, comma_span.start),
                             );
                             Some(docs.into_iter())
                         }
                         EitherOrBoth::Left(value) => {
                             let mut docs = ctx
-                                .end_padded_comments(*pos, value.span().start)
+                                .end_spaced_comments(*pos, value.span().start)
                                 .collect::<Vec<_>>();
                             docs.push(value.doc(ctx));
                             Some(docs.into_iter())
@@ -150,7 +150,7 @@ pub(super) fn format_values_list<'s>(
             values.iter().scan(list_span.start, |pos, value| {
                 let value_span = value.span();
                 Some(
-                    ctx.end_padded_comments(mem::replace(pos, value_span.end), value_span.start)
+                    ctx.end_spaced_comments(mem::replace(pos, value_span.end), value_span.start)
                         .chain(iter::once(value.doc(ctx)))
                         .collect::<Vec<_>>()
                         .into_iter(),
@@ -162,7 +162,7 @@ pub(super) fn format_values_list<'s>(
         .collect::<Vec<_>>();
 
         if let Some(last) = values.last() {
-            docs.extend(ctx.start_padded_comments(last.span().end, list_span.end));
+            docs.extend(ctx.start_spaced_comments(last.span().end, list_span.end));
         }
 
         Doc::list(docs).group().nest(ctx.indent_width)

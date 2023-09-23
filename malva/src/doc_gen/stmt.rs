@@ -11,10 +11,10 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx));
             docs.extend(
-                ctx.start_padded_comments(less_property_merge.span.end, self.colon_span.start),
+                ctx.start_spaced_comments(less_property_merge.span.end, self.colon_span.start),
             );
         } else {
-            docs.extend(ctx.start_padded_comments(self.name.span().end, self.colon_span.start));
+            docs.extend(ctx.start_spaced_comments(self.name.span().end, self.colon_span.start));
         }
 
         docs.push(Doc::text(":"));
@@ -44,7 +44,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 use raffia::token::Token;
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.end_padded_comments(pos, span.start));
+                    values.extend(ctx.end_spaced_comments(pos, span.start));
 
                     values.push(value.doc(ctx));
                     if let ComponentValue::TokenWithSpan(TokenWithSpan {
@@ -64,7 +64,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
             _ => {
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.end_padded_comments(pos, span.start));
+                    values.extend(ctx.end_spaced_comments(pos, span.start));
 
                     values.push(value.doc(ctx));
                     match value {
@@ -105,7 +105,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
 
         if let Some(important) = &self.important {
             values.push(Doc::soft_line());
-            values.extend(ctx.end_padded_comments(pos, important.span.start));
+            values.extend(ctx.end_spaced_comments(pos, important.span.start));
             values.push(important.doc(ctx));
         }
 
@@ -137,7 +137,7 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
             ctx,
         )
         .append(Doc::space())
-        .concat(ctx.end_padded_comments(self.selector.span.end, self.block.span.start))
+        .concat(ctx.end_spaced_comments(self.selector.span.end, self.block.span.start))
         .append(self.block.doc(ctx))
     }
 }

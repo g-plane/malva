@@ -84,10 +84,10 @@ impl<'s> DocGen<'s> for Calc<'s> {
         };
 
         left.append(helpers::format_operator_prefix_space(ctx))
-            .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
+            .concat(ctx.end_spaced_comments(self.left.span().end, self.op.span.start))
             .append(self.op.doc(ctx))
             .append(helpers::format_operator_suffix_space(ctx))
-            .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
+            .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
             .append(right)
     }
 }
@@ -233,7 +233,7 @@ impl<'s> DocGen<'s> for Function<'s> {
                     group.iter().map(|arg| {
                         let arg_span = arg.span();
                         Doc::list(
-                            ctx.end_padded_comments(
+                            ctx.end_spaced_comments(
                                 mem::replace(pos, arg_span.end),
                                 arg_span.start,
                             )
@@ -262,7 +262,7 @@ impl<'s> DocGen<'s> for Function<'s> {
                 )] = group
                 {
                     format_group(group, &mut pos, separator.clone(), ctx)
-                        .concat(ctx.start_padded_comments(
+                        .concat(ctx.start_spaced_comments(
                             mem::replace(&mut pos, delimiter_span.end),
                             delimiter_span.start,
                         ))
@@ -273,7 +273,7 @@ impl<'s> DocGen<'s> for Function<'s> {
             }),
             Doc::line_or_space(),
         ));
-        arg_docs.extend(ctx.start_padded_comments(pos, self.span.end));
+        arg_docs.extend(ctx.start_spaced_comments(pos, self.span.end));
 
         docs.push(
             Doc::list(arg_docs)

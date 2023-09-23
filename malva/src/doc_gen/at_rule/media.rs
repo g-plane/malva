@@ -12,7 +12,7 @@ impl<'s> DocGen<'s> for MediaAnd<'s> {
             OperatorLineBreak::After => vec![Doc::space(), Doc::text("and"), Doc::line_or_space()],
         };
         docs.extend(
-            ctx.end_padded_comments(self.keyword.span.end, self.media_in_parens.span.start),
+            ctx.end_spaced_comments(self.keyword.span.end, self.media_in_parens.span.start),
         );
         docs.push(self.media_in_parens.doc(ctx));
 
@@ -29,7 +29,7 @@ impl<'s> DocGen<'s> for MediaCondition<'s> {
                     (Vec::with_capacity(self.conditions.len()), self.span.start),
                     |(mut docs, pos), condition| {
                         let span = condition.span();
-                        docs.extend(ctx.start_padded_comments(pos, span.start));
+                        docs.extend(ctx.start_spaced_comments(pos, span.start));
                         docs.push(condition.doc(ctx));
                         (docs, span.end)
                     },
@@ -47,7 +47,7 @@ impl<'s> DocGen<'s> for MediaConditionAfterMediaType<'s> {
             OperatorLineBreak::Before => vec![Doc::text("and"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::text("and"), Doc::line_or_space()],
         };
-        docs.extend(ctx.end_padded_comments(self.and.span.end, self.condition.span.start));
+        docs.extend(ctx.end_spaced_comments(self.and.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
@@ -112,9 +112,9 @@ impl<'s> DocGen<'s> for MediaFeaturePlain<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name
             .doc(ctx)
-            .concat(ctx.start_padded_comments(self.name.span().end, self.colon_span.start))
+            .concat(ctx.start_spaced_comments(self.name.span().end, self.colon_span.start))
             .append(Doc::text(": "))
-            .concat(ctx.end_padded_comments(self.colon_span.start, self.value.span().start))
+            .concat(ctx.end_spaced_comments(self.colon_span.start, self.value.span().start))
             .append(self.value.doc(ctx))
     }
 }
@@ -124,10 +124,10 @@ impl<'s> DocGen<'s> for MediaFeatureRange<'s> {
         self.left
             .doc(ctx)
             .append(Doc::space())
-            .concat(ctx.end_padded_comments(self.left.span().end, self.comparison.span.start))
+            .concat(ctx.end_spaced_comments(self.left.span().end, self.comparison.span.start))
             .append(self.comparison.doc(ctx))
             .append(Doc::space())
-            .concat(ctx.end_padded_comments(self.comparison.span.end, self.right.span().start))
+            .concat(ctx.end_spaced_comments(self.comparison.span.end, self.right.span().start))
             .append(self.right.doc(ctx))
     }
 }
@@ -138,17 +138,17 @@ impl<'s> DocGen<'s> for MediaFeatureRangeInterval<'s> {
         self.left
             .doc(ctx)
             .append(Doc::space())
-            .concat(ctx.end_padded_comments(self.left.span().end, self.left_comparison.span.start))
+            .concat(ctx.end_spaced_comments(self.left.span().end, self.left_comparison.span.start))
             .append(self.left_comparison.doc(ctx))
             .append(Doc::space())
-            .concat(ctx.end_padded_comments(self.left_comparison.span.end, name_span.start))
+            .concat(ctx.end_spaced_comments(self.left_comparison.span.end, name_span.start))
             .append(self.name.doc(ctx))
             .append(Doc::space())
-            .concat(ctx.end_padded_comments(name_span.end, self.right_comparison.span.start))
+            .concat(ctx.end_spaced_comments(name_span.end, self.right_comparison.span.start))
             .append(self.right_comparison.doc(ctx))
             .append(Doc::space())
             .concat(
-                ctx.end_padded_comments(self.right_comparison.span.end, self.right.span().start),
+                ctx.end_spaced_comments(self.right_comparison.span.end, self.right.span().start),
             )
             .append(self.right.doc(ctx))
     }
@@ -163,9 +163,9 @@ impl<'s> DocGen<'s> for MediaInParens<'s> {
         let kind_span = self.kind.span();
 
         Doc::text("(")
-            .concat(ctx.end_padded_comments(self.span.start, kind_span.start))
+            .concat(ctx.end_spaced_comments(self.span.start, kind_span.start))
             .append(kind)
-            .concat(ctx.start_padded_comments(kind_span.end, self.span.end))
+            .concat(ctx.start_spaced_comments(kind_span.end, self.span.end))
             .append(Doc::text(")"))
     }
 }
@@ -179,7 +179,7 @@ impl<'s> DocGen<'s> for MediaNot<'s> {
             OperatorLineBreak::After => vec![Doc::text("not"), Doc::line_or_space()],
         };
         docs.extend(
-            ctx.end_padded_comments(self.keyword.span.end, self.media_in_parens.span.start),
+            ctx.end_spaced_comments(self.keyword.span.end, self.media_in_parens.span.start),
         );
         docs.push(self.media_in_parens.doc(ctx));
 
@@ -196,7 +196,7 @@ impl<'s> DocGen<'s> for MediaOr<'s> {
             OperatorLineBreak::After => vec![Doc::space(), Doc::text("or"), Doc::line_or_space()],
         };
         docs.extend(
-            ctx.end_padded_comments(self.keyword.span.end, self.media_in_parens.span.start),
+            ctx.end_spaced_comments(self.keyword.span.end, self.media_in_parens.span.start),
         );
         docs.push(self.media_in_parens.doc(ctx));
 
@@ -223,12 +223,12 @@ impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
         if let Some(modifier) = &self.modifier {
             docs.push(modifier.doc(ctx));
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(modifier.span.end, media_type_span.start));
+            docs.extend(ctx.end_spaced_comments(modifier.span.end, media_type_span.start));
         }
         docs.push(self.media_type.doc(ctx));
         if let Some(condition) = &self.condition {
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(media_type_span.end, condition.span.start));
+            docs.extend(ctx.end_spaced_comments(media_type_span.end, condition.span.start));
             docs.push(condition.doc(ctx));
         }
         Doc::list(docs)

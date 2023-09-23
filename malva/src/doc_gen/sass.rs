@@ -36,10 +36,10 @@ impl<'s> DocGen<'s> for SassAtRootQuery<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(7);
         docs.push(Doc::text("("));
-        docs.extend(ctx.end_padded_comments(self.span.start, self.modifier.span.start));
+        docs.extend(ctx.end_spaced_comments(self.span.start, self.modifier.span.start));
 
         docs.push(self.modifier.doc(ctx));
-        docs.extend(ctx.start_padded_comments(self.modifier.span.end, self.colon_span.start));
+        docs.extend(ctx.start_spaced_comments(self.modifier.span.end, self.colon_span.start));
         docs.push(Doc::text(": "));
 
         docs.extend(
@@ -47,7 +47,7 @@ impl<'s> DocGen<'s> for SassAtRootQuery<'s> {
                 self.rules.iter().scan(self.colon_span.start, |pos, rule| {
                     let rule_span = rule.span();
                     Some(
-                        ctx.end_padded_comments(mem::replace(pos, rule_span.end), rule_span.start)
+                        ctx.end_spaced_comments(mem::replace(pos, rule_span.end), rule_span.start)
                             .chain(iter::once(rule.doc(ctx)))
                             .collect::<Vec<_>>()
                             .into_iter(),
@@ -59,7 +59,7 @@ impl<'s> DocGen<'s> for SassAtRootQuery<'s> {
         );
 
         if let Some(last) = self.rules.last() {
-            docs.extend(ctx.start_padded_comments(last.span().end, self.span.end));
+            docs.extend(ctx.start_spaced_comments(last.span().end, self.span.end));
         }
 
         docs.push(Doc::text(")"));
@@ -90,10 +90,10 @@ impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
         self.left
             .doc(ctx)
             .append(helpers::format_operator_prefix_space(ctx))
-            .concat(ctx.end_padded_comments(self.left.span().end, self.op.span.start))
+            .concat(ctx.end_spaced_comments(self.left.span().end, self.op.span.start))
             .append(self.op.doc(ctx))
             .append(helpers::format_operator_suffix_space(ctx))
-            .concat(ctx.end_padded_comments(self.op.span.end, self.right.span().start))
+            .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
             .append(self.right.doc(ctx))
     }
 }
@@ -123,7 +123,7 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
         self.condition
             .doc(ctx)
             .append(Doc::space())
-            .concat(ctx.end_padded_comments(self.condition.span().end, self.block.span.start))
+            .concat(ctx.end_spaced_comments(self.condition.span().end, self.block.span.start))
             .append(self.block.doc(ctx))
     }
 }
@@ -141,7 +141,7 @@ impl<'s> DocGen<'s> for SassContent<'s> {
                         ctx,
                     ))
                     .concat(
-                        ctx.start_padded_comments(
+                        ctx.start_spaced_comments(
                             self.args
                                 .len()
                                 .checked_sub(1)
@@ -172,10 +172,10 @@ impl<'s> DocGen<'s> for SassEach<'s> {
         .group()
         .nest(ctx.indent_width)
         .append(helpers::format_operator_prefix_space(ctx))
-        .concat(ctx.end_padded_comments(self.bindings.last().unwrap().span.end, self.in_span.start))
+        .concat(ctx.end_spaced_comments(self.bindings.last().unwrap().span.end, self.in_span.start))
         .append(Doc::text("in"))
         .append(helpers::format_operator_suffix_space(ctx))
-        .concat(ctx.end_padded_comments(self.in_span.end, self.expr.span().start))
+        .concat(ctx.end_spaced_comments(self.in_span.end, self.expr.span().start))
         .append(self.expr.doc(ctx))
     }
 }
@@ -193,7 +193,7 @@ impl<'s> DocGen<'s> for SassExtend<'s> {
         if let Some(optional) = &self.optional {
             selectors
                 .append(Doc::space())
-                .concat(ctx.end_padded_comments(self.selectors.span().end, optional.span.start))
+                .concat(ctx.end_spaced_comments(self.selectors.span().end, optional.span.start))
                 .append(optional.doc(ctx))
         } else {
             selectors
@@ -213,16 +213,16 @@ impl<'s> DocGen<'s> for SassFor<'s> {
         self.binding
             .doc(ctx)
             .append(helpers::format_operator_prefix_space(ctx))
-            .concat(ctx.end_padded_comments(self.binding.span.end, self.from_span.start))
+            .concat(ctx.end_spaced_comments(self.binding.span.end, self.from_span.start))
             .append(Doc::text("from"))
             .append(helpers::format_operator_suffix_space(ctx))
-            .concat(ctx.end_padded_comments(self.from_span.end, start_value_span.start))
+            .concat(ctx.end_spaced_comments(self.from_span.end, start_value_span.start))
             .append(self.start.doc(ctx))
             .append(helpers::format_operator_prefix_space(ctx))
-            .concat(ctx.end_padded_comments(start_value_span.end, self.boundary.span.start))
+            .concat(ctx.end_spaced_comments(start_value_span.end, self.boundary.span.start))
             .append(self.boundary.doc(ctx))
             .append(helpers::format_operator_suffix_space(ctx))
-            .concat(ctx.end_padded_comments(self.boundary.span.end, self.end.span().start))
+            .concat(ctx.end_spaced_comments(self.boundary.span.end, self.end.span().start))
             .append(self.end.doc(ctx))
     }
 }
@@ -245,7 +245,7 @@ impl<'s> DocGen<'s> for SassForward<'s> {
             docs.reserve(2);
             docs.push(Doc::space());
             docs.extend(
-                ctx.end_padded_comments(mem::replace(&mut pos, prefix.span.end), prefix.span.start),
+                ctx.end_spaced_comments(mem::replace(&mut pos, prefix.span.end), prefix.span.start),
             );
             docs.push(prefix.doc(ctx));
         }
@@ -253,7 +253,7 @@ impl<'s> DocGen<'s> for SassForward<'s> {
         if let Some(visibility) = &self.visibility {
             docs.reserve(2);
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(
+            docs.extend(ctx.end_spaced_comments(
                 mem::replace(&mut pos, visibility.span.end),
                 visibility.span.start,
             ));
@@ -264,7 +264,7 @@ impl<'s> DocGen<'s> for SassForward<'s> {
             docs.reserve(2);
             docs.push(Doc::space());
             docs.extend(
-                ctx.end_padded_comments(mem::replace(&mut pos, config.span.end), config.span.start),
+                ctx.end_spaced_comments(mem::replace(&mut pos, config.span.end), config.span.start),
             );
             docs.push(config.doc(ctx));
         }
@@ -285,7 +285,7 @@ impl<'s> DocGen<'s> for SassForwardMember<'s> {
 impl<'s> DocGen<'s> for SassForwardPrefix<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("as ")
-            .concat(ctx.end_padded_comments(self.as_span.end, self.name.span.start))
+            .concat(ctx.end_spaced_comments(self.as_span.end, self.name.span.start))
             .append(self.name.doc(ctx))
             .append(Doc::text("*"))
     }
@@ -324,7 +324,7 @@ impl<'s> DocGen<'s> for SassFunction<'s> {
 impl<'s> DocGen<'s> for SassIfAtRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = vec![Doc::text("@if ")];
-        docs.extend(ctx.end_padded_comments(self.span.start, self.if_clause.span.start));
+        docs.extend(ctx.end_spaced_comments(self.span.start, self.if_clause.span.start));
         docs.push(self.if_clause.doc(ctx));
         let mut pos = self.if_clause.span.end;
 
@@ -335,12 +335,12 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
                 .scan(&mut pos, |pos, (clause, elseif_span)| {
                     Some(
                         iter::once(Doc::space())
-                            .chain(ctx.end_padded_comments(
+                            .chain(ctx.end_spaced_comments(
                                 mem::replace(*pos, elseif_span.end),
                                 elseif_span.start,
                             ))
                             .chain(iter::once(Doc::text("@else if ")))
-                            .chain(ctx.end_padded_comments(
+                            .chain(ctx.end_spaced_comments(
                                 mem::replace(*pos, clause.span.end),
                                 clause.span.start,
                             ))
@@ -355,9 +355,9 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
         {
             docs.reserve(3);
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(pos, else_span.start));
+            docs.extend(ctx.end_spaced_comments(pos, else_span.start));
             docs.push(Doc::text("@else "));
-            docs.extend(ctx.end_padded_comments(else_span.end, else_clause.span.start));
+            docs.extend(ctx.end_spaced_comments(else_span.end, else_clause.span.start));
             docs.push(else_clause.doc(ctx));
         }
 
@@ -384,7 +384,7 @@ impl<'s> DocGen<'s> for SassInclude<'s> {
         let mut pos = self.name.span().end;
 
         if let Some(arguments) = &self.arguments {
-            docs.extend(ctx.end_padded_comments(
+            docs.extend(ctx.end_spaced_comments(
                 mem::replace(&mut pos, arguments.span.end),
                 arguments.span.start,
             ));
@@ -394,7 +394,7 @@ impl<'s> DocGen<'s> for SassInclude<'s> {
         if let Some(content_block_params) = &self.content_block_params {
             docs.reserve(2);
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(
+            docs.extend(ctx.end_spaced_comments(
                 mem::replace(&mut pos, content_block_params.span.end),
                 content_block_params.span.start,
             ));
@@ -418,7 +418,7 @@ impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
                         ctx,
                     ))
                     .concat(
-                        ctx.start_padded_comments(
+                        ctx.start_spaced_comments(
                             self.args
                                 .len()
                                 .checked_sub(1)
@@ -440,7 +440,7 @@ impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
 impl<'s> DocGen<'s> for SassIncludeContentBlockParams<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("using ")
-            .concat(ctx.end_padded_comments(self.using_span.end, self.params.span.start))
+            .concat(ctx.end_spaced_comments(self.using_span.end, self.params.span.start))
             .append(self.params.doc(ctx))
     }
 }
@@ -459,10 +459,10 @@ impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
                 SassInterpolatedIdentElement::Expression(expr) => {
                     let expr_span = expr.span();
                     docs.push(Doc::text("#{"));
-                    docs.extend(ctx.end_padded_comments(pos, expr_span.start));
+                    docs.extend(ctx.end_spaced_comments(pos, expr_span.start));
                     docs.push(expr.doc(ctx));
                     docs.extend(
-                        ctx.start_padded_comments(
+                        ctx.start_spaced_comments(
                             expr_span.end,
                             iter.peek()
                                 .map(|element| element.span().start)
@@ -508,10 +508,10 @@ impl<'s> DocGen<'s> for SassInterpolatedStr<'s> {
                     SassInterpolatedStrElement::Expression(expr) => {
                         let expr_span = expr.span();
                         docs.push(Doc::text("#{"));
-                        docs.extend(ctx.end_padded_comments(pos, expr_span.start));
+                        docs.extend(ctx.end_spaced_comments(pos, expr_span.start));
                         docs.push(expr.doc(ctx));
                         docs.extend(
-                            ctx.start_padded_comments(
+                            ctx.start_spaced_comments(
                                 expr_span.end,
                                 iter.peek()
                                     .map(|element| element.span().start)
@@ -549,10 +549,10 @@ impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
                 SassInterpolatedUrlElement::Expression(expr) => {
                     let expr_span = expr.span();
                     docs.push(Doc::text("#{"));
-                    docs.extend(ctx.end_padded_comments(pos, expr_span.start));
+                    docs.extend(ctx.end_spaced_comments(pos, expr_span.start));
                     docs.push(expr.doc(ctx));
                     docs.extend(
-                        ctx.start_padded_comments(
+                        ctx.start_spaced_comments(
                             expr_span.end,
                             iter.peek()
                                 .map(|element| element.span().start)
@@ -572,9 +572,9 @@ impl<'s> DocGen<'s> for SassKeywordArgument<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name
             .doc(ctx)
-            .concat(ctx.start_padded_comments(self.name.span.start, self.colon_span.start))
+            .concat(ctx.start_spaced_comments(self.name.span.start, self.colon_span.start))
             .append(Doc::text(": "))
-            .concat(ctx.end_padded_comments(self.colon_span.end, self.value.span().start))
+            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
             .append(self.value.doc(ctx))
     }
 }
@@ -602,7 +602,7 @@ impl<'s> DocGen<'s> for SassMap<'s> {
                     .group(),
             )
             .concat(
-                ctx.start_padded_comments(
+                ctx.start_spaced_comments(
                     self.items
                         .last()
                         .map(|item| item.span.end)
@@ -618,9 +618,9 @@ impl<'s> DocGen<'s> for SassMapItem<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.key
             .doc(ctx)
-            .concat(ctx.start_padded_comments(self.key.span().end, self.colon_span.start))
+            .concat(ctx.start_spaced_comments(self.key.span().end, self.colon_span.start))
             .append(Doc::text(": "))
-            .concat(ctx.end_padded_comments(self.colon_span.end, self.value.span().start))
+            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
             .append(self.value.doc(ctx))
     }
 }
@@ -639,7 +639,7 @@ impl<'s> DocGen<'s> for SassMixin<'s> {
 impl<'s> DocGen<'s> for SassModuleConfig<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("with ")
-            .concat(ctx.end_padded_comments(self.with_span.end, self.lparen_span.start))
+            .concat(ctx.end_spaced_comments(self.with_span.end, self.lparen_span.start))
             .append(Doc::text("("))
             .append(
                 Doc::line_or_nil()
@@ -663,9 +663,9 @@ impl<'s> DocGen<'s> for SassModuleConfigItem<'s> {
         let value_span = self.value.span();
         self.variable
             .doc(ctx)
-            .concat(ctx.start_padded_comments(self.variable.span.end, self.colon_span.start))
+            .concat(ctx.start_spaced_comments(self.variable.span.end, self.colon_span.start))
             .append(Doc::text(": "))
-            .concat(ctx.end_padded_comments(self.colon_span.end, value_span.start))
+            .concat(ctx.end_spaced_comments(self.colon_span.end, value_span.start))
             .append(self.value.doc(ctx))
             .concat(
                 self.flags
@@ -673,7 +673,7 @@ impl<'s> DocGen<'s> for SassModuleConfigItem<'s> {
                     .scan(value_span.end, |pos, flag| {
                         Some(
                             iter::once(Doc::soft_line())
-                                .chain(ctx.end_padded_comments(
+                                .chain(ctx.end_spaced_comments(
                                     mem::replace(pos, flag.span.end),
                                     flag.span.start,
                                 ))
@@ -706,7 +706,7 @@ impl<'s> DocGen<'s> for SassParameter<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let name = self.name.doc(ctx);
         if let Some(default_value) = &self.default_value {
-            name.concat(ctx.start_padded_comments(self.name.span.end, default_value.span.start))
+            name.concat(ctx.start_spaced_comments(self.name.span.end, default_value.span.start))
                 .append(default_value.doc(ctx))
         } else {
             name
@@ -717,7 +717,7 @@ impl<'s> DocGen<'s> for SassParameter<'s> {
 impl<'s> DocGen<'s> for SassParameterDefaultValue<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(": ")
-            .concat(ctx.end_padded_comments(self.colon_span.end, self.value.span().start))
+            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
             .append(self.value.doc(ctx))
     }
 }
@@ -766,7 +766,7 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
                         ctx,
                     ))
                     .concat(
-                        ctx.start_padded_comments(
+                        ctx.start_spaced_comments(
                             self.params
                                 .len()
                                 .checked_sub(1)
@@ -791,9 +791,9 @@ impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
         Doc::text("(")
             .append(
                 Doc::line_or_nil()
-                    .concat(ctx.end_padded_comments(self.span.start, expr_span.start))
+                    .concat(ctx.end_spaced_comments(self.span.start, expr_span.start))
                     .append(self.expr.doc(ctx))
-                    .concat(ctx.start_padded_comments(expr_span.end, self.span.end))
+                    .concat(ctx.start_spaced_comments(expr_span.end, self.span.end))
                     .nest(ctx.indent_width)
                     .append(Doc::line_or_nil())
                     .group(),
@@ -847,7 +847,7 @@ impl<'s> DocGen<'s> for SassUse<'s> {
 
         if let Some(namespace) = &self.namespace {
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(
+            docs.extend(ctx.end_spaced_comments(
                 mem::replace(&mut pos, namespace.span.end),
                 namespace.span.start,
             ));
@@ -856,7 +856,7 @@ impl<'s> DocGen<'s> for SassUse<'s> {
 
         if let Some(config) = &self.config {
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(pos, config.span.start));
+            docs.extend(ctx.end_spaced_comments(pos, config.span.start));
             docs.push(config.doc(ctx));
         }
 
@@ -867,7 +867,7 @@ impl<'s> DocGen<'s> for SassUse<'s> {
 impl<'s> DocGen<'s> for SassUseNamespace<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("as ")
-            .concat(ctx.end_padded_comments(self.as_span.end, self.kind.span().start))
+            .concat(ctx.end_spaced_comments(self.as_span.end, self.kind.span().start))
             .append(match &self.kind {
                 SassUseNamespaceKind::Named(named) => named.doc(ctx),
                 SassUseNamespaceKind::Unnamed(unnamed) => unnamed.doc(ctx),
@@ -892,9 +892,9 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
         }
         docs.push(self.name.doc(ctx));
 
-        docs.extend(ctx.start_padded_comments(self.name.span.end, self.colon_span.start));
+        docs.extend(ctx.start_spaced_comments(self.name.span.end, self.colon_span.start));
         docs.push(Doc::text(": "));
-        docs.extend(ctx.end_padded_comments(self.colon_span.end, value_span.start));
+        docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
 
         docs.push(self.value.doc(ctx));
 
@@ -904,7 +904,7 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
                 .scan(value_span.end, |pos, flag| {
                     Some(
                         iter::once(Doc::soft_line())
-                            .chain(ctx.end_padded_comments(
+                            .chain(ctx.end_spaced_comments(
                                 mem::replace(pos, flag.span.end),
                                 flag.span.start,
                             ))
@@ -931,14 +931,14 @@ impl<'s> DocGen<'s> for UnknownSassAtRule<'s> {
         if let Some(prelude) = &self.prelude {
             docs.push(Doc::space());
             let span = prelude.span();
-            docs.extend(ctx.end_padded_comments(pos, span.start));
+            docs.extend(ctx.end_spaced_comments(pos, span.start));
             docs.push(prelude.doc(ctx));
             pos = span.end;
         }
 
         if let Some(block) = &self.block {
             docs.push(Doc::space());
-            docs.extend(ctx.end_padded_comments(pos, block.span.start));
+            docs.extend(ctx.end_spaced_comments(pos, block.span.start));
             docs.push(block.doc(ctx));
         }
 

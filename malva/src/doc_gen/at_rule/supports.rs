@@ -11,7 +11,7 @@ impl<'s> DocGen<'s> for SupportsAnd<'s> {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("and"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::space(), Doc::text("and"), Doc::line_or_space()],
         };
-        docs.extend(ctx.end_padded_comments(self.keyword.span.end, self.condition.span.start));
+        docs.extend(ctx.end_spaced_comments(self.keyword.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
@@ -27,7 +27,7 @@ impl<'s> DocGen<'s> for SupportsCondition<'s> {
                     (Vec::with_capacity(self.conditions.len()), self.span.start),
                     |(mut docs, pos), condition| {
                         let span = condition.span();
-                        docs.extend(ctx.start_padded_comments(pos, span.start));
+                        docs.extend(ctx.start_spaced_comments(pos, span.start));
                         docs.push(condition.doc(ctx));
                         (docs, span.end)
                     },
@@ -53,9 +53,9 @@ impl<'s> DocGen<'s> for SupportsConditionKind<'s> {
 impl<'s> DocGen<'s> for SupportsDecl<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("(")
-            .concat(ctx.end_padded_comments(self.span.start, self.decl.span.start))
+            .concat(ctx.end_spaced_comments(self.span.start, self.decl.span.start))
             .append(self.decl.doc(ctx))
-            .concat(ctx.start_padded_comments(self.decl.span.end, self.span.end))
+            .concat(ctx.start_spaced_comments(self.decl.span.end, self.span.end))
             .append(Doc::text(")"))
     }
 }
@@ -65,14 +65,14 @@ impl<'s> DocGen<'s> for SupportsInParens<'s> {
         match &self.kind {
             SupportsInParensKind::Feature(feature) => feature.doc(ctx),
             SupportsInParensKind::SupportsCondition(condition) => Doc::text("(")
-                .concat(ctx.end_padded_comments(self.span.start, condition.span.start))
+                .concat(ctx.end_spaced_comments(self.span.start, condition.span.start))
                 .append(condition.doc(ctx))
-                .concat(ctx.start_padded_comments(condition.span.end, self.span.end))
+                .concat(ctx.start_spaced_comments(condition.span.end, self.span.end))
                 .append(Doc::text(")")),
             SupportsInParensKind::Selector(selector) => Doc::text("selector(")
-                .concat(ctx.end_padded_comments(self.span.start, selector.span.start))
+                .concat(ctx.end_spaced_comments(self.span.start, selector.span.start))
                 .append(selector.doc(ctx))
-                .concat(ctx.start_padded_comments(selector.span.end, self.span.end))
+                .concat(ctx.start_spaced_comments(selector.span.end, self.span.end))
                 .append(Doc::text(")")),
             SupportsInParensKind::Function(function) => function.doc(ctx),
         }
@@ -87,7 +87,7 @@ impl<'s> DocGen<'s> for SupportsNot<'s> {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("not"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::text("not"), Doc::line_or_space()],
         };
-        docs.extend(ctx.end_padded_comments(self.keyword.span.end, self.condition.span.start));
+        docs.extend(ctx.end_spaced_comments(self.keyword.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
@@ -102,7 +102,7 @@ impl<'s> DocGen<'s> for SupportsOr<'s> {
             OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("or"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::space(), Doc::text("or"), Doc::line_or_space()],
         };
-        docs.extend(ctx.end_padded_comments(self.keyword.span.end, self.condition.span.start));
+        docs.extend(ctx.end_spaced_comments(self.keyword.span.end, self.condition.span.start));
         docs.push(self.condition.doc(ctx));
 
         Doc::list(docs).group().nest(ctx.indent_width)
