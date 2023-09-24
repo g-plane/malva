@@ -108,8 +108,10 @@ source: malva/tests/fmt.rs
 @supports selector(:not(.a, .b)) {}
 @supports selector(:not(.a, .b)) {}
 @supports selector(
-  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
-  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+    .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+    .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
 ) {}
 @supports selector(.parent > .child) {}
 @supports selector(.parent ~ .child) {}

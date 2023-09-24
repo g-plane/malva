@@ -106,10 +106,13 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
 
         let mut children = self.children.iter();
         if let Some(first) = children.next() {
-            docs.push(match first {
-                ComplexSelectorChild::CompoundSelector(selector) => selector.doc(ctx),
-                ComplexSelectorChild::Combinator(combinator) => combinator.doc(ctx),
-            });
+            match first {
+                ComplexSelectorChild::CompoundSelector(selector) => docs.push(selector.doc(ctx)),
+                ComplexSelectorChild::Combinator(combinator) => {
+                    docs.push(combinator.doc(ctx));
+                    docs.push(Doc::space());
+                }
+            }
             pos = first.span().end;
         }
 
@@ -117,7 +120,6 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
             children
                 .fold((docs, pos), |(mut docs, pos), child| match child {
                     ComplexSelectorChild::CompoundSelector(selector) => {
-                        docs.push(Doc::space());
                         docs.extend(ctx.end_spaced_comments(pos, selector.span.start));
                         docs.push(selector.doc(ctx));
                         (docs, selector.span.end)
@@ -125,11 +127,15 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                     ComplexSelectorChild::Combinator(Combinator {
                         kind: CombinatorKind::Descendant,
                         ..
-                    }) => (docs, pos),
+                    }) => {
+                        docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                        (docs, pos)
+                    }
                     ComplexSelectorChild::Combinator(combinator) => {
                         docs.push(Doc::line_or_space().nest(ctx.indent_width));
                         docs.extend(ctx.end_spaced_comments(pos, combinator.span.start));
                         docs.push(combinator.doc(ctx));
+                        docs.push(Doc::space());
                         (docs, combinator.span.end)
                     }
                 })

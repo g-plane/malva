@@ -14,12 +14,18 @@ source: malva/tests/fmt.rs
   }
 }
 
-.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
-.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas {}
-.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
-.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas {}
-.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
-.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas {}
+.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
+.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas {}
+.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
+.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas {}
+.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
+.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas {}
 
 .parent, .another-parent {}
 .parent, .another-parent {}
