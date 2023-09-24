@@ -1,0 +1,17 @@
+---
+source: malva/tests/fmt.rs
+---
+.funky {
+  font: {
+    family: fantasy;
+    size: 30em;
+    weight: bold;
+  }
+}
+
+.funky {
+  font: 20px/24px fantasy {
+    weight: bold;
+  }
+}
+

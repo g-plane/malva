@@ -1,0 +1,67 @@
+---
+source: malva/tests/fmt.rs
+---
+.foo {
+  --paddingC: calc( var( --widthB ) / 2 );
+  content: attr(data-title);
+  color: var(--main-bg-color);
+  background-color: rgb(255, 0, 0);
+  background: element(#css-source);
+  padding-top: var(--paddingC);
+  margin: 1 * 1 (1) * 1 1 * (1) (1) * (1);
+  prop: -1 * -1 - (-1) * -1 -1 * -(-1) - (-1) * -(-1);
+  prop4: +1;
+  prop5: -1;
+  prop6: word + 1; /* word1 */
+  prop7: word - 1; /* word-1 */
+  prop8: +1 + 1 + 1 + 1; /* +1 +1 +1 +1 */
+  prop9: -1 -1 -1 -1; /* -1 -1 -1 -1 */
+  prop10: (-1);
+  prop11: (+1);
+  prop12: 10px/8px;
+  prop13: round(1.5) / 2 round(1.5) / 2 round(1.5) / 2 round(1.5) / 2;
+  prop14: 2/round(1.5) 2 / round(1.5) 2/round(1.5) 2 / round(1.5);
+  prop15: (round(1.5) / 2) (round(1.5) / 2) (round(1.5) / 2) (round(1.5) / 2);
+  prop16: (2 / round(1.5)) (2 / round(1.5)) (2 / round(1.5)) (2 / round(1.5));
+  prop26: 8px/2px 8px / 1 1/2px 1 / 2;
+  prop27: 8px/2px 8px/1 1/2px 1/2;
+  prop28: 8px / 2px 8px / 1 1 / 2px 1 / 2;
+  prop29: (8px / 2px) (8px / 1) (1 / 2px) (1 / 2);
+  prop30: (8px / 2px) (8px / 1) (1 / 2px) (1 / 2);
+  prop32: func(8px / 2);
+  prop33: 5px + 8px/2px;
+  prop34: func(+20px, +20px);
+  prop35: 1 + 1 + 1 + 1;
+  prop36: 1 + 1 + 1 + 1;
+  prop37: 1 + 1 1 + 1;
+  prop38: ++1;
+  prop39: +(+1);
+  prop40: --1;
+  prop41: --(1);
+  prop42: 1px + 1px + 1px + 1px;
+  prop43: 1px + 1px + 1px + 1px;
+  prop44: -1 + -1 - (-1) + -1 -1 + -(-1) - (-1) + -(-1);
+  prop45: round(1.5) * 2 round(1.5) * 2 round(1.5) * 2 round(1.5) * 2;
+  prop46: 2 * round(1.5) 2 * round(1.5) 2 * round(1.5) 2 * round(1.5);
+  prop47: (round(1.5) * 2) (round(1.5) * 2) (round(1.5) * 2) (round(1.5) * 2);
+  prop48: (2 * round(1.5)) (2 * round(1.5)) (2 * round(1.5)) (2 * round(1.5));
+  prop57: round(1.5) + 2 round(1.5) + 2 round(1.5) + 2 round(1.5) + 2;
+  prop58: 2 + round(1.5) 2 + round(1.5) 2 + round(1.5) 2 + round(1.5);
+  prop59: (round(1.5) + 2) (round(1.5) + 2) (round(1.5) + 2) (round(1.5) + 2);
+  prop60: (2 + round(1.5)) (2 + round(1.5)) (2 + round(1.5)) (2 + round(1.5));
+  prop69: "test" + 1 "test" + 1 "test" + 1 "test" + 1;
+  prop70: 1 + "test" 1 + "test" 1 + "test" 1 + "test";
+  prop71: "test" - 1 "test" -1 "test" - 1 "test" - 1;
+  prop72: 1 - "test" 1 - "test" 1 - "test" 1 - "test";
+  prop73: calc(100% * 2px) calc(100% * 2px) calc(100% * 2px) calc(100% * 2px);
+  prop74: calc(100% / 2px) calc(100% / 2px) calc(100% / 2px) calc(100% / 2px);
+  prop75: calc(100% +2px) calc(100% +2px) calc(100% + 2px) calc(100% + 2px);
+  prop76: calc(100% -2px) calc(100% -2px) calc(100% - 2px) calc(100% - 2px);
+  prop77: calc(-5px);
+  prop78: calc(+5px);
+  prop79: calc(-100px + 100px);
+  prop80: calc(+100px + 100px);
+  prop81: calc(100px - 100px);
+  prop82: calc(100px + 100px);
+}
+
