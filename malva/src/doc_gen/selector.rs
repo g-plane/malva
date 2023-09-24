@@ -284,7 +284,19 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                 PseudoClassSelectorArg::RelativeSelectorList(relative_selector_list) => {
                     relative_selector_list.doc(ctx)
                 }
-                PseudoClassSelectorArg::SelectorList(selector_list) => selector_list.doc(ctx),
+                PseudoClassSelectorArg::SelectorList(selector_list) => {
+                    if ctx.options.linebreak_in_pseudo_parens {
+                        selector_list.doc(ctx).group().nest(ctx.indent_width)
+                    } else {
+                        helpers::format_comma_separated_list(
+                            &selector_list.selectors,
+                            &selector_list.comma_spans,
+                            selector_list.span.start,
+                            Doc::space(),
+                            ctx,
+                        )
+                    }
+                }
                 PseudoClassSelectorArg::LessExtendList(less_extend_list) => {
                     less_extend_list.doc(ctx)
                 }
@@ -409,7 +421,7 @@ impl<'s> DocGen<'s> for SelectorList<'s> {
             &self.selectors,
             &self.comma_spans,
             self.span.start,
-            Doc::space(),
+            Doc::line_or_space(),
             ctx,
         )
     }

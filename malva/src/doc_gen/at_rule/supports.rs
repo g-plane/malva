@@ -70,9 +70,15 @@ impl<'s> DocGen<'s> for SupportsInParens<'s> {
                 .concat(ctx.start_spaced_comments(condition.span.end, self.span.end))
                 .append(Doc::text(")")),
             SupportsInParensKind::Selector(selector) => Doc::text("selector(")
-                .concat(ctx.end_spaced_comments(self.span.start, selector.span.start))
-                .append(selector.doc(ctx))
-                .concat(ctx.start_spaced_comments(selector.span.end, self.span.end))
+                .append(
+                    Doc::line_or_nil()
+                        .concat(ctx.end_spaced_comments(self.span.start, selector.span.start))
+                        .append(selector.doc(ctx))
+                        .concat(ctx.start_spaced_comments(selector.span.end, self.span.end))
+                        .nest(ctx.indent_width)
+                        .append(Doc::line_or_nil())
+                        .group(),
+                )
                 .append(Doc::text(")")),
             SupportsInParensKind::Function(function) => function.doc(ctx),
         }

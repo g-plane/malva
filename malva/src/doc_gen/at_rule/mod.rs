@@ -52,7 +52,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::Keyframes(keyframes) => keyframes.doc(ctx),
             AtRulePrelude::Layer(layer) => layer.doc(ctx),
             AtRulePrelude::Namespace(namespace) => namespace.doc(ctx),
-            AtRulePrelude::Nest(nest) => nest.doc(ctx),
+            AtRulePrelude::Nest(nest) => nest.doc(ctx).group().nest(ctx.indent_width),
             AtRulePrelude::Page(page) => page.doc(ctx),
             AtRulePrelude::PositionFallback(position_fallback) => position_fallback.doc(ctx),
             AtRulePrelude::Property(property) => property.doc(ctx),

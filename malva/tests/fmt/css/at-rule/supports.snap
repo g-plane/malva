@@ -107,7 +107,10 @@ source: malva/tests/fmt.rs
 
 @supports selector(:not(.a, .b)) {}
 @supports selector(:not(.a, .b)) {}
-@supports selector(.asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas, .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas) {}
+@supports selector(
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas,
+  .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas .asdasldaskdhjkashdahsdkjahskdjhakjsdkjahsdhkas
+) {}
 @supports selector(.parent > .child) {}
 @supports selector(.parent ~ .child) {}
 @supports selector(ns|*) {}
@@ -115,7 +118,11 @@ source: malva/tests/fmt.rs
 @supports selector(|b) {}
 @supports selector(*|*) {}
 @supports selector(|*) {}
-@supports selector(.a, .b, :not(asdasldaskdhjkashdahsdkjahskdjhakj, asdasldaskdhjkashdahsdkjahskdjhakj)) {}
+@supports selector(
+  .a,
+  .b,
+  :not(asdasldaskdhjkashdahsdkjahskdjhakj, asdasldaskdhjkashdahsdkjahskdjhakj)
+) {}
 @supports not (transform-origin: 10em 10em 10em) {}
 @supports not (not (transform-origin: 2px)) {}
 @supports (display: grid) and (not (display: inline-grid)) {}
