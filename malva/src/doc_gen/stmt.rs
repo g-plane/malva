@@ -33,7 +33,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
             docs.push(Doc::space());
         }
 
-        let mut values = Vec::with_capacity(self.value.len() * 2);
+        docs.reserve(self.value.len() * 2);
         let mut pos = self.colon_span.end;
 
         let mut iter = self.value.iter().peekable();
@@ -44,18 +44,21 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 use raffia::token::Token;
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.end_spaced_comments(pos, span.start));
+                    docs.push(
+                        Doc::list(ctx.end_spaced_comments(pos, span.start).collect())
+                            .nest(ctx.indent_width),
+                    );
 
-                    values.push(value.doc(ctx));
+                    docs.push(value.doc(ctx));
                     if let ComponentValue::TokenWithSpan(TokenWithSpan {
                         token: Token::Comma(..) | Token::Semicolon(..),
                         ..
                     }) = value
                     {
-                        values.push(Doc::soft_line());
+                        docs.push(Doc::soft_line().nest(ctx.indent_width));
                     } else if matches!(iter.peek(), Some(next) if value.span().end < next.span().start)
                     {
-                        values.push(Doc::soft_line());
+                        docs.push(Doc::soft_line().nest(ctx.indent_width));
                     }
 
                     pos = span.end;
@@ -64,20 +67,23 @@ impl<'s> DocGen<'s> for Declaration<'s> {
             _ => {
                 while let Some(value) = iter.next() {
                     let span = value.span();
-                    values.extend(ctx.end_spaced_comments(pos, span.start));
+                    docs.push(
+                        Doc::list(ctx.end_spaced_comments(pos, span.start).collect())
+                            .nest(ctx.indent_width),
+                    );
 
-                    values.push(value.doc(ctx));
+                    docs.push(value.doc(ctx));
                     match value {
                         ComponentValue::Delimiter(Delimiter {
                             kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
                             ..
-                        }) => values.push(Doc::line_or_space()),
+                        }) => docs.push(Doc::line_or_space().nest(ctx.indent_width)),
                         ComponentValue::Delimiter(Delimiter {
                             kind: DelimiterKind::Solidus,
                             span,
                         }) => {
                             if pos < span.start {
-                                values.push(Doc::soft_line());
+                                docs.push(Doc::soft_line().nest(ctx.indent_width));
                             }
                         }
                         _ => match iter.peek() {
@@ -91,10 +97,10 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                                 span: next_span,
                             })) => {
                                 if span.end < next_span.start {
-                                    values.push(Doc::soft_line());
+                                    docs.push(Doc::soft_line().nest(ctx.indent_width));
                                 }
                             }
-                            _ => values.push(Doc::soft_line()),
+                            _ => docs.push(Doc::soft_line().nest(ctx.indent_width)),
                         },
                     }
 
@@ -104,19 +110,15 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         }
 
         if let Some(important) = &self.important {
-            values.push(Doc::soft_line());
-            values.extend(ctx.end_spaced_comments(pos, important.span.start));
-            values.push(important.doc(ctx));
+            docs.push(Doc::soft_line().nest(ctx.indent_width));
+            docs.push(
+                Doc::list(ctx.end_spaced_comments(pos, important.span.start).collect())
+                    .nest(ctx.indent_width),
+            );
+            docs.push(important.doc(ctx));
         }
 
-        docs.push(Doc::list(values).group().nest(ctx.indent_width));
-
-        let doc = Doc::list(docs);
-        if can_break_before_value {
-            doc.group()
-        } else {
-            doc
-        }
+        Doc::list(docs).group()
     }
 }
 
