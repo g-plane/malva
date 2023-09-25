@@ -1,0 +1,10 @@
+---
+source: malva/tests/fmt.rs
+---
+a:after {
+  content: "";
+}
+a::before {
+  content: "";
+}
+

@@ -1,0 +1,27 @@
+---
+source: malva/tests/fmt.rs
+---
+.btn {
+  &:hover {
+    color: red;
+  }
+  &:active {
+    color: blue;
+  }
+  &:nth-child(5n+1) {
+    color: blue;
+  }
+  &:nth-child(-n+3) {
+    color: green;
+  }
+  > li > a {
+    color: red;
+  }
+  > li > li {
+    color: blue;
+  }
+  > p + p {
+    color: green;
+  }
+}
+

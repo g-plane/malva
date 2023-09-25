@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+.class {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+

@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+div {
+  content: "  test 1/2  ";
+  content: "  test   1+2";
+}
+
