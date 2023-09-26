@@ -1020,9 +1020,9 @@ dependencies = [
 
 [[package]]
 name = "tiny_pretty"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11173831118c6fd7f92176db3f8aeb0c07b7665aae409d473d74f2654793dc3b"
+checksum = "34dd2e384e3ddc3f1cd30c12f4647e32b6afd85eceb058c0245a2a96f7717179"
 
 [[package]]
 name = "tinytemplate"
