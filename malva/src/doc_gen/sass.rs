@@ -870,7 +870,7 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
             docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
             docs.push(helpers::format_comma_separated_list_with_trailing(
                 &sass_list.elements,
-                &comma_spans,
+                comma_spans,
                 span.start,
                 Doc::line_or_space(),
                 ctx,
