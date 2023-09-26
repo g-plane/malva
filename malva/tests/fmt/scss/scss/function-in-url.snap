@@ -1,0 +1,15 @@
+---
+source: malva/tests/fmt.rs
+---
+@function concat($strings...) {
+  $result: "";
+  @each $string in $strings {
+    $sum: $result + $string;
+  }
+  @return $result;
+}
+
+a {
+  backround: url(concat("http://", "example.com", "/image.png"));
+}
+

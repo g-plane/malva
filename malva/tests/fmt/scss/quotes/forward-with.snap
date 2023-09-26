@@ -1,0 +1,5 @@
+---
+source: malva/tests/fmt.rs
+---
+@forward "foo.scss" with ($components: red);
+

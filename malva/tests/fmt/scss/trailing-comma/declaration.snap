@@ -1,0 +1,7 @@
+---
+source: malva/tests/fmt.rs
+---
+a {
+  margin: $bar, ;
+}
+

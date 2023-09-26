@@ -1,0 +1,6 @@
+---
+source: malva/tests/fmt.rs
+---
+$test: 1,;
+$margin: 0, 2em, 0, 1.5em;
+
