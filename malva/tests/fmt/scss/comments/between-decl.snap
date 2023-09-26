@@ -23,8 +23,9 @@ selector {
 }
 
 // #8052
-$font-family-rich: // custom
-"Noto Sans TC",
+$font-family-rich:
+  // custom
+  "Noto Sans TC",
   "Noto Sans SC",
   "Noto Sans JP",
   // Safari for OS X and iOS (San Francisco)

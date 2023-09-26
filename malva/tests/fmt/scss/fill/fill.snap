@@ -7,7 +7,8 @@ div {
     $warningBorderColors,
     50%
   );
-  $fontFamily: "Lato",
+  $fontFamily:
+    "Lato",
     -apple-system,
     "Helvetica Neue",
     Helvetica,

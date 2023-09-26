@@ -1,9 +1,13 @@
 ---
 source: malva/tests/fmt.rs
 ---
-$my-list: "foo", // Foo
+$my-list:
+  "foo",
+  // Foo
   "bar"; // Bar
 
-$my-list2: a // a
-  b c;
+$my-list2: a
+  // a
+  b
+  c;
 
