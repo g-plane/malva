@@ -56,6 +56,7 @@ impl<'a, 's> Ctx<'a, 's> {
         &'a self,
         start: usize,
         end: usize,
+        has_last_line_comment: &'a mut bool,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
         debug_assert!(start <= end);
 
@@ -63,6 +64,7 @@ impl<'a, 's> Ctx<'a, 's> {
             ctx: self,
             iter: self.get_comments_between(start, end).peekable(),
             prev_kind: CommentKind::Block,
+            has_last_line_comment,
         }
         .flatten()
     }
@@ -109,6 +111,7 @@ where
     ctx: &'a Ctx<'a, 's>,
     iter: Peekable<I>,
     prev_kind: CommentKind,
+    has_last_line_comment: &'a mut bool,
 }
 
 impl<'a, 's, I> Iterator for StartSpacedCommentsWithoutLastHardLine<'a, 's, I>
@@ -120,6 +123,11 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|comment| {
+            let peeked = self.iter.peek();
+            if peeked.is_none() {
+                *self.has_last_line_comment = comment.kind == CommentKind::Line;
+            }
+
             [
                 match mem::replace(&mut self.prev_kind, comment.kind.clone()) {
                     CommentKind::Block => Doc::soft_line(),

@@ -192,6 +192,8 @@ pub(super) fn format_parenthesized<'s>(
     trailing_comments_end: usize,
     ctx: &Ctx<'_, 's>,
 ) -> Doc<'s> {
+    let mut has_last_line_comment = false;
+
     Doc::text("(")
         .append(
             Doc::line_or_nil()
@@ -199,9 +201,14 @@ pub(super) fn format_parenthesized<'s>(
                 .concat(ctx.start_spaced_comments_without_last_hard_line(
                     trailing_comments_start,
                     trailing_comments_end,
+                    &mut has_last_line_comment,
                 ))
                 .nest(ctx.indent_width)
-                .append(Doc::line_or_nil())
+                .append(if has_last_line_comment {
+                    Doc::hard_line()
+                } else {
+                    Doc::line_or_nil()
+                })
                 .group(),
         )
         .append(Doc::text(")"))

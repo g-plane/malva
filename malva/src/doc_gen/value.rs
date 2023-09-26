@@ -273,12 +273,22 @@ impl<'s> DocGen<'s> for Function<'s> {
             }),
             Doc::line_or_space(),
         ));
-        arg_docs.extend(ctx.start_spaced_comments(pos, self.span.end));
+
+        let mut has_last_line_comment = false;
+        arg_docs.extend(ctx.start_spaced_comments_without_last_hard_line(
+            pos,
+            self.span.end,
+            &mut has_last_line_comment,
+        ));
 
         docs.push(
             Doc::list(arg_docs)
                 .nest(ctx.indent_width)
-                .append(Doc::line_or_nil())
+                .append(if has_last_line_comment {
+                    Doc::hard_line()
+                } else {
+                    Doc::line_or_nil()
+                })
                 .group(),
         );
 
