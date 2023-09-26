@@ -42,8 +42,17 @@ fn fmt_snapshot() {
         };
 
         let output = format_text(&input, syntax, &options).unwrap();
+        assert!(
+            !output.contains(" \n"),
+            "'{}' has trailing whitespace",
+            path.display()
+        );
         let mut regression_parser = Parser::new(&output, syntax);
-        assert!(regression_parser.parse::<Stylesheet>().is_ok());
+        assert!(
+            regression_parser.parse::<Stylesheet>().is_ok(),
+            "'{}' has syntax errors after formatted",
+            path.display()
+        );
 
         let mut settings = Settings::clone_current();
         settings.set_snapshot_path(path.parent().unwrap());
