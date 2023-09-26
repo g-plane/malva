@@ -210,7 +210,9 @@ impl<'s> DocGen<'s> for NsPrefix<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let bar = Doc::text("|");
         if let Some(kind) = &self.kind {
-            kind.doc(ctx).append(bar)
+            kind.doc(ctx)
+                .concat(ctx.unspaced_comments(kind.span().end, self.span.end))
+                .append(bar)
         } else {
             bar
         }
@@ -261,7 +263,9 @@ impl<'s> DocGen<'s> for NthMatcher<'s> {
 
 impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let mut docs = vec![Doc::text(":"), helpers::ident_to_lowercase(&self.name, ctx)];
+        let mut docs = vec![Doc::text(":")];
+        docs.extend(ctx.unspaced_comments(self.span.start, self.name.span().start));
+        docs.push(helpers::ident_to_lowercase(&self.name, ctx));
 
         if let Some(arg) = &self.arg {
             docs.push(Doc::text("("));
@@ -334,10 +338,9 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
 
 impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let mut docs = vec![
-            Doc::text("::"),
-            helpers::ident_to_lowercase(&self.name, ctx),
-        ];
+        let mut docs = vec![Doc::text("::")];
+        docs.extend(ctx.unspaced_comments(self.span.start, self.name.span().start));
+        docs.push(helpers::ident_to_lowercase(&self.name, ctx));
 
         if let Some(arg) = &self.arg {
             docs.push(Doc::text("("));
@@ -452,7 +455,10 @@ impl<'s> DocGen<'s> for UniversalSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let asterisk = Doc::text("*");
         if let Some(prefix) = &self.prefix {
-            prefix.doc(ctx).append(asterisk)
+            prefix
+                .doc(ctx)
+                .concat(ctx.unspaced_comments(prefix.span.end, self.span.end))
+                .append(asterisk)
         } else {
             asterisk
         }
@@ -467,7 +473,10 @@ impl<'s> DocGen<'s> for WqName<'s> {
             self.name.doc(ctx)
         };
         if let Some(prefix) = &self.prefix {
-            prefix.doc(ctx).append(name)
+            prefix
+                .doc(ctx)
+                .concat(ctx.unspaced_comments(prefix.span.end, self.name.span().start))
+                .append(name)
         } else {
             name
         }

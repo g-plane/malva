@@ -85,6 +85,20 @@ impl<'a, 's> Ctx<'a, 's> {
             .into_iter()
         })
     }
+
+    pub(crate) fn unspaced_comments(
+        &'a self,
+        start: usize,
+        end: usize,
+    ) -> impl Iterator<Item = Doc<'s>> + 'a {
+        debug_assert!(start <= end);
+
+        self.get_comments_between(start, end)
+            .filter_map(|comment| match comment.kind {
+                CommentKind::Block => Some(comment.doc(self)),
+                CommentKind::Line => None,
+            })
+    }
 }
 
 struct StartSpacedCommentsWithoutLastHardLine<'a, 's, I>
