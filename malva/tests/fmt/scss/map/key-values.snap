@@ -1,0 +1,51 @@
+---
+source: malva/tests/fmt.rs
+---
+$map: (
+  (
+    "key": "value",
+    "key": "value",
+    "key": "value",
+    "key": "value",
+    "key": "value"
+  ): ("key": "value"),
+  (
+    "key": "value",
+    "key": "value",
+    "key": "value",
+    "key": "value",
+    "key": "value"
+  ): ("list"),
+  (
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list"
+  ): ("list"),
+  (
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list",
+    "list"
+  ): ("key": "value"),
+  (
+    "key": "value",
+    "key": "value",
+    "key": "value",
+    "key": "value",
+    "key": "value"
+  ): 1
+);
+
