@@ -3,7 +3,7 @@ use raffia::{
     token::{Comment, CommentKind},
     Syntax,
 };
-use std::mem;
+use std::{array, iter::Peekable, mem};
 use tiny_pretty::Doc;
 
 pub(crate) struct Ctx<'a, 's: 'a> {
@@ -52,6 +52,21 @@ impl<'a, 's> Ctx<'a, 's> {
             .flatten()
     }
 
+    pub(crate) fn start_spaced_comments_without_last_hard_line(
+        &'a self,
+        start: usize,
+        end: usize,
+    ) -> impl Iterator<Item = Doc<'s>> + 'a {
+        debug_assert!(start <= end);
+
+        StartSpacedCommentsWithoutLastHardLine {
+            ctx: self,
+            iter: self.get_comments_between(start, end).peekable(),
+            prev_kind: CommentKind::Block,
+        }
+        .flatten()
+    }
+
     pub(crate) fn end_spaced_comments(
         &'a self,
         start: usize,
@@ -65,6 +80,41 @@ impl<'a, 's> Ctx<'a, 's> {
                 match comment.kind {
                     CommentKind::Block => Doc::soft_line(),
                     CommentKind::Line => Doc::hard_line(),
+                },
+            ]
+            .into_iter()
+        })
+    }
+}
+
+struct StartSpacedCommentsWithoutLastHardLine<'a, 's, I>
+where
+    's: 'a,
+    I: Iterator<Item = &'a Comment<'s>>,
+{
+    ctx: &'a Ctx<'a, 's>,
+    iter: Peekable<I>,
+    prev_kind: CommentKind,
+}
+
+impl<'a, 's, I> Iterator for StartSpacedCommentsWithoutLastHardLine<'a, 's, I>
+where
+    's: 'a,
+    I: Iterator<Item = &'a Comment<'s>>,
+{
+    type Item = array::IntoIter<Doc<'s>, 3>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|comment| {
+            [
+                match mem::replace(&mut self.prev_kind, comment.kind.clone()) {
+                    CommentKind::Block => Doc::soft_line(),
+                    CommentKind::Line => Doc::nil(),
+                },
+                comment.doc(self.ctx),
+                match comment.kind {
+                    CommentKind::Line if self.iter.peek().is_some() => Doc::hard_line(),
+                    _ => Doc::nil(),
                 },
             ]
             .into_iter()

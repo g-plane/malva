@@ -130,33 +130,24 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
 
 impl<'s> DocGen<'s> for SassContent<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text("(")
-            .append(
-                Doc::line_or_nil()
-                    .append(helpers::format_comma_separated_list_with_trailing(
-                        &self.args,
-                        &self.comma_spans,
-                        self.span.start,
-                        Doc::line_or_space(),
-                        ctx,
-                    ))
-                    .concat(
-                        ctx.start_spaced_comments(
-                            self.args
-                                .len()
-                                .checked_sub(1)
-                                .and_then(|i| self.comma_spans.get(i))
-                                .or_else(|| self.args.last().map(|param| param.span()))
-                                .map(|span| span.end)
-                                .unwrap_or(self.span.start),
-                            self.span.end,
-                        ),
-                    )
-                    .nest(ctx.indent_width)
-                    .append(Doc::line_or_nil())
-                    .group(),
-            )
-            .append(Doc::text(")"))
+        helpers::format_parenthesized(
+            helpers::format_comma_separated_list_with_trailing(
+                &self.args,
+                &self.comma_spans,
+                self.span.start,
+                Doc::line_or_space(),
+                ctx,
+            ),
+            self.args
+                .len()
+                .checked_sub(1)
+                .and_then(|i| self.comma_spans.get(i))
+                .or_else(|| self.args.last().map(|param| param.span()))
+                .map(|span| span.end)
+                .unwrap_or(self.span.start),
+            self.span.end,
+            ctx,
+        )
     }
 }
 
@@ -407,33 +398,24 @@ impl<'s> DocGen<'s> for SassInclude<'s> {
 
 impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text("(")
-            .append(
-                Doc::line_or_nil()
-                    .append(helpers::format_comma_separated_list_with_trailing(
-                        &self.args,
-                        &self.comma_spans,
-                        self.span.start,
-                        Doc::line_or_space(),
-                        ctx,
-                    ))
-                    .concat(
-                        ctx.start_spaced_comments(
-                            self.args
-                                .len()
-                                .checked_sub(1)
-                                .and_then(|i| self.comma_spans.get(i))
-                                .or_else(|| self.args.last().map(|param| param.span()))
-                                .map(|span| span.end)
-                                .unwrap_or(self.span.start),
-                            self.span.end,
-                        ),
-                    )
-                    .nest(ctx.indent_width)
-                    .append(Doc::line_or_nil())
-                    .group(),
-            )
-            .append(Doc::text(")"))
+        helpers::format_parenthesized(
+            helpers::format_comma_separated_list_with_trailing(
+                &self.args,
+                &self.comma_spans,
+                self.span.start,
+                Doc::line_or_space(),
+                ctx,
+            ),
+            self.args
+                .len()
+                .checked_sub(1)
+                .and_then(|i| self.comma_spans.get(i))
+                .or_else(|| self.args.last().map(|param| param.span()))
+                .map(|span| span.end)
+                .unwrap_or(self.span.start),
+            self.span.end,
+            ctx,
+        )
     }
 }
 
@@ -587,30 +569,21 @@ impl<'s> DocGen<'s> for SassList<'s> {
 
 impl<'s> DocGen<'s> for SassMap<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text("(")
-            .append(
-                Doc::line_or_nil()
-                    .append(helpers::format_comma_separated_list_with_trailing(
-                        &self.items,
-                        &self.comma_spans,
-                        self.span.start,
-                        Doc::line_or_space(),
-                        ctx,
-                    ))
-                    .nest(ctx.indent_width)
-                    .append(Doc::line_or_nil())
-                    .group(),
-            )
-            .concat(
-                ctx.start_spaced_comments(
-                    self.items
-                        .last()
-                        .map(|item| item.span.end)
-                        .unwrap_or(self.span.start),
-                    self.span.end,
-                ),
-            )
-            .append(Doc::text(")"))
+        helpers::format_parenthesized(
+            helpers::format_comma_separated_list_with_trailing(
+                &self.items,
+                &self.comma_spans,
+                self.span.start,
+                Doc::line_or_space(),
+                ctx,
+            ),
+            self.items
+                .last()
+                .map(|item| item.span.end)
+                .unwrap_or(self.span.start),
+            self.span.end,
+            ctx,
+        )
     }
 }
 
@@ -640,21 +613,21 @@ impl<'s> DocGen<'s> for SassModuleConfig<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("with ")
             .concat(ctx.end_spaced_comments(self.with_span.end, self.lparen_span.start))
-            .append(Doc::text("("))
-            .append(
-                Doc::line_or_nil()
-                    .append(helpers::format_comma_separated_list_with_trailing(
-                        &self.items,
-                        &self.comma_spans,
-                        self.lparen_span.end,
-                        Doc::line_or_space(),
-                        ctx,
-                    ))
-                    .nest(ctx.indent_width)
-                    .append(Doc::line_or_nil())
-                    .group(),
-            )
-            .append(Doc::text(")"))
+            .append(helpers::format_parenthesized(
+                helpers::format_comma_separated_list_with_trailing(
+                    &self.items,
+                    &self.comma_spans,
+                    self.lparen_span.end,
+                    Doc::line_or_space(),
+                    ctx,
+                ),
+                self.items
+                    .last()
+                    .map(|item| item.span.end)
+                    .unwrap_or(self.lparen_span.end),
+                self.span.end,
+                ctx,
+            ))
     }
 }
 
@@ -755,50 +728,40 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
                     .map(ParameterOrArbitrary::Arbitrary),
             )
             .collect::<Vec<_>>();
-        Doc::text("(")
-            .append(
-                Doc::line_or_nil()
-                    .append(helpers::format_comma_separated_list_with_trailing(
-                        &params,
-                        &self.comma_spans,
-                        self.span.start,
-                        Doc::line_or_space(),
-                        ctx,
-                    ))
-                    .concat(
-                        ctx.start_spaced_comments(
-                            self.params
-                                .len()
-                                .checked_sub(1)
-                                .and_then(|i| self.comma_spans.get(i))
-                                .or_else(|| self.params.last().map(|param| param.span()))
-                                .map(|span| span.end)
-                                .unwrap_or(self.span.start),
-                            self.span.end,
-                        ),
-                    )
-                    .nest(ctx.indent_width)
-                    .append(Doc::line_or_nil())
-                    .group(),
-            )
-            .append(Doc::text(")"))
+        helpers::format_parenthesized(
+            helpers::format_comma_separated_list_with_trailing(
+                &params,
+                &self.comma_spans,
+                self.span.start,
+                Doc::line_or_space(),
+                ctx,
+            ),
+            self.params
+                .len()
+                .checked_sub(1)
+                .and_then(|i| self.comma_spans.get(i))
+                .or_else(|| self.params.last().map(|param| param.span()))
+                .map(|span| span.end)
+                .unwrap_or(self.span.start),
+            self.span.end,
+            ctx,
+        )
     }
 }
 
 impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let expr_span = self.expr.span();
-        Doc::text("(")
-            .append(
-                Doc::line_or_nil()
-                    .concat(ctx.end_spaced_comments(self.span.start, expr_span.start))
-                    .append(self.expr.doc(ctx))
-                    .concat(ctx.start_spaced_comments(expr_span.end, self.span.end))
-                    .nest(ctx.indent_width)
-                    .append(Doc::line_or_nil())
-                    .group(),
+        helpers::format_parenthesized(
+            Doc::list(
+                ctx.end_spaced_comments(self.span.start, expr_span.start)
+                    .collect(),
             )
-            .append(Doc::text(")"))
+            .append(self.expr.doc(ctx)),
+            expr_span.end,
+            self.span.end,
+            ctx,
+        )
     }
 }
 

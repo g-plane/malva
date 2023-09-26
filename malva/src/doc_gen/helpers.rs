@@ -187,6 +187,27 @@ pub(super) fn format_operator_suffix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
     }
 }
 
+pub(super) fn format_parenthesized<'s>(
+    body: Doc<'s>,
+    trailing_comments_start: usize,
+    trailing_comments_end: usize,
+    ctx: &Ctx<'_, 's>,
+) -> Doc<'s> {
+    Doc::text("(")
+        .append(
+            Doc::line_or_nil()
+                .append(body)
+                .concat(ctx.start_spaced_comments_without_last_hard_line(
+                    trailing_comments_start,
+                    trailing_comments_end,
+                ))
+                .nest(ctx.indent_width)
+                .append(Doc::line_or_nil())
+                .group(),
+        )
+        .append(Doc::text(")"))
+}
+
 pub(super) fn ident_to_lowercase<'s>(
     interpolable_ident: &InterpolableIdent<'s>,
     ctx: &Ctx<'_, 's>,
