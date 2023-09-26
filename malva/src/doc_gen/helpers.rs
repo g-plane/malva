@@ -138,7 +138,9 @@ pub(super) fn format_values_list<'s>(
             .flatten()
             .collect(),
         )
-        .append(if ctx.options.trailing_comma {
+        .append(if values.len() == 1 {
+            Doc::text(",")
+        } else if ctx.options.trailing_comma {
             Doc::flat_or_break(Doc::nil(), Doc::text(","))
         } else {
             Doc::nil()

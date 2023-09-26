@@ -861,23 +861,25 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
         docs.extend(ctx.start_spaced_comments(self.name.span.end, self.colon_span.start));
         docs.push(Doc::text(":"));
 
-        let should_group = if let ComponentValue::SassList(
-            sass_list @ SassList {
-                comma_spans: Some(comma_spans),
-                span,
-                ..
-            },
-        ) = &self.value
+        let should_group = if let ComponentValue::SassList(SassList {
+            elements,
+            comma_spans: Some(comma_spans),
+            span,
+            ..
+        }) = &self.value
         {
             docs.push(Doc::line_or_space());
             docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
             docs.push(helpers::format_comma_separated_list_with_trailing(
-                &sass_list.elements,
+                elements,
                 comma_spans,
                 span.start,
                 Doc::line_or_space(),
                 ctx,
             ));
+            if elements.len() == 1 {
+                docs.push(Doc::text(","));
+            }
             true
         } else {
             docs.push(Doc::space());
