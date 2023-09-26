@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+$my-map: (
+  "foo": 1,
+  // Foo
+  "bar": 2 // Bar
+);
+
