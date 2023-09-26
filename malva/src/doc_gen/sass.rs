@@ -757,7 +757,10 @@ impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
                 ctx.end_spaced_comments(self.span.start, expr_span.start)
                     .collect(),
             )
-            .append(self.expr.doc(ctx)),
+            .append(match &*self.expr {
+                ComponentValue::SassList(sass_list) => sass_list.doc(ctx),
+                expr => expr.doc(ctx),
+            }),
             expr_span.end,
             self.span.end,
             ctx,

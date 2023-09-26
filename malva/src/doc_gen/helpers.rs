@@ -144,7 +144,6 @@ pub(super) fn format_values_list<'s>(
             Doc::nil()
         })
         .group()
-        .nest(ctx.indent_width)
     } else {
         let mut docs = itertools::intersperse(
             values.iter().scan(list_span.start, |pos, value| {
@@ -165,7 +164,7 @@ pub(super) fn format_values_list<'s>(
             docs.extend(ctx.start_spaced_comments(last.span().end, list_span.end));
         }
 
-        Doc::list(docs).group().nest(ctx.indent_width)
+        Doc::list(docs).group()
     }
 }
 
