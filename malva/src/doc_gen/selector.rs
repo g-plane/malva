@@ -164,7 +164,19 @@ impl<'s> DocGen<'s> for CompoundSelector<'s> {
         Doc::list(
             self.children
                 .iter()
-                .map(|selector| selector.doc(ctx))
+                .scan(self.span.start, |pos, selector| {
+                    let selector_span = selector.span();
+                    Some(
+                        Doc::list(
+                            ctx.unspaced_comments(
+                                mem::replace(pos, selector_span.end),
+                                selector_span.start,
+                            )
+                            .collect(),
+                        )
+                        .append(selector.doc(ctx)),
+                    )
+                })
                 .collect(),
         )
     }
