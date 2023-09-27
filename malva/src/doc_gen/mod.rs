@@ -9,6 +9,7 @@ mod sass;
 mod selector;
 mod stmt;
 mod str;
+mod token_seq;
 mod value;
 
 pub(super) trait DocGen<'s> {

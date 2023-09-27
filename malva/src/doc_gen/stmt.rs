@@ -188,10 +188,14 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
 impl<'s> DocGen<'s> for Statement<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let stmt = match self {
+            Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx),
             Statement::AtRule(at_rule) => at_rule.doc(ctx),
             Statement::Declaration(declaration) => declaration.doc(ctx),
             Statement::KeyframeBlock(keyframe_block) => keyframe_block.doc(ctx),
-            Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx),
+            Statement::LessFunctionCall(less_function_call) => less_function_call.doc(ctx),
+            Statement::LessVariableDeclaration(less_variable_declaration) => {
+                less_variable_declaration.doc(ctx)
+            }
             Statement::SassIfAtRule(sass_if_at_rule) => sass_if_at_rule.doc(ctx),
             Statement::SassVariableDeclaration(sass_variable_declaration) => {
                 sass_variable_declaration.doc(ctx)
@@ -214,7 +218,9 @@ impl<'s> DocGen<'s> for Statement<'s> {
                 {
                     stmt.append(Doc::text(";"))
                 }
-                Statement::SassVariableDeclaration(..) => stmt.append(Doc::text(";")),
+                Statement::LessFunctionCall(..)
+                | Statement::LessVariableDeclaration(..)
+                | Statement::SassVariableDeclaration(..) => stmt.append(Doc::text(";")),
                 Statement::UnknownSassAtRule(unknown_sass_at_rule)
                     if unknown_sass_at_rule.block.is_none() =>
                 {

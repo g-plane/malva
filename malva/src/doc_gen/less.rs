@@ -7,7 +7,8 @@ use super::{
     DocGen,
 };
 use crate::ctx::Ctx;
-use raffia::ast::*;
+use raffia::{ast::*, Spanned};
+use std::{iter, mem};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for LessDetachedRuleset<'s> {
@@ -42,6 +43,49 @@ impl<'s> DocGen<'s> for LessExtendList<'s> {
             )
             .collect(),
         )
+    }
+}
+
+impl<'s> DocGen<'s> for LessImportOptions<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        helpers::format_parenthesized(
+            helpers::format_comma_separated_list_with_trailing(
+                &self.names,
+                &self.comma_spans,
+                self.span.start,
+                Doc::line_or_space(),
+                ctx,
+            ),
+            self.names
+                .last()
+                .map(|name| name.span.end)
+                .unwrap_or(self.span.start),
+            self.span.end,
+            ctx,
+        )
+    }
+}
+
+impl<'s> DocGen<'s> for LessImportPrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = Vec::with_capacity(3);
+        docs.push(self.href.doc(ctx));
+        let mut pos = self.href.span().end;
+
+        docs.push(Doc::line_or_space());
+        docs.extend(ctx.end_spaced_comments(
+            mem::replace(&mut pos, self.options.span.end),
+            self.options.span.start,
+        ));
+        docs.push(self.options.doc(ctx));
+
+        if let Some(media) = &self.media {
+            docs.push(Doc::line_or_space());
+            docs.extend(ctx.end_spaced_comments(pos, media.span.start));
+            docs.push(media.doc(ctx));
+        }
+
+        Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
@@ -133,9 +177,92 @@ impl<'s> DocGen<'s> for LessListFunction {
     }
 }
 
+impl<'s> DocGen<'s> for LessLookup<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        if let Some(name) = &self.name {
+            let name_span = name.span();
+            Doc::text("[")
+                .concat(ctx.end_spaced_comments(self.span.start, name_span.start))
+                .append(name.doc(ctx))
+                .concat(ctx.start_spaced_comments(name_span.end, self.span.end))
+                .append(Doc::text("]"))
+        } else {
+            Doc::text("[")
+                .concat(ctx.end_spaced_comments(self.span.start, self.span.end))
+                .append(Doc::text("]"))
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessLookupName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessLookupName::LessVariable(less_variable) => less_variable.doc(ctx),
+            LessLookupName::LessVariableVariable(less_variable_variable) => {
+                less_variable_variable.doc(ctx)
+            }
+            LessLookupName::LessPropertyVariable(less_property_variable) => {
+                less_property_variable.doc(ctx)
+            }
+            LessLookupName::Ident(ident) => ident.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessLookups<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::list(
+            self.lookups
+                .iter()
+                .scan(self.span.start, |pos, lookup| {
+                    Some(
+                        ctx.start_spaced_comments(
+                            mem::replace(pos, lookup.span.end),
+                            lookup.span.start,
+                        )
+                        .chain(iter::once(lookup.doc(ctx))),
+                    )
+                })
+                .flatten()
+                .collect(),
+        )
+    }
+}
+
 impl<'s> DocGen<'s> for LessPercentKeyword {
     fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("%")
+    }
+}
+
+impl<'s> DocGen<'s> for LessPlugin<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let path = self.path.doc(ctx);
+        if let Some(args) = &self.args {
+            Doc::text("(")
+                .append(
+                    Doc::line_or_nil()
+                        .append(args.doc(ctx))
+                        .nest(ctx.indent_width),
+                )
+                .append(Doc::line_or_nil())
+                .append(Doc::text(")"))
+                .append(Doc::line_or_space())
+                .append(path)
+                .group()
+                .nest(ctx.indent_width)
+        } else {
+            path
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessPluginPath<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessPluginPath::Str(str) => str.doc(ctx),
+            LessPluginPath::Url(url) => url.doc(ctx),
+        }
     }
 }
 
@@ -163,6 +290,52 @@ impl<'s> DocGen<'s> for LessPropertyVariable<'s> {
 impl<'s> DocGen<'s> for LessVariable<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("@").append(self.name.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for LessVariableDeclaration<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = Vec::with_capacity(3);
+        let value_span = self.value.span();
+
+        docs.push(self.name.doc(ctx));
+
+        docs.extend(ctx.start_spaced_comments(self.name.span.end, self.colon_span.start));
+        docs.push(Doc::text(":"));
+
+        let should_group = if let ComponentValue::LessList(LessList {
+            elements,
+            comma_spans: Some(comma_spans),
+            span,
+            ..
+        }) = &self.value
+        {
+            docs.push(Doc::line_or_space());
+            docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
+            docs.push(helpers::format_comma_separated_list_with_trailing(
+                elements,
+                comma_spans,
+                span.start,
+                Doc::line_or_space(),
+                ctx,
+            ));
+            if elements.len() == 1 {
+                docs.push(Doc::text(","));
+            }
+            true
+        } else {
+            docs.push(Doc::space());
+            docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
+            docs.push(self.value.doc(ctx));
+            false
+        };
+
+        let doc = Doc::list(docs);
+        if should_group {
+            doc.group().nest(ctx.indent_width)
+        } else {
+            doc
+        }
     }
 }
 

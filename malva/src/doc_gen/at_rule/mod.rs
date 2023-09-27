@@ -1,6 +1,6 @@
 use super::{super::DocGen, helpers};
 use crate::ctx::Ctx;
-use raffia::{ast::*, token::TokenWithSpan, Spanned};
+use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 mod container;
@@ -51,6 +51,8 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::Import(import) => import.doc(ctx),
             AtRulePrelude::Keyframes(keyframes) => keyframes.doc(ctx),
             AtRulePrelude::Layer(layer) => layer.doc(ctx),
+            AtRulePrelude::LessImport(less_import) => less_import.doc(ctx),
+            AtRulePrelude::LessPlugin(less_plugin) => less_plugin.doc(ctx),
             AtRulePrelude::Namespace(namespace) => namespace.doc(ctx),
             AtRulePrelude::Nest(nest) => nest.doc(ctx).group().nest(ctx.indent_width),
             AtRulePrelude::Page(page) => page.doc(ctx),
@@ -259,32 +261,7 @@ impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             UnknownAtRulePrelude::ComponentValue(component_value) => component_value.doc(ctx),
-            UnknownAtRulePrelude::TokenSeq(token_seq) => {
-                use raffia::token::Token;
-
-                let mut pos = token_seq.span.start;
-                let mut docs = Vec::with_capacity(token_seq.tokens.len());
-                let mut iter = token_seq.tokens.iter().peekable();
-                while let Some(token) = iter.next() {
-                    let span = token.span();
-                    docs.extend(ctx.start_spaced_comments(pos, span.start));
-
-                    docs.push(token.doc(ctx));
-                    if let TokenWithSpan {
-                        token: Token::Comma(..) | Token::Semicolon(..),
-                        ..
-                    } = token
-                    {
-                        docs.push(Doc::soft_line());
-                    } else if matches!(iter.peek(), Some(next) if token.span().end < next.span().start)
-                    {
-                        docs.push(Doc::soft_line());
-                    }
-
-                    pos = span.end;
-                }
-                Doc::list(docs)
-            }
+            UnknownAtRulePrelude::TokenSeq(token_seq) => token_seq.doc(ctx),
         }
     }
 }
