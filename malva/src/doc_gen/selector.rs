@@ -1,6 +1,7 @@
 use super::{helpers, DocGen};
 use crate::ctx::Ctx;
 use raffia::{ast::*, Spanned};
+use std::mem;
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for AnPlusB {
@@ -24,23 +25,36 @@ impl<'s> DocGen<'s> for AttributeSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         docs.push(Doc::text("["));
+        docs.extend(ctx.end_spaced_comments(self.span.start, self.name.span.start));
         docs.push(self.name.doc(ctx));
+
+        let mut pos = self.name.span.end;
         if let Some((matcher, value)) = self.matcher.as_ref().zip(self.value.as_ref()) {
-            docs.extend(ctx.end_spaced_comments(self.name.span.end, matcher.span.start));
+            docs.extend(
+                ctx.end_spaced_comments(
+                    mem::replace(&mut pos, matcher.span.end),
+                    matcher.span.start,
+                ),
+            );
             docs.push(matcher.doc(ctx));
 
             let value_span = value.span();
-            docs.extend(ctx.end_spaced_comments(matcher.span.end, value_span.start));
+            docs.extend(
+                ctx.end_spaced_comments(mem::replace(&mut pos, value_span.end), value_span.start),
+            );
             docs.push(value.doc(ctx));
             if let Some(modifier) = &self.modifier {
                 docs.reserve(2);
                 docs.push(Doc::space());
-                docs.extend(ctx.end_spaced_comments(value_span.end, modifier.span.start));
+                docs.extend(ctx.end_spaced_comments(
+                    mem::replace(&mut pos, modifier.span.end),
+                    modifier.span.start,
+                ));
                 docs.push(modifier.doc(ctx));
             }
-        } else {
-            docs.extend(ctx.start_spaced_comments(self.name.span.end, self.span.end));
         }
+
+        docs.extend(ctx.start_spaced_comments(pos, self.span.end));
         docs.push(Doc::text("]"));
         Doc::list(docs)
     }
