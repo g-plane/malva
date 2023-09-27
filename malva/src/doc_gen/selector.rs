@@ -327,8 +327,8 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                 PseudoClassSelectorArg::TokenSeq(token_seq) => format_pseudo_selector_arg_tokens(
                     token_seq,
                     ctx,
-                    self.span.start,
-                    self.span.end,
+                    token_seq.span.start,
+                    token_seq.span.end,
                 ),
             });
 
@@ -375,8 +375,8 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
                 PseudoElementSelectorArg::TokenSeq(token_seq) => format_pseudo_selector_arg_tokens(
                     token_seq,
                     ctx,
-                    self.span.start,
-                    self.span.end,
+                    token_seq.span.start,
+                    token_seq.span.end,
                 ),
             });
 
