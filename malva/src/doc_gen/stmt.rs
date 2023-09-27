@@ -138,7 +138,7 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
             self.selector.span.start,
             ctx,
         )
-        .append(Doc::space())
+        .append(helpers::format_space_before_block(ctx))
         .concat(ctx.end_spaced_comments(self.selector.span.end, self.block.span.start))
         .append(self.block.doc(ctx))
     }
@@ -230,7 +230,9 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut stmt_docs = vec![];
         format_statements(&mut stmt_docs, &self.statements, &self.span, ctx);
-        stmt_docs.push(Doc::empty_line());
+        if ctx.syntax != Syntax::Sass {
+            stmt_docs.push(Doc::empty_line());
+        }
         Doc::list(stmt_docs)
     }
 }

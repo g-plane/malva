@@ -1,7 +1,7 @@
 use super::DocGen;
 use crate::ctx::Ctx;
 use itertools::{EitherOrBoth, Itertools};
-use raffia::{ast::*, Span, Spanned};
+use raffia::{ast::*, Span, Spanned, Syntax};
 use std::{iter, mem};
 use tiny_pretty::Doc;
 
@@ -214,6 +214,14 @@ pub(super) fn format_parenthesized<'s>(
                 .group(),
         )
         .append(Doc::text(")"))
+}
+
+pub(super) fn format_space_before_block<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    if ctx.syntax == Syntax::Sass {
+        Doc::nil()
+    } else {
+        Doc::space()
+    }
 }
 
 pub(super) fn ident_to_lowercase<'s>(

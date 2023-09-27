@@ -122,7 +122,7 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.condition
             .doc(ctx)
-            .append(Doc::space())
+            .append(helpers::format_space_before_block(ctx))
             .concat(ctx.end_spaced_comments(self.condition.span().end, self.block.span.start))
             .append(self.block.doc(ctx))
     }
@@ -347,7 +347,8 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
             docs.reserve(3);
             docs.push(Doc::space());
             docs.extend(ctx.end_spaced_comments(pos, else_span.start));
-            docs.push(Doc::text("@else "));
+            docs.push(Doc::text("@else"));
+            docs.push(helpers::format_space_before_block(ctx));
             docs.extend(ctx.end_spaced_comments(else_span.end, else_clause.span.start));
             docs.push(else_clause.doc(ctx));
         }
@@ -932,7 +933,7 @@ impl<'s> DocGen<'s> for UnknownSassAtRule<'s> {
         }
 
         if let Some(block) = &self.block {
-            docs.push(Doc::space());
+            docs.push(helpers::format_space_before_block(ctx));
             docs.extend(ctx.end_spaced_comments(pos, block.span.start));
             docs.push(block.doc(ctx));
         }
