@@ -170,21 +170,25 @@ pub(super) fn format_values_list<'s>(
     }
 }
 
+/// Remember to call `.group()` if use this,
+/// otherwise it will always add linebreak.
 pub(super) fn format_operator_prefix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
     use crate::config::OperatorLineBreak;
 
     match ctx.options.operator_linebreak {
-        OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
+        OperatorLineBreak::Before => Doc::line_or_space().nest(ctx.indent_width),
         OperatorLineBreak::After => Doc::space(),
     }
 }
 
+/// Remember to call `.group()` if use this,
+/// otherwise it will always add linebreak.
 pub(super) fn format_operator_suffix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
     use crate::config::OperatorLineBreak;
 
     match ctx.options.operator_linebreak {
         OperatorLineBreak::Before => Doc::space(),
-        OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
+        OperatorLineBreak::After => Doc::line_or_space().nest(ctx.indent_width),
     }
 }
 

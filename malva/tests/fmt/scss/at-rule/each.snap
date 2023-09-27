@@ -15,15 +15,12 @@ source: malva/tests/fmt.rs
 @each $animal in ((puma), (sea-slug), (egret), (salamander)) {}
 @each $animal in ((puma), (sea-slug), (egret), (salamander)) {}
 @each $animal in ((puma), (sea-slug), (egret), (salamander)) {}
-@each $animal, $color, $cursor in (puma, black, default),
-  (sea-slug, blue, pointer),
-  (egret, white, move) {}
-@each $animal, $color, $cursor in (puma, black, default),
-  (sea-slug, blue, pointer),
-  (egret, white, move) {}
-@each $animal, $color, $cursor in (puma, black, default),
-  (sea-slug, blue, pointer),
-  (egret, white, move) {}
+@each $animal, $color, $cursor in
+  (puma, black, default), (sea-slug, blue, pointer), (egret, white, move) {}
+@each $animal, $color, $cursor in
+  (puma, black, default), (sea-slug, blue, pointer), (egret, white, move) {}
+@each $animal, $color, $cursor in
+  (puma, black, default), (sea-slug, blue, pointer), (egret, white, move) {}
 @each $very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var in
   puma, sea-slug, egret, salamander {}
 @each $very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var,

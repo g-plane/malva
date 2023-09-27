@@ -95,6 +95,7 @@ impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
             .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
             .append(self.right.doc(ctx))
+            .group()
     }
 }
 
@@ -168,6 +169,7 @@ impl<'s> DocGen<'s> for SassEach<'s> {
         .append(helpers::format_operator_suffix_space(ctx))
         .concat(ctx.end_spaced_comments(self.in_span.end, self.expr.span().start))
         .append(self.expr.doc(ctx))
+        .group()
     }
 }
 
@@ -200,19 +202,33 @@ impl<'s> DocGen<'s> for SassFlag<'s> {
 
 impl<'s> DocGen<'s> for SassFor<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        use crate::config::OperatorLineBreak;
+
         let start_value_span = self.start.span();
         self.binding
             .doc(ctx)
-            .append(helpers::format_operator_prefix_space(ctx))
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
+                OperatorLineBreak::After => Doc::space(),
+            })
             .concat(ctx.end_spaced_comments(self.binding.span.end, self.from_span.start))
             .append(Doc::text("from"))
-            .append(helpers::format_operator_suffix_space(ctx))
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::space(),
+                OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
+            })
             .concat(ctx.end_spaced_comments(self.from_span.end, start_value_span.start))
             .append(self.start.doc(ctx))
-            .append(helpers::format_operator_prefix_space(ctx))
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::soft_line().nest(ctx.indent_width),
+                OperatorLineBreak::After => Doc::space(),
+            })
             .concat(ctx.end_spaced_comments(start_value_span.end, self.boundary.span.start))
             .append(self.boundary.doc(ctx))
-            .append(helpers::format_operator_suffix_space(ctx))
+            .append(match ctx.options.operator_linebreak {
+                OperatorLineBreak::Before => Doc::space(),
+                OperatorLineBreak::After => Doc::soft_line().nest(ctx.indent_width),
+            })
             .concat(ctx.end_spaced_comments(self.boundary.span.end, self.end.span().start))
             .append(self.end.doc(ctx))
     }

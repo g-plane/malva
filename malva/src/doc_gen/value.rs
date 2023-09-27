@@ -89,6 +89,7 @@ impl<'s> DocGen<'s> for Calc<'s> {
             .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
             .append(right)
+            .group()
     }
 }
 
