@@ -7,7 +7,7 @@ mod line_bounds;
 use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen};
 pub use crate::{error::Error, line_bounds::LineBounds};
 pub use raffia::Syntax;
-use raffia::{ast::Stylesheet, token::Comment, ParserBuilder};
+use raffia::{ast::Stylesheet, token::Comment, ParserBuilder, ParserOptions};
 
 /// Format the given source code.
 pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Result<String, Error> {
@@ -16,6 +16,10 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
     let mut parser = ParserBuilder::new(input)
         .syntax(syntax)
         .comments(&mut comments)
+        .options(ParserOptions {
+            try_parsing_value_in_custom_property: true,
+            tolerate_semicolon_in_sass: true,
+        })
         .build();
     let stylesheet = match parser.parse::<Stylesheet>() {
         Ok(stylesheet) => stylesheet,

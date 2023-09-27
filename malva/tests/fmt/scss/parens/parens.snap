@@ -13,7 +13,7 @@ a {
 }
 
 .foo {
-  --paddingC: calc( var( --widthB ) / 2 );
+  --paddingC: calc(var(--widthB) / 2);
   content: attr(data-title);
   color: var(--main-bg-color);
   background-color: rgb(255, 0, 0);

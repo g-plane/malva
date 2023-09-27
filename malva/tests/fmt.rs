@@ -1,6 +1,6 @@
 use insta::{assert_snapshot, glob, Settings};
 use malva::{config::FormatOptions, format_text};
-use raffia::{ast::Stylesheet, Parser, ParserBuilder, Syntax};
+use raffia::{ast::Stylesheet, Parser, ParserBuilder, ParserOptions, Syntax};
 use std::fs;
 
 #[test]
@@ -19,6 +19,10 @@ fn fmt_snapshot() {
         let mut parser = ParserBuilder::new(&input)
             .syntax(syntax)
             .comments(&mut comments)
+            .options(ParserOptions {
+                try_parsing_value_in_custom_property: true,
+                tolerate_semicolon_in_sass: true,
+            })
             .build();
         parser
             .parse::<Stylesheet>()
