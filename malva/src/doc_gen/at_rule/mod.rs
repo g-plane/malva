@@ -70,10 +70,10 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::SassInclude(sass_include) => sass_include.doc(ctx),
             AtRulePrelude::SassMixin(sass_mixin) => sass_mixin.doc(ctx),
             AtRulePrelude::SassUse(sass_use) => sass_use.doc(ctx),
+            AtRulePrelude::Scope(scope) => scope.doc(ctx),
             AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),
             AtRulePrelude::Supports(supports) => supports.doc(ctx),
             AtRulePrelude::Unknown(unknown) => unknown.doc(ctx),
-            _ => todo!(),
         }
     }
 }
@@ -254,6 +254,50 @@ impl<'s> DocGen<'s> for PageSelectorList<'s> {
 impl<'s> DocGen<'s> for PseudoPage<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(":").append(self.name.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for ScopeEnd<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("to ")
+            .concat(ctx.end_spaced_comments(self.to_span.end, self.lparen_span.start))
+            .append(helpers::format_parenthesized(
+                self.selector.doc(ctx),
+                self.selector.span.end,
+                self.span.end,
+                ctx,
+            ))
+    }
+}
+
+impl<'s> DocGen<'s> for ScopePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            ScopePrelude::StartOnly(start_only) => start_only.doc(ctx),
+            ScopePrelude::EndOnly(end_only) => end_only.doc(ctx),
+            ScopePrelude::Both(both) => both.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for ScopeStart<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        helpers::format_parenthesized(
+            self.selector.doc(ctx),
+            self.selector.span.end,
+            self.span.end,
+            ctx,
+        )
+    }
+}
+
+impl<'s> DocGen<'s> for ScopeStartWithEnd<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.start
+            .doc(ctx)
+            .append(Doc::line_or_space().nest(ctx.indent_width))
+            .append(self.end.doc(ctx))
+            .group()
     }
 }
 
