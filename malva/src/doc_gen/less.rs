@@ -229,6 +229,113 @@ impl<'s> DocGen<'s> for LessLookups<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for LessMixinArgument<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessMixinArgument::Named(named) => named.doc(ctx),
+            LessMixinArgument::Value(value) => value.doc(ctx),
+            LessMixinArgument::Variadic(variadic) => variadic.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinCalleeChild<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        if let Some(combinator) = &self.combinator {
+            combinator
+                .doc(ctx)
+                .append(Doc::space())
+                .concat(ctx.end_spaced_comments(combinator.span.end, self.name.span().start))
+                .append(self.name.doc(ctx))
+        } else {
+            self.name.doc(ctx)
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessMixinName::ClassSelector(class_selector) => class_selector.doc(ctx),
+            LessMixinName::IdSelector(id_selector) => id_selector.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinNamedArgument<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.name
+            .doc(ctx)
+            .concat(ctx.start_spaced_comments(self.name.span().end, self.colon_span.start))
+            .append(Doc::text(": "))
+            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
+            .append(self.value.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinNamedParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let name = self.name.doc(ctx);
+        if let Some(value) = &self.value {
+            name.concat(ctx.start_spaced_comments(self.name.span().end, value.span.start))
+                .append(value.doc(ctx))
+        } else {
+            name
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessMixinParameter::Named(named) => named.doc(ctx),
+            LessMixinParameter::Unnamed(unnamed) => unnamed.doc(ctx),
+            LessMixinParameter::Variadic(variadic) => variadic.doc(ctx),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinNamedParameterDefaultValue<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text(": ")
+            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
+            .append(self.value.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinParameterName<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessMixinParameterName::Variable(variable) => variable.doc(ctx),
+            LessMixinParameterName::PropertyVariable(property_variable) => {
+                property_variable.doc(ctx)
+            }
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinUnnamedParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.value.doc(ctx)
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinVariadicArgument<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.name.doc(ctx).append(Doc::text("..."))
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinVariadicParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        if let Some(name) = &self.name {
+            name.doc(ctx).append(Doc::text("..."))
+        } else {
+            Doc::text("...")
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for LessPercentKeyword {
     fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("%")
