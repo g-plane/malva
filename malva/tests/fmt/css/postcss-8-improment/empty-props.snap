@@ -1,0 +1,10 @@
+---
+source: malva/tests/fmt.rs
+---
+:root {
+  --empty: ;
+  --one-space: ;
+  --two-space: ;
+  --many-space: ;
+}
+
