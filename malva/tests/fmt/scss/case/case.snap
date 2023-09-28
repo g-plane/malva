@@ -10,8 +10,8 @@ source: malva/tests/fmt.rs
 @import "Keep";
 
 html#KeepId.KeepClass,
-a[href=KeepAttrValue]:hover::first-letter,
-svg[viewbox] lineargradient,
+a[HREF=KeepAttrValue]:hover::first-letter,
+svg[viewBox] lineargradient,
 :not(:nth-child(2n+1)) {
   color: #aabbcc;
   background-image: url("KeepString");

@@ -464,7 +464,19 @@ impl<'s> DocGen<'s> for SelectorList<'s> {
 
 impl<'s> DocGen<'s> for TagNameSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        self.name.doc(ctx)
+        let name = if let InterpolableIdent::Literal(ident) = &self.name.name {
+            Doc::text(ident.raw.to_ascii_lowercase())
+        } else {
+            self.name.doc(ctx)
+        };
+        if let Some(prefix) = &self.name.prefix {
+            prefix
+                .doc(ctx)
+                .concat(ctx.unspaced_comments(prefix.span.end, self.name.name.span().start))
+                .append(name)
+        } else {
+            name
+        }
     }
 }
 
@@ -493,11 +505,7 @@ impl<'s> DocGen<'s> for UniversalSelector<'s> {
 
 impl<'s> DocGen<'s> for WqName<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let name = if let InterpolableIdent::Literal(ident) = &self.name {
-            Doc::text(ident.raw.to_ascii_lowercase())
-        } else {
-            self.name.doc(ctx)
-        };
+        let name = self.name.doc(ctx);
         if let Some(prefix) = &self.prefix {
             prefix
                 .doc(ctx)
