@@ -36,12 +36,12 @@ impl<'s> DocGen<'s> for LessExtend<'s> {
 
 impl<'s> DocGen<'s> for LessExtendList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.elements.iter().map(|extend| extend.doc(ctx)),
-                Doc::text(", "),
-            )
-            .collect(),
+        helpers::format_comma_separated_list(
+            &self.elements,
+            &self.comma_spans,
+            self.span.start,
+            Doc::space(),
+            ctx,
         )
     }
 }
@@ -290,6 +290,12 @@ impl<'s> DocGen<'s> for LessPropertyVariable<'s> {
 impl<'s> DocGen<'s> for LessVariable<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("@").append(self.name.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for LessVariableCall<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.variable.doc(ctx).append(Doc::text("()"))
     }
 }
 

@@ -193,6 +193,7 @@ impl<'s> DocGen<'s> for Statement<'s> {
             Statement::Declaration(declaration) => declaration.doc(ctx),
             Statement::KeyframeBlock(keyframe_block) => keyframe_block.doc(ctx),
             Statement::LessFunctionCall(less_function_call) => less_function_call.doc(ctx),
+            Statement::LessVariableCall(less_variable_call) => less_variable_call.doc(ctx),
             Statement::LessVariableDeclaration(less_variable_declaration) => {
                 less_variable_declaration.doc(ctx)
             }
@@ -219,6 +220,7 @@ impl<'s> DocGen<'s> for Statement<'s> {
                     stmt.append(Doc::text(";"))
                 }
                 Statement::LessFunctionCall(..)
+                | Statement::LessVariableCall(..)
                 | Statement::LessVariableDeclaration(..)
                 | Statement::SassVariableDeclaration(..) => stmt.append(Doc::text(";")),
                 Statement::UnknownSassAtRule(unknown_sass_at_rule)
