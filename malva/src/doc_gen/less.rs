@@ -11,6 +11,47 @@ use raffia::{ast::*, Spanned};
 use std::{iter, mem};
 use tiny_pretty::Doc;
 
+impl<'s> DocGen<'s> for LessBinaryCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.left
+            .doc(ctx)
+            .append(helpers::format_operator_prefix_space(ctx))
+            .concat(ctx.end_spaced_comments(self.left.span().end, self.op.span.start))
+            .append(self.op.doc(ctx))
+            .append(helpers::format_operator_suffix_space(ctx))
+            .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
+            .append(self.right.doc(ctx))
+            .group()
+    }
+}
+
+impl<'s> DocGen<'s> for LessBinaryConditionOperator {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        match self.kind {
+            LessBinaryConditionOperatorKind::GreaterThan => Doc::text(">"),
+            LessBinaryConditionOperatorKind::GreaterThanOrEqual => Doc::text(">="),
+            LessBinaryConditionOperatorKind::LessThan => Doc::text("<"),
+            LessBinaryConditionOperatorKind::LessThanOrEqual => Doc::text("<="),
+            LessBinaryConditionOperatorKind::Equal => Doc::text("="),
+            LessBinaryConditionOperatorKind::EqualOrGreaterThan => Doc::text("=>"),
+            LessBinaryConditionOperatorKind::EqualOrLessThan => Doc::text("=<"),
+            LessBinaryConditionOperatorKind::And => Doc::text("and"),
+            LessBinaryConditionOperatorKind::Or => Doc::text("or"),
+        }
+    }
+}
+
+impl<'s> DocGen<'s> for LessCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessCondition::Binary(binary) => binary.doc(ctx),
+            LessCondition::Negated(negated) => negated.doc(ctx),
+            LessCondition::Parenthesized(parenthesized) => parenthesized.doc(ctx),
+            LessCondition::Value(value) => value.doc(ctx),
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for LessDetachedRuleset<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.block.doc(ctx)
@@ -333,6 +374,38 @@ impl<'s> DocGen<'s> for LessMixinVariadicParameter<'s> {
         } else {
             Doc::text("...")
         }
+    }
+}
+
+impl<'s> DocGen<'s> for LessNegatedCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let condition_span = self.condition.span();
+        Doc::text("not").append(helpers::format_parenthesized(
+            Doc::list(
+                ctx.end_spaced_comments(self.span.start, condition_span.start)
+                    .collect(),
+            )
+            .append(self.condition.doc(ctx)),
+            condition_span.end,
+            self.span.end,
+            ctx,
+        ))
+    }
+}
+
+impl<'s> DocGen<'s> for LessParenthesizedCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let condition_span = self.condition.span();
+        helpers::format_parenthesized(
+            Doc::list(
+                ctx.end_spaced_comments(self.span.start, condition_span.start)
+                    .collect(),
+            )
+            .append(self.condition.doc(ctx)),
+            condition_span.end,
+            self.span.end,
+            ctx,
+        )
     }
 }
 
