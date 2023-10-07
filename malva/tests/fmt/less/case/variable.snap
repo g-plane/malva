@@ -1,0 +1,73 @@
+---
+source: malva/tests/fmt.rs
+---
+// Do not change case of property name if inside a variable declaration
+
+@var: {
+  notVar: 0;
+  @notVarNested: {
+    notVar: 1;
+    notVar2: 2;
+  };
+};
+
+@var: {
+  preserveCase: 5;
+};
+
+@var: {
+  preserveCase: 5;
+};
+
+@var: {
+  preserveCase: 5;
+};
+
+@var /* comment */: /* comment */ {
+  preserveCase: 5;
+};
+
+@var: /* comment */ {
+  preserveCase: 5;
+};
+
+@var /* comment */: {
+  preserveCase: 5;
+};
+
+@var // comment
+: // comment
+{
+  preserveCase: 5;
+};
+
+@var: // comment
+{
+  preserveCase: 5;
+};
+
+@var // comment
+: {
+  preserveCase: 5;
+};
+
+// Known css properties
+@var: {
+  COLoR: RED;
+};
+
+@not-var {
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[@notVarNested][notVar];
+  canchangecase: @var[notVar];
+  canchangecase: @var[notVar];
+  canchangecase: @var[notVar];
+  canchangecase: @var[notVar];
+}
+
