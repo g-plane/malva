@@ -86,7 +86,7 @@ impl SeparatedListFormatter {
                             docs.push(list_item.doc(ctx));
                             Some(docs.into_iter())
                         }
-                        EitherOrBoth::Right(..) => unreachable!(),
+                        EitherOrBoth::Right(..) => Some(vec![].into_iter()),
                     },
                 ),
                 vec![self.separator, self.space_after_separator].into_iter(),
@@ -142,7 +142,7 @@ pub(super) fn format_values_list<'s>(
                             docs.push(value.doc(ctx));
                             Some(docs.into_iter())
                         }
-                        EitherOrBoth::Right(..) => unreachable!(),
+                        EitherOrBoth::Right(..) => Some(vec![].into_iter()),
                     }),
                 vec![Doc::text(","), Doc::line_or_space()].into_iter(),
             )
