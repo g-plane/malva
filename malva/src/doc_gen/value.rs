@@ -118,11 +118,24 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::InterpolableIdent(interpolable_ident) => interpolable_ident.doc(ctx),
             ComponentValue::InterpolableStr(interpolable_str) => interpolable_str.doc(ctx),
             ComponentValue::LayerName(layer_name) => layer_name.doc(ctx),
+            ComponentValue::LessBinaryOperation(less_binary_operation) => {
+                less_binary_operation.doc(ctx)
+            }
+            ComponentValue::LessCondition(less_condition) => less_condition.doc(ctx),
             ComponentValue::LessDetachedRuleset(less_detached_ruleset) => {
                 less_detached_ruleset.doc(ctx)
             }
+            ComponentValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
             ComponentValue::LessJavaScriptSnippet(less_js_snippet) => less_js_snippet.doc(ctx),
             ComponentValue::LessList(less_list) => less_list.doc(ctx),
+            ComponentValue::LessMixinCall(less_mixin_call) => less_mixin_call.doc(ctx),
+            ComponentValue::LessNamespaceValue(less_namespace_value) => {
+                less_namespace_value.doc(ctx)
+            }
+            ComponentValue::LessNegativeValue(less_negative_value) => less_negative_value.doc(ctx),
+            ComponentValue::LessParenthesizedOperation(less_parenthesized_operation) => {
+                less_parenthesized_operation.doc(ctx)
+            }
             ComponentValue::LessPercentKeyword(less_percent_keyword) => {
                 less_percent_keyword.doc(ctx)
             }
@@ -156,7 +169,6 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx),
             ComponentValue::UnicodeRange(unicode_range) => unicode_range.doc(ctx),
             ComponentValue::Url(url) => url.doc(ctx),
-            _ => todo!(),
         }
     }
 }

@@ -41,6 +41,20 @@ impl<'s> DocGen<'s> for LessBinaryConditionOperator {
     }
 }
 
+impl<'s> DocGen<'s> for LessBinaryOperation<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.left
+            .doc(ctx)
+            .append(helpers::format_operator_prefix_space(ctx))
+            .concat(ctx.end_spaced_comments(self.left.span().end, self.op.span.start))
+            .append(self.op.doc(ctx))
+            .append(helpers::format_operator_suffix_space(ctx))
+            .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
+            .append(self.right.doc(ctx))
+            .group()
+    }
+}
+
 impl<'s> DocGen<'s> for LessCondition<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
@@ -49,6 +63,37 @@ impl<'s> DocGen<'s> for LessCondition<'s> {
             LessCondition::Parenthesized(parenthesized) => parenthesized.doc(ctx),
             LessCondition::Value(value) => value.doc(ctx),
         }
+    }
+}
+
+impl<'s> DocGen<'s> for LessConditionalQualifiedRule<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        helpers::format_selectors_before_block(
+            &self.selector.selectors,
+            &self.selector.comma_spans,
+            self.selector.span.start,
+            ctx,
+        )
+        .append(Doc::soft_line())
+        .append(self.guard.doc(ctx))
+        .concat(ctx.end_spaced_comments(self.selector.span.end, self.guard.span.start))
+        .append(helpers::format_space_before_block(ctx))
+        .concat(ctx.end_spaced_comments(self.selector.span.end, self.block.span.start))
+        .append(self.block.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for LessConditions<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("when ")
+            .append(
+                helpers::SeparatedListFormatter::new(
+                    ",",
+                    Doc::line_or_space().nest(ctx.indent_width),
+                )
+                .format(&self.conditions, &self.comma_spans, self.span.start, ctx),
+            )
+            .group()
     }
 }
 
@@ -83,6 +128,45 @@ impl<'s> DocGen<'s> for LessExtendList<'s> {
             self.span.start,
             ctx,
         )
+    }
+}
+
+impl<'s> DocGen<'s> for LessExtendRule<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.nesting_selector
+            .doc(ctx)
+            .concat(ctx.unspaced_comments(
+                self.nesting_selector.span.end,
+                self.name_of_extend.span.start,
+            ))
+            .append(Doc::text(":extend("))
+            .append({
+                let mut extend_doc = vec![];
+
+                if ctx.options.linebreak_in_pseudo_parens {
+                    extend_doc.push(Doc::line_or_nil());
+                }
+
+                extend_doc.extend(ctx.end_spaced_comments(self.span.start, self.extend.span.start));
+                extend_doc.push(self.extend.doc(ctx));
+
+                extend_doc.extend(ctx.start_spaced_comments(self.extend.span.end, self.span.end));
+                if ctx.options.linebreak_in_pseudo_parens {
+                    Doc::list(extend_doc)
+                        .nest(ctx.indent_width)
+                        .append(Doc::line_or_nil())
+                        .group()
+                } else {
+                    Doc::list(extend_doc)
+                }
+            })
+            .append(Doc::text(")"))
+    }
+}
+
+impl<'s> DocGen<'s> for LessFormatFunction {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("%")
     }
 }
 
@@ -122,12 +206,6 @@ impl<'s> DocGen<'s> for LessImportPrelude<'s> {
         }
 
         Doc::list(docs).group().nest(ctx.indent_width)
-    }
-}
-
-impl<'s> DocGen<'s> for LessFormatFunction {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text("%")
     }
 }
 
@@ -275,6 +353,70 @@ impl<'s> DocGen<'s> for LessMixinArgument<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for LessMixinArguments<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        helpers::format_parenthesized(
+            helpers::SeparatedListFormatter::new(
+                if self.is_comma_separated { "," } else { ";" },
+                Doc::line_or_space(),
+            )
+            .format(&self.args, &self.separator_spans, self.span.start, ctx),
+            self.args
+                .last()
+                .map(|arg| arg.span().end)
+                .unwrap_or(self.span.start),
+            self.span.end,
+            ctx,
+        )
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinCall<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = vec![self.callee.doc(ctx)];
+        let mut pos = self.callee.span.end;
+
+        if let Some(args) = &self.args {
+            docs.push(args.doc(ctx));
+            pos = args.span.end;
+        }
+
+        if let Some(important) = &self.important {
+            docs.push(Doc::soft_line().nest(ctx.indent_width));
+            docs.extend(ctx.end_spaced_comments(pos, important.span.start));
+            docs.push(important.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinCallee<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = Vec::with_capacity(1);
+        let mut pos = self.span.start;
+
+        let mut iter = self.children.iter();
+        if let Some(first) = iter.next() {
+            docs.push(first.doc(ctx));
+            pos = first.span.end;
+        }
+
+        let (docs, _) = iter.fold((docs, pos), |(mut docs, pos), child| {
+            if pos < child.span.start {
+                docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                docs.extend(ctx.end_spaced_comments(pos, child.span.start));
+            } else {
+                docs.extend(ctx.unspaced_comments(pos, child.span.start));
+            }
+            docs.push(child.doc(ctx));
+            (docs, child.span.end)
+        });
+
+        Doc::list(docs).group()
+    }
+}
+
 impl<'s> DocGen<'s> for LessMixinCalleeChild<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         if let Some(combinator) = &self.combinator {
@@ -286,6 +428,26 @@ impl<'s> DocGen<'s> for LessMixinCalleeChild<'s> {
         } else {
             self.name.doc(ctx)
         }
+    }
+}
+
+impl<'s> DocGen<'s> for LessMixinDefinition<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let mut docs = vec![self.name.doc(ctx), self.params.doc(ctx)];
+        let mut pos = self.params.span.end;
+
+        if let Some(guard) = &self.guard {
+            docs.push(Doc::soft_line());
+            docs.extend(ctx.end_spaced_comments(self.params.span.end, guard.span.start));
+            docs.push(guard.doc(ctx));
+            pos = guard.span.end;
+        }
+
+        docs.push(helpers::format_space_before_block(ctx));
+        docs.extend(ctx.end_spaced_comments(pos, self.block.span.start));
+        docs.push(self.block.doc(ctx));
+
+        Doc::list(docs)
     }
 }
 
@@ -321,6 +483,14 @@ impl<'s> DocGen<'s> for LessMixinNamedParameter<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for LessMixinNamedParameterDefaultValue<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text(": ")
+            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
+            .append(self.value.doc(ctx))
+    }
+}
+
 impl<'s> DocGen<'s> for LessMixinParameter<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
@@ -331,11 +501,21 @@ impl<'s> DocGen<'s> for LessMixinParameter<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for LessMixinNamedParameterDefaultValue<'s> {
+impl<'s> DocGen<'s> for LessMixinParameters<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text(": ")
-            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
-            .append(self.value.doc(ctx))
+        helpers::format_parenthesized(
+            helpers::SeparatedListFormatter::new(
+                if self.is_comma_separated { "," } else { ";" },
+                Doc::line_or_space(),
+            )
+            .format(&self.params, &self.separator_spans, self.span.start, ctx),
+            self.params
+                .last()
+                .map(|param| param.span().end)
+                .unwrap_or(self.span.start),
+            self.span.end,
+            ctx,
+        )
     }
 }
 
@@ -372,6 +552,24 @@ impl<'s> DocGen<'s> for LessMixinVariadicParameter<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for LessNamespaceValue<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        self.callee
+            .doc(ctx)
+            .concat(ctx.unspaced_comments(self.callee.span().end, self.lookups.span.start))
+            .append(self.lookups.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for LessNamespaceValueCallee<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        match self {
+            LessNamespaceValueCallee::LessMixinCall(mixin_call) => mixin_call.doc(ctx),
+            LessNamespaceValueCallee::LessVariable(variable) => variable.doc(ctx),
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for LessNegatedCondition<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let condition_span = self.condition.span();
@@ -388,6 +586,23 @@ impl<'s> DocGen<'s> for LessNegatedCondition<'s> {
     }
 }
 
+impl<'s> DocGen<'s> for LessNegativeValue<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        Doc::text("-").append(self.value.doc(ctx))
+    }
+}
+
+impl<'s> DocGen<'s> for LessOperationOperator {
+    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+        match self.kind {
+            LessOperationOperatorKind::Multiply => Doc::text("*"),
+            LessOperationOperatorKind::Division => Doc::text("/"),
+            LessOperationOperatorKind::Plus => Doc::text("+"),
+            LessOperationOperatorKind::Minus => Doc::text("-"),
+        }
+    }
+}
+
 impl<'s> DocGen<'s> for LessParenthesizedCondition<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let condition_span = self.condition.span();
@@ -398,6 +613,22 @@ impl<'s> DocGen<'s> for LessParenthesizedCondition<'s> {
             )
             .append(self.condition.doc(ctx)),
             condition_span.end,
+            self.span.end,
+            ctx,
+        )
+    }
+}
+
+impl<'s> DocGen<'s> for LessParenthesizedOperation<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        let operation_span = self.operation.span();
+        helpers::format_parenthesized(
+            Doc::list(
+                ctx.end_spaced_comments(self.span.start, operation_span.start)
+                    .collect(),
+            )
+            .append(self.operation.doc(ctx)),
+            operation_span.end,
             self.span.end,
             ctx,
         )

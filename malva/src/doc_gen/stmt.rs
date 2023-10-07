@@ -192,7 +192,13 @@ impl<'s> DocGen<'s> for Statement<'s> {
             Statement::AtRule(at_rule) => at_rule.doc(ctx),
             Statement::Declaration(declaration) => declaration.doc(ctx),
             Statement::KeyframeBlock(keyframe_block) => keyframe_block.doc(ctx),
+            Statement::LessConditionalQualifiedRule(less_conditional_qualified_rule) => {
+                less_conditional_qualified_rule.doc(ctx)
+            }
+            Statement::LessExtendRule(less_extend_rule) => less_extend_rule.doc(ctx),
             Statement::LessFunctionCall(less_function_call) => less_function_call.doc(ctx),
+            Statement::LessMixinCall(less_mixin_call) => less_mixin_call.doc(ctx),
+            Statement::LessMixinDefinition(less_mixin_definition) => less_mixin_definition.doc(ctx),
             Statement::LessVariableCall(less_variable_call) => less_variable_call.doc(ctx),
             Statement::LessVariableDeclaration(less_variable_declaration) => {
                 less_variable_declaration.doc(ctx)
@@ -202,7 +208,6 @@ impl<'s> DocGen<'s> for Statement<'s> {
                 sass_variable_declaration.doc(ctx)
             }
             Statement::UnknownSassAtRule(unknown_sass_at_rule) => unknown_sass_at_rule.doc(ctx),
-            _ => todo!(),
         };
         if ctx.syntax == Syntax::Sass {
             stmt
@@ -219,7 +224,9 @@ impl<'s> DocGen<'s> for Statement<'s> {
                 {
                     stmt.append(Doc::text(";"))
                 }
-                Statement::LessFunctionCall(..)
+                Statement::LessExtendRule(..)
+                | Statement::LessFunctionCall(..)
+                | Statement::LessMixinCall(..)
                 | Statement::LessVariableCall(..)
                 | Statement::LessVariableDeclaration(..)
                 | Statement::SassVariableDeclaration(..) => stmt.append(Doc::text(";")),

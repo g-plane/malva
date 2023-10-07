@@ -210,7 +210,7 @@ impl<'s> DocGen<'s> for MediaQuery<'s> {
             MediaQuery::ConditionOnly(media_condition) => media_condition.doc(ctx),
             MediaQuery::WithType(media_query_with_type) => media_query_with_type.doc(ctx),
             MediaQuery::LessVariable(less_variable) => less_variable.doc(ctx),
-            MediaQuery::LessNamespaceValue(..) => todo!(),
+            MediaQuery::LessNamespaceValue(less_namespace_value) => less_namespace_value.doc(ctx),
         }
     }
 }
