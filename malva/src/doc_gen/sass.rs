@@ -132,13 +132,9 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
 impl<'s> DocGen<'s> for SassContent<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::format_comma_separated_list_with_trailing(
-                &self.args,
-                &self.comma_spans,
-                self.span.start,
-                Doc::line_or_space(),
-                ctx,
-            ),
+            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                .with_trailing()
+                .format(&self.args, &self.comma_spans, self.span.start, ctx),
             self.args
                 .len()
                 .checked_sub(1)
@@ -154,35 +150,33 @@ impl<'s> DocGen<'s> for SassContent<'s> {
 
 impl<'s> DocGen<'s> for SassEach<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_comma_separated_list(
-            &self.bindings,
-            &self.comma_spans,
-            self.span.start,
-            Doc::line_or_space(),
-            ctx,
-        )
-        .group()
-        .nest(ctx.indent_width)
-        .append(helpers::format_operator_prefix_space(ctx))
-        .concat(ctx.end_spaced_comments(self.bindings.last().unwrap().span.end, self.in_span.start))
-        .append(Doc::text("in"))
-        .append(helpers::format_operator_suffix_space(ctx))
-        .concat(ctx.end_spaced_comments(self.in_span.end, self.expr.span().start))
-        .append(self.expr.doc(ctx))
-        .group()
+        helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+            .format(&self.bindings, &self.comma_spans, self.span.start, ctx)
+            .group()
+            .nest(ctx.indent_width)
+            .append(helpers::format_operator_prefix_space(ctx))
+            .concat(
+                ctx.end_spaced_comments(self.bindings.last().unwrap().span.end, self.in_span.start),
+            )
+            .append(Doc::text("in"))
+            .append(helpers::format_operator_suffix_space(ctx))
+            .concat(ctx.end_spaced_comments(self.in_span.end, self.expr.span().start))
+            .append(self.expr.doc(ctx))
+            .group()
     }
 }
 
 impl<'s> DocGen<'s> for SassExtend<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let selectors = helpers::format_comma_separated_list(
-            &self.selectors.selectors,
-            &self.selectors.comma_spans,
-            self.selectors.span.start,
-            Doc::line_or_space().nest(ctx.indent_width),
-            ctx,
-        )
-        .group();
+        let selectors =
+            helpers::SeparatedListFormatter::new(",", Doc::line_or_space().nest(ctx.indent_width))
+                .format(
+                    &self.selectors.selectors,
+                    &self.selectors.comma_spans,
+                    self.selectors.span.start,
+                    ctx,
+                )
+                .group();
         if let Some(optional) = &self.optional {
             selectors
                 .append(Doc::space())
@@ -300,16 +294,14 @@ impl<'s> DocGen<'s> for SassForwardPrefix<'s> {
 
 impl<'s> DocGen<'s> for SassForwardVisibility<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        self.modifier
-            .doc(ctx)
-            .append(Doc::space())
-            .append(helpers::format_comma_separated_list(
+        self.modifier.doc(ctx).append(Doc::space()).append(
+            helpers::SeparatedListFormatter::new(",", Doc::soft_line()).format(
                 &self.members,
                 &self.comma_spans,
                 self.modifier.span.end,
-                Doc::soft_line(),
                 ctx,
-            ))
+            ),
+        )
     }
 }
 
@@ -375,14 +367,9 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
 
 impl<'s> DocGen<'s> for SassImportPrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_comma_separated_list(
-            &self.paths,
-            &self.comma_spans,
-            self.span.start,
-            Doc::line_or_space().nest(ctx.indent_width),
-            ctx,
-        )
-        .group()
+        helpers::SeparatedListFormatter::new(",", Doc::line_or_space().nest(ctx.indent_width))
+            .format(&self.paths, &self.comma_spans, self.span.start, ctx)
+            .group()
     }
 }
 
@@ -416,13 +403,9 @@ impl<'s> DocGen<'s> for SassInclude<'s> {
 impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::format_comma_separated_list_with_trailing(
-                &self.args,
-                &self.comma_spans,
-                self.span.start,
-                Doc::line_or_space(),
-                ctx,
-            ),
+            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                .with_trailing()
+                .format(&self.args, &self.comma_spans, self.span.start, ctx),
             self.args
                 .len()
                 .checked_sub(1)
@@ -587,13 +570,9 @@ impl<'s> DocGen<'s> for SassList<'s> {
 impl<'s> DocGen<'s> for SassMap<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::format_comma_separated_list_with_trailing(
-                &self.items,
-                &self.comma_spans,
-                self.span.start,
-                Doc::line_or_space(),
-                ctx,
-            ),
+            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                .with_trailing()
+                .format(&self.items, &self.comma_spans, self.span.start, ctx),
             self.items
                 .last()
                 .map(|item| item.span.end)
@@ -631,13 +610,9 @@ impl<'s> DocGen<'s> for SassModuleConfig<'s> {
         Doc::text("with ")
             .concat(ctx.end_spaced_comments(self.with_span.end, self.lparen_span.start))
             .append(helpers::format_parenthesized(
-                helpers::format_comma_separated_list_with_trailing(
-                    &self.items,
-                    &self.comma_spans,
-                    self.lparen_span.end,
-                    Doc::line_or_space(),
-                    ctx,
-                ),
+                helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                    .with_trailing()
+                    .format(&self.items, &self.comma_spans, self.lparen_span.end, ctx),
                 self.items
                     .last()
                     .map(|item| item.span.end)
@@ -746,13 +721,9 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
             )
             .collect::<Vec<_>>();
         helpers::format_parenthesized(
-            helpers::format_comma_separated_list_with_trailing(
-                &params,
-                &self.comma_spans,
-                self.span.start,
-                Doc::line_or_space(),
-                ctx,
-            ),
+            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                .with_trailing()
+                .format(&params, &self.comma_spans, self.span.start, ctx),
             self.params
                 .len()
                 .checked_sub(1)
@@ -887,13 +858,11 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
         {
             docs.push(Doc::line_or_space());
             docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
-            docs.push(helpers::format_comma_separated_list_with_trailing(
-                elements,
-                comma_spans,
-                span.start,
-                Doc::line_or_space(),
-                ctx,
-            ));
+            docs.push(
+                helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                    .with_trailing()
+                    .format(elements, comma_spans, span.start, ctx),
+            );
             if elements.len() == 1 {
                 docs.push(Doc::text(","));
             }

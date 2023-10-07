@@ -77,11 +77,10 @@ impl<'s> DocGen<'s> for LessExtend<'s> {
 
 impl<'s> DocGen<'s> for LessExtendList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_comma_separated_list(
+        helpers::SeparatedListFormatter::new(",", Doc::space()).format(
             &self.elements,
             &self.comma_spans,
             self.span.start,
-            Doc::space(),
             ctx,
         )
     }
@@ -90,13 +89,9 @@ impl<'s> DocGen<'s> for LessExtendList<'s> {
 impl<'s> DocGen<'s> for LessImportOptions<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::format_comma_separated_list_with_trailing(
-                &self.names,
-                &self.comma_spans,
-                self.span.start,
-                Doc::line_or_space(),
-                ctx,
-            ),
+            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                .with_trailing()
+                .format(&self.names, &self.comma_spans, self.span.start, ctx),
             self.names
                 .last()
                 .map(|name| name.span.end)
@@ -498,13 +493,11 @@ impl<'s> DocGen<'s> for LessVariableDeclaration<'s> {
         {
             docs.push(Doc::line_or_space());
             docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
-            docs.push(helpers::format_comma_separated_list_with_trailing(
-                elements,
-                comma_spans,
-                span.start,
-                Doc::line_or_space(),
-                ctx,
-            ));
+            docs.push(
+                helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                    .with_trailing()
+                    .format(elements, comma_spans, span.start, ctx),
+            );
             if elements.len() == 1 {
                 docs.push(Doc::text(","));
             }

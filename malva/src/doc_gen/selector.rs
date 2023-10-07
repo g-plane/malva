@@ -184,11 +184,10 @@ impl<'s> DocGen<'s> for CompoundSelector<'s> {
 
 impl<'s> DocGen<'s> for CompoundSelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_comma_separated_list(
+        helpers::SeparatedListFormatter::new(",", Doc::space()).format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
-            Doc::space(),
             ctx,
         )
     }
@@ -324,11 +323,10 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                     if ctx.options.linebreak_in_pseudo_parens {
                         selector_list.doc(ctx).group().nest(ctx.indent_width)
                     } else {
-                        helpers::format_comma_separated_list(
+                        helpers::SeparatedListFormatter::new(",", Doc::space()).format(
                             &selector_list.selectors,
                             &selector_list.comma_spans,
                             selector_list.span.start,
-                            Doc::space(),
                             ctx,
                         )
                     }
@@ -425,11 +423,10 @@ impl<'s> DocGen<'s> for RelativeSelector<'s> {
 
 impl<'s> DocGen<'s> for RelativeSelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_comma_separated_list(
+        helpers::SeparatedListFormatter::new(",", Doc::space()).format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
-            Doc::space(),
             ctx,
         )
     }
@@ -452,11 +449,10 @@ impl<'s> DocGen<'s> for SimpleSelector<'s> {
 
 impl<'s> DocGen<'s> for SelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_comma_separated_list(
+        helpers::SeparatedListFormatter::new(",", Doc::line_or_space()).format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
-            Doc::line_or_space(),
             ctx,
         )
     }

@@ -237,14 +237,9 @@ impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
 
 impl<'s> DocGen<'s> for MediaQueryList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_comma_separated_list(
-            &self.queries,
-            &self.comma_spans,
-            self.span.start,
-            Doc::line_or_space(),
-            ctx,
-        )
-        .group()
-        .nest(ctx.indent_width)
+        helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+            .format(&self.queries, &self.comma_spans, self.span.start, ctx)
+            .group()
+            .nest(ctx.indent_width)
     }
 }

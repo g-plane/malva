@@ -16,84 +16,95 @@ where
 {
     use crate::config::BlockSelectorLineBreak;
 
-    format_comma_separated_list(
-        selectors,
-        comma_spans,
-        start,
+    SeparatedListFormatter::new(
+        ",",
         match ctx.options.block_selector_linebreak {
             BlockSelectorLineBreak::Always => Doc::hard_line(),
             BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
             BlockSelectorLineBreak::Wrap => Doc::soft_line(),
         },
-        ctx,
     )
+    .format(selectors, comma_spans, start, ctx)
     .group()
 }
 
-pub(super) fn format_comma_separated_list<'s, N>(
-    list: &[N],
-    comma_spans: &[Span],
-    start: usize,
-    space_after_comma: Doc<'s>,
-    ctx: &Ctx<'_, 's>,
-) -> Doc<'s>
-where
-    N: DocGen<'s> + Spanned,
-{
-    Doc::list(
-        itertools::intersperse(
-            list.iter()
-                .zip_longest(comma_spans.iter())
-                .scan(start, |pos, either_or_both| match either_or_both {
-                    EitherOrBoth::Both(list_item, comma_span) => {
-                        let list_item_span = list_item.span();
-                        let mut docs = ctx
-                            .end_spaced_comments(
-                                mem::replace(pos, comma_span.end),
-                                list_item_span.start,
-                            )
-                            .collect::<Vec<_>>();
-                        docs.push(list_item.doc(ctx));
-                        docs.extend(
-                            ctx.start_spaced_comments(list_item_span.end, comma_span.start),
-                        );
-                        Some(docs.into_iter())
-                    }
-                    EitherOrBoth::Left(list_item) => {
-                        let mut docs = ctx
-                            .end_spaced_comments(*pos, list_item.span().start)
-                            .collect::<Vec<_>>();
-                        docs.push(list_item.doc(ctx));
-                        Some(docs.into_iter())
-                    }
-                    EitherOrBoth::Right(..) => unreachable!(),
-                }),
-            vec![Doc::text(","), space_after_comma].into_iter(),
-        )
-        .flatten()
-        .collect(),
-    )
+pub(super) struct SeparatedListFormatter {
+    separator: Doc<'static>,
+    space_after_separator: Doc<'static>,
+    trailing: bool,
 }
 
-/// Remember to call `.group()` if use this,
-/// otherwise it can't decide whether to add trailing comma or not.
-pub(super) fn format_comma_separated_list_with_trailing<'s, N>(
-    list: &[N],
-    comma_spans: &[Span],
-    start: usize,
-    space_after_comma: Doc<'s>,
-    ctx: &Ctx<'_, 's>,
-) -> Doc<'s>
-where
-    N: DocGen<'s> + Spanned,
-{
-    format_comma_separated_list(list, comma_spans, start, space_after_comma, ctx).append(
-        if ctx.options.trailing_comma {
-            Doc::flat_or_break(Doc::nil(), Doc::text(","))
+impl SeparatedListFormatter {
+    pub(super) fn new(separator: &'static str, space_after_separator: Doc<'static>) -> Self {
+        Self {
+            separator: Doc::text(separator),
+            space_after_separator,
+            trailing: false,
+        }
+    }
+
+    /// Remember to call `.group()` if enabling trailing separator,
+    /// otherwise it can't decide whether to add or not.
+    pub(super) fn with_trailing(mut self) -> Self {
+        self.trailing = true;
+        self
+    }
+
+    pub(super) fn format<'s, N>(
+        self,
+        list: &[N],
+        separator_spans: &[Span],
+        start: usize,
+        ctx: &Ctx<'_, 's>,
+    ) -> Doc<'s>
+    where
+        N: DocGen<'s> + Spanned,
+    {
+        let list = Doc::list(
+            itertools::intersperse(
+                list.iter().zip_longest(separator_spans.iter()).scan(
+                    start,
+                    |pos, either_or_both| match either_or_both {
+                        EitherOrBoth::Both(list_item, separator_span) => {
+                            let list_item_span = list_item.span();
+                            let mut docs = ctx
+                                .end_spaced_comments(
+                                    mem::replace(pos, separator_span.end),
+                                    list_item_span.start,
+                                )
+                                .collect::<Vec<_>>();
+                            docs.push(list_item.doc(ctx));
+                            docs.extend(
+                                ctx.start_spaced_comments(list_item_span.end, separator_span.start),
+                            );
+                            Some(docs.into_iter())
+                        }
+                        EitherOrBoth::Left(list_item) => {
+                            let mut docs = ctx
+                                .end_spaced_comments(*pos, list_item.span().start)
+                                .collect::<Vec<_>>();
+                            docs.push(list_item.doc(ctx));
+                            Some(docs.into_iter())
+                        }
+                        EitherOrBoth::Right(..) => unreachable!(),
+                    },
+                ),
+                vec![self.separator, self.space_after_separator].into_iter(),
+            )
+            .flatten()
+            .collect(),
+        );
+
+        if self.trailing {
+            list.append(if ctx.options.trailing_comma {
+                Doc::flat_or_break(Doc::nil(), Doc::text(","))
+            } else {
+                Doc::nil()
+            })
         } else {
-            Doc::nil()
-        },
-    )
+            list
+        }
+    }
 }
 
 /// Only for SCSS/Sass/Less.
