@@ -3,6 +3,7 @@ mod ctx;
 mod doc_gen;
 mod error;
 mod line_bounds;
+mod state;
 
 use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen};
 pub use crate::{error::Error, line_bounds::LineBounds};
@@ -52,6 +53,7 @@ pub fn print_stylesheet<'a, 's>(
         comments,
         indent_width: options.layout.indent_width,
         line_bounds,
+        state: Default::default(),
     };
     let doc = stylesheet.doc(&ctx);
     tiny_pretty::print(

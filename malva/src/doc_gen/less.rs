@@ -6,7 +6,7 @@ use super::{
     },
     DocGen,
 };
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state};
 use raffia::{ast::*, Spanned};
 use std::{iter, mem};
 use tiny_pretty::Doc;
@@ -99,7 +99,9 @@ impl<'s> DocGen<'s> for LessConditions<'s> {
 
 impl<'s> DocGen<'s> for LessDetachedRuleset<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        self.block.doc(ctx)
+        ctx.with_state(state::STATE_IN_LESS_DETACHED_RULESET, || {
+            self.block.doc(ctx)
+        })
     }
 }
 

@@ -1,12 +1,18 @@
 use super::{helpers, DocGen};
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state};
 use raffia::{ast::*, token::TokenWithSpan, Span, Spanned, Syntax};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for Declaration<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
-        docs.push(helpers::ident_to_lowercase(&self.name, ctx));
+        docs.push(
+            if ctx.has_state_flag(state::STATE_IN_LESS_DETACHED_RULESET) {
+                self.name.doc(ctx)
+            } else {
+                helpers::ident_to_lowercase(&self.name, ctx)
+            },
+        );
 
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx));

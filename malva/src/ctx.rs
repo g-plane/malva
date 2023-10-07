@@ -3,7 +3,7 @@ use raffia::{
     token::{Comment, CommentKind},
     Syntax,
 };
-use std::{array, iter::Peekable, mem};
+use std::{array, cell::Cell, iter::Peekable, mem};
 use tiny_pretty::Doc;
 
 pub(crate) struct Ctx<'a, 's: 'a> {
@@ -12,6 +12,7 @@ pub(crate) struct Ctx<'a, 's: 'a> {
     pub comments: &'a [Comment<'s>],
     pub indent_width: usize,
     pub line_bounds: LineBounds,
+    pub state: Cell<u8>,
 }
 
 impl<'a, 's> Ctx<'a, 's> {
@@ -100,6 +101,17 @@ impl<'a, 's> Ctx<'a, 's> {
                 CommentKind::Block => Some(comment.doc(self)),
                 CommentKind::Line => None,
             })
+    }
+
+    pub(crate) fn has_state_flag(&self, flag: u8) -> bool {
+        self.state.get() & flag != 0
+    }
+
+    pub(crate) fn with_state(&self, additional_flag: u8, f: impl FnOnce() -> Doc<'s>) -> Doc<'s> {
+        let old_state = self.state.replace(self.state.get() | additional_flag);
+        let doc = f();
+        self.state.set(old_state);
+        doc
     }
 }
 
