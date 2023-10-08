@@ -191,15 +191,15 @@ impl<'s> DocGen<'s> for LessImportOptions<'s> {
 impl<'s> DocGen<'s> for LessImportPrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
-        docs.push(self.href.doc(ctx));
-        let mut pos = self.href.span().end;
+        docs.push(self.options.doc(ctx));
+        let mut pos = self.options.span.end;
 
         docs.push(Doc::line_or_space());
-        docs.extend(ctx.end_spaced_comments(
-            mem::replace(&mut pos, self.options.span.end),
-            self.options.span.start,
-        ));
-        docs.push(self.options.doc(ctx));
+        let href_span = self.href.span();
+        docs.extend(
+            ctx.end_spaced_comments(mem::replace(&mut pos, href_span.end), href_span.start),
+        );
+        docs.push(self.href.doc(ctx));
 
         if let Some(media) = &self.media {
             docs.push(Doc::line_or_space());
