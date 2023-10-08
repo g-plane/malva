@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+.test {
+  @color: red;
+  color: @color;
+}
+

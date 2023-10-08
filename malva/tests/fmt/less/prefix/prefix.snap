@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+div {
+  margin-left: -@leftMargin;
+  transform: translateY(-@offset);
+}
+
