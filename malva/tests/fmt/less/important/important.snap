@@ -1,0 +1,11 @@
+---
+source: malva/tests/fmt.rs
+---
+div {
+  max-height: none !important;
+}
+
+.important {
+  .foo() !important;
+}
+

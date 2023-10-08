@@ -1,0 +1,10 @@
+---
+source: malva/tests/fmt.rs
+---
+@supports selector(:focus-visible) // *"a"
+{
+  a {
+    color: #f00;
+  }
+}
+

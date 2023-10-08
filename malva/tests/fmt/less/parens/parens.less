@@ -1,0 +1,27 @@
+.foo {
+  prop53: @width*2 @width *2 @width* 2 @width * 2;
+  prop54: 2*@width 2 *@width 2* @width 2 * @width;
+  prop55: (@width*2) (@width *2) (@width* 2) (@width * 2);
+  prop56: (2*@width) (2 *@width) (2* @width) (2 * @width);
+  prop65: @width+2 @width +2 @width+ 2 @width + 2;
+  prop66: 2+@width 2 +@width 2+ @width 2 + @width;
+  prop67: (@width+2) (@width +2) (@width+ 2) (@width + 2);
+  prop68: (2+@width) (2 +@width) (2+ @width) (2 + @width);
+}
+
+// no space after unary minus when followed by opening parenthesis, #13998
+.unary_minus_single {
+  margin: -(@a);
+}
+
+.unary_minus_multi_1 {
+  margin: 0 -(@a);
+}
+
+.unary_minus_multi_2 {
+  margin: 0  -( @a + @b );
+}
+
+.binary_minus {
+  margin: 0 - (@a);
+}

@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+@prefix: foo;
+
+@{prefix}-title {
+  color: red;
+}
+

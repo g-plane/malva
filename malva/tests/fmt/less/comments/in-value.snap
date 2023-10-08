@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+.simplification {
+  foo: (
+    calc() // not a comment anymore
+  );
+}
+

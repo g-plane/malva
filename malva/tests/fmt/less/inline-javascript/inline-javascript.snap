@@ -1,0 +1,15 @@
+---
+source: malva/tests/fmt.rs
+---
+// Deprecated feature https://lesscss.org/usage/#less-options-enable-inline-javascript-deprecated-
+
+.calcPxMixin() {
+  @functions: ~`(function() {
+    const designWidth = 3840
+    const actualWidth = 5760
+    this.calcPx = function(_) {
+      return _ * actualWidth / designWidth + 'px'
+    }
+  })()`;
+}
+

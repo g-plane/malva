@@ -1,0 +1,12 @@
+---
+source: malva/tests/fmt.rs
+---
+div {
+  // a
+
+  margin-left: -@leftMargin; // b
+} // c
+
+// d
+div {}
+

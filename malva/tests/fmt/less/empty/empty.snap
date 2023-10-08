@@ -1,0 +1,12 @@
+---
+source: malva/tests/fmt.rs
+---
+.ui-syntax-color();
+
+details[open] {}
+
+div {
+  box-sizing: border-box;
+  color: red;
+}
+
