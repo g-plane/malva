@@ -358,19 +358,59 @@ impl<'s> DocGen<'s> for LessMixinArgument<'s> {
 
 impl<'s> DocGen<'s> for LessMixinArguments<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_parenthesized(
-            helpers::SeparatedListFormatter::new(
-                if self.is_comma_separated { "," } else { ";" },
-                Doc::line_or_space(),
+        let mut has_last_line_comment = false;
+
+        let is_detached_rulset_only = matches!(
+            &self.args[..],
+            [LessMixinArgument::Value(
+                ComponentValue::LessDetachedRuleset(..)
+            )]
+        );
+        let doc_close_to_paren = if is_detached_rulset_only {
+            Doc::nil()
+        } else {
+            Doc::line_or_nil()
+        };
+
+        Doc::text("(")
+            .append(
+                doc_close_to_paren
+                    .clone()
+                    .append(
+                        helpers::SeparatedListFormatter::new(
+                            if self.is_comma_separated { "," } else { ";" },
+                            Doc::line_or_space(),
+                        )
+                        .format(
+                            &self.args,
+                            &self.separator_spans,
+                            self.span.start,
+                            ctx,
+                        ),
+                    )
+                    .concat(
+                        ctx.start_spaced_comments_without_last_hard_line(
+                            self.args
+                                .last()
+                                .map(|arg| arg.span().end)
+                                .unwrap_or(self.span.start),
+                            self.span.end,
+                            &mut has_last_line_comment,
+                        ),
+                    )
+                    .nest(if is_detached_rulset_only {
+                        0
+                    } else {
+                        ctx.indent_width
+                    })
+                    .append(if has_last_line_comment {
+                        Doc::hard_line()
+                    } else {
+                        doc_close_to_paren
+                    })
+                    .group(),
             )
-            .format(&self.args, &self.separator_spans, self.span.start, ctx),
-            self.args
-                .last()
-                .map(|arg| arg.span().end)
-                .unwrap_or(self.span.start),
-            self.span.end,
-            ctx,
-        )
+            .append(Doc::text(")"))
     }
 }
 
