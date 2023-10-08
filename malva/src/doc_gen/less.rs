@@ -265,14 +265,15 @@ impl<'s> DocGen<'s> for LessInterpolatedStr<'s> {
 
 impl<'s> DocGen<'s> for LessJavaScriptSnippet<'s> {
     fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
-        let code = Doc::text("`")
-            .concat(itertools::intersperse(
+        let code = Doc::list(
+            itertools::intersperse(
                 self.raw
                     .split('\n')
                     .map(|s| Doc::text(s.strip_suffix('\r').unwrap_or(s))),
                 Doc::empty_line(),
-            ))
-            .append(Doc::text("`"));
+            )
+            .collect(),
+        );
         if self.escaped {
             Doc::text("~").append(code)
         } else {
