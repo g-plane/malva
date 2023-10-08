@@ -127,7 +127,7 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
             }
             ComponentValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
             ComponentValue::LessJavaScriptSnippet(less_js_snippet) => less_js_snippet.doc(ctx),
-            ComponentValue::LessList(less_list) => less_list.doc(ctx),
+            ComponentValue::LessList(less_list) => less_list.doc(ctx).nest(ctx.indent_width),
             ComponentValue::LessMixinCall(less_mixin_call) => less_mixin_call.doc(ctx),
             ComponentValue::LessNamespaceValue(less_namespace_value) => {
                 less_namespace_value.doc(ctx)
