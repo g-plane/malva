@@ -7,7 +7,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         docs.push(
-            if ctx.has_state_flag(state::STATE_IN_LESS_DETACHED_RULESET) {
+            if ctx.state.get().has(state::STATE_IN_LESS_DETACHED_RULESET) {
                 self.name.doc(ctx)
             } else {
                 helpers::ident_to_lowercase(&self.name, ctx)
