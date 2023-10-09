@@ -3,9 +3,18 @@ use crate::ctx::Ctx;
 use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
+mod color_profile;
 mod container;
+mod custom_media;
+mod document;
+mod font_feature_values;
 mod import;
+mod keyframes;
+mod layer;
 mod media;
+mod namespace;
+mod page;
+mod scope;
 mod supports;
 
 impl<'s> DocGen<'s> for AtRule<'s> {
@@ -78,238 +87,11 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ColorProfilePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            ColorProfilePrelude::DashedIdent(dashed_ident) => dashed_ident.doc(ctx),
-            ColorProfilePrelude::DeviceCmyk(device_cmyk) => device_cmyk.doc(ctx),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for CustomMedia<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        self.name
-            .doc(ctx)
-            .append(Doc::space())
-            .concat(ctx.end_spaced_comments(self.name.span().end, self.value.span().start))
-            .append(self.value.doc(ctx))
-    }
-}
-
-impl<'s> DocGen<'s> for CustomMediaValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            CustomMediaValue::MediaQueryList(media_query_list) => media_query_list.doc(ctx),
-            CustomMediaValue::True(..) => Doc::text("true"),
-            CustomMediaValue::False(..) => Doc::text("false"),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for DocumentPrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-            .format(&self.matchers, &self.comma_spans, self.span.start, ctx)
-            .group()
-            .nest(ctx.indent_width)
-    }
-}
-
-impl<'s> DocGen<'s> for DocumentPreludeMatcher<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            DocumentPreludeMatcher::Function(function) => function.doc(ctx),
-            DocumentPreludeMatcher::Url(url) => url.doc(ctx),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for FontFamilyName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            FontFamilyName::Str(str) => str.doc(ctx),
-            FontFamilyName::Unquoted(unquoted) => unquoted.doc(ctx),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for KeyframeBlock<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_selectors_before_block(
-            &self.selectors,
-            &self.comma_spans,
-            self.span.start,
-            ctx,
-        )
-        .append(helpers::format_space_before_block(ctx))
-        .concat(
-            ctx.end_spaced_comments(
-                self.selectors
-                    .last()
-                    .map(|selector| selector.span().end)
-                    .unwrap_or(self.span.start),
-                self.block.span.start,
-            ),
-        )
-        .append(self.block.doc(ctx))
-    }
-}
-
-impl<'s> DocGen<'s> for KeyframesName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            KeyframesName::Ident(ident) => ident.doc(ctx),
-            KeyframesName::Str(str) => str.doc(ctx),
-            KeyframesName::LessVariable(less_variable) => less_variable.doc(ctx),
-            KeyframesName::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for KeyframeSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            KeyframeSelector::Percentage(percentage) => percentage.doc(ctx),
-            KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
-                if name.eq_ignore_ascii_case("from") =>
-            {
-                Doc::text("from")
-            }
-            KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
-                if name.eq_ignore_ascii_case("to") =>
-            {
-                Doc::text("to")
-            }
-            KeyframeSelector::Ident(ident) => ident.doc(ctx),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for LayerName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(
-                self.idents.iter().map(|ident| ident.doc(ctx)),
-                Doc::text("."),
-            )
-            .collect(),
-        )
-    }
-}
-
-impl<'s> DocGen<'s> for NamespacePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        if let Some(prefix) = &self.prefix {
-            prefix
-                .doc(ctx)
-                .append(Doc::line_or_space())
-                .concat(ctx.end_spaced_comments(prefix.span().end, self.uri.span().start))
-                .append(self.uri.doc(ctx))
-                .group()
-                .nest(ctx.indent_width)
-        } else {
-            self.uri.doc(ctx)
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for NamespacePreludeUri<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            NamespacePreludeUri::Str(str) => str.doc(ctx),
-            NamespacePreludeUri::Url(url) => url.doc(ctx),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for PageSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let pseudo = Doc::list(self.pseudo.iter().map(|pseudo| pseudo.doc(ctx)).collect());
-        if let Some(name) = &self.name {
-            name.doc(ctx).append(pseudo)
-        } else {
-            pseudo
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for PageSelectorList<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_selectors_before_block(
-            &self.selectors,
-            &self.comma_spans,
-            self.span.start,
-            ctx,
-        )
-        .nest(ctx.indent_width)
-    }
-}
-
-impl<'s> DocGen<'s> for PseudoPage<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text(":").append(self.name.doc(ctx))
-    }
-}
-
-impl<'s> DocGen<'s> for ScopeEnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text("to ")
-            .concat(ctx.end_spaced_comments(self.to_span.end, self.lparen_span.start))
-            .append(helpers::format_parenthesized(
-                self.selector.doc(ctx),
-                self.selector.span.end,
-                self.span.end,
-                ctx,
-            ))
-    }
-}
-
-impl<'s> DocGen<'s> for ScopePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        match self {
-            ScopePrelude::StartOnly(start_only) => start_only.doc(ctx),
-            ScopePrelude::EndOnly(end_only) => end_only.doc(ctx),
-            ScopePrelude::Both(both) => both.doc(ctx),
-        }
-    }
-}
-
-impl<'s> DocGen<'s> for ScopeStart<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        helpers::format_parenthesized(
-            self.selector.doc(ctx),
-            self.selector.span.end,
-            self.span.end,
-            ctx,
-        )
-    }
-}
-
-impl<'s> DocGen<'s> for ScopeStartWithEnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        self.start
-            .doc(ctx)
-            .append(Doc::line_or_space().nest(ctx.indent_width))
-            .append(self.end.doc(ctx))
-            .group()
-    }
-}
-
 impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             UnknownAtRulePrelude::ComponentValue(component_value) => component_value.doc(ctx),
             UnknownAtRulePrelude::TokenSeq(token_seq) => token_seq.doc(ctx),
         }
-    }
-}
-
-impl<'s> DocGen<'s> for UnquotedFontFamilyName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::list(
-            itertools::intersperse(self.idents.iter().map(|ident| ident.doc(ctx)), Doc::space())
-                .collect(),
-        )
     }
 }
