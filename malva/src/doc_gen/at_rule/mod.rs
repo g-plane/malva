@@ -53,7 +53,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         match self {
             AtRulePrelude::Media(media) => media.doc(ctx),
-            AtRulePrelude::Charset(charset) => charset.doc(ctx),
+            AtRulePrelude::Charset(charset) => Doc::text(charset.raw),
             AtRulePrelude::ColorProfile(color_profile) => color_profile.doc(ctx),
             AtRulePrelude::Container(container) => container.doc(ctx),
             AtRulePrelude::CounterStyle(counter_style) => counter_style.doc(ctx),
