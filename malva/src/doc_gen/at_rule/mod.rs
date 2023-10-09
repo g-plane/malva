@@ -6,6 +6,7 @@ use tiny_pretty::Doc;
 mod color_profile;
 mod container;
 mod custom_media;
+mod custom_selector;
 mod document;
 mod font_feature_values;
 mod import;
@@ -54,6 +55,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::Container(container) => container.doc(ctx),
             AtRulePrelude::CounterStyle(counter_style) => counter_style.doc(ctx),
             AtRulePrelude::CustomMedia(custom_media) => custom_media.doc(ctx),
+            AtRulePrelude::CustomSelector(custom_selector) => custom_selector.doc(ctx),
             AtRulePrelude::Document(document) => document.doc(ctx),
             AtRulePrelude::FontFeatureValues(font_feature_values) => font_feature_values.doc(ctx),
             AtRulePrelude::FontPaletteValues(font_palette_values) => font_palette_values.doc(ctx),

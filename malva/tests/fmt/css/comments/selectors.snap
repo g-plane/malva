@@ -74,9 +74,9 @@ a[/* comment 83 */ target/* comment 84 */ *=/* comment 85 */ "_blank"
 [/* comment 93 */ */* comment 94 */|/* comment 95 */att /* comment 96 */] {}
 [/* comment 97 */ |/* comment 98 */att /* comment 99 */] {}
 
-a /* comment 100 */ :/* comment 101 */active {}
+a/* comment 100 */:/* comment 101 */active {}
 
-a /* comment 102 */ ::/* comment 103 */after {}
+a/* comment 102 */::/* comment 103 */after {}
 
 p:lang(/* comment 104 */ it /* comment 105 */) {}
 
