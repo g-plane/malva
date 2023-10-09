@@ -879,7 +879,7 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
                 .iter()
                 .scan(value_span.end, |pos, flag| {
                     Some(
-                        iter::once(Doc::soft_line())
+                        iter::once(Doc::soft_line().nest(ctx.indent_width))
                             .chain(ctx.end_spaced_comments(
                                 mem::replace(pos, flag.span.end),
                                 flag.span.start,
