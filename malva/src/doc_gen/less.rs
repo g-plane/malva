@@ -819,22 +819,18 @@ fn is_preferred_quote_allowed(interpolated_str: &LessInterpolatedStr, ctx: &Ctx)
             .elements
             .iter()
             .any(|element| match element {
-                LessInterpolatedStrElement::Static(InterpolableStrStaticPart {
-                    raw,
-                    value,
-                    ..
-                }) => value.contains('"') && !raw.contains("\\\""),
+                LessInterpolatedStrElement::Static(InterpolableStrStaticPart { value, .. }) => {
+                    value.contains('"')
+                }
                 _ => false,
             }),
         Quotes::PreferSingle => interpolated_str
             .elements
             .iter()
             .any(|element| match element {
-                LessInterpolatedStrElement::Static(InterpolableStrStaticPart {
-                    raw,
-                    value,
-                    ..
-                }) => value.contains('\'') && !raw.contains("\\'"),
+                LessInterpolatedStrElement::Static(InterpolableStrStaticPart { value, .. }) => {
+                    value.contains('\'')
+                }
                 _ => false,
             }),
     }

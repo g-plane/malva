@@ -662,7 +662,7 @@ fn is_preferred_quote_allowed(raw: &str, ctx: &Ctx) -> bool {
 
     match ctx.options.quotes {
         Quotes::AlwaysDouble | Quotes::AlwaysSingle => false,
-        Quotes::PreferDouble => raw.contains('"') && !raw.contains("\\\""),
-        Quotes::PreferSingle => raw.contains('\'') && !raw.contains("\\'"),
+        Quotes::PreferDouble => raw.contains('"'),
+        Quotes::PreferSingle => raw.contains('\''),
     }
 }
