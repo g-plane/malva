@@ -77,8 +77,11 @@ impl<'s> DocGen<'s> for LessConditionalQualifiedRule<'s> {
         .append(Doc::soft_line())
         .append(self.guard.doc(ctx))
         .concat(ctx.end_spaced_comments(self.selector.span.end, self.guard.span.start))
-        .append(helpers::format_space_before_block(ctx))
-        .concat(ctx.end_spaced_comments(self.selector.span.end, self.block.span.start))
+        .append(helpers::format_space_before_block(
+            self.guard.span.end,
+            self.block.span.start,
+            ctx,
+        ))
         .append(self.block.doc(ctx))
     }
 }
@@ -486,8 +489,11 @@ impl<'s> DocGen<'s> for LessMixinDefinition<'s> {
             pos = guard.span.end;
         }
 
-        docs.push(helpers::format_space_before_block(ctx));
-        docs.extend(ctx.end_spaced_comments(pos, self.block.span.start));
+        docs.push(helpers::format_space_before_block(
+            pos,
+            self.block.span.start,
+            ctx,
+        ));
         docs.push(self.block.doc(ctx));
 
         Doc::list(docs)

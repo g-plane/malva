@@ -231,11 +231,23 @@ pub(super) fn format_parenthesized<'s>(
         .append(Doc::text(")"))
 }
 
-pub(super) fn format_space_before_block<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
+pub(super) fn format_space_before_block<'s>(
+    previous_end: usize,
+    block_start: usize,
+    ctx: &Ctx<'_, 's>,
+) -> Doc<'s> {
     if ctx.syntax == Syntax::Sass {
-        Doc::nil()
+        let mut has_last_line_comment = false;
+        Doc::list(
+            ctx.start_spaced_comments_without_last_hard_line(
+                previous_end,
+                block_start,
+                &mut has_last_line_comment,
+            )
+            .collect(),
+        )
     } else {
-        Doc::space()
+        Doc::space().concat(ctx.end_spaced_comments(previous_end, block_start))
     }
 }
 

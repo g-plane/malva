@@ -1,0 +1,6 @@
+---
+source: malva/tests/fmt.rs
+---
+@function test() // x
+  @return a
+

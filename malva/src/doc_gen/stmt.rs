@@ -144,8 +144,11 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
             self.selector.span.start,
             ctx,
         )
-        .append(helpers::format_space_before_block(ctx))
-        .concat(ctx.end_spaced_comments(self.selector.span.end, self.block.span.start))
+        .append(helpers::format_space_before_block(
+            self.selector.span.end,
+            self.block.span.start,
+            ctx,
+        ))
         .append(self.block.doc(ctx))
     }
 }

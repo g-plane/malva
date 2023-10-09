@@ -37,8 +37,11 @@ impl<'s> DocGen<'s> for AtRule<'s> {
         }
 
         if let Some(block) = &self.block {
-            docs.push(helpers::format_space_before_block(ctx));
-            docs.extend(ctx.end_spaced_comments(pos, block.span.start));
+            docs.push(helpers::format_space_before_block(
+                pos,
+                block.span.start,
+                ctx,
+            ));
             docs.push(block.doc(ctx));
         }
 

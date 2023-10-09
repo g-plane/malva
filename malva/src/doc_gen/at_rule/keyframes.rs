@@ -11,16 +11,14 @@ impl<'s> DocGen<'s> for KeyframeBlock<'s> {
             self.span.start,
             ctx,
         )
-        .append(helpers::format_space_before_block(ctx))
-        .concat(
-            ctx.end_spaced_comments(
-                self.selectors
-                    .last()
-                    .map(|selector| selector.span().end)
-                    .unwrap_or(self.span.start),
-                self.block.span.start,
-            ),
-        )
+        .append(helpers::format_space_before_block(
+            self.selectors
+                .last()
+                .map(|selector| selector.span().end)
+                .unwrap_or(self.span.start),
+            self.block.span.start,
+            ctx,
+        ))
         .append(self.block.doc(ctx))
     }
 }
