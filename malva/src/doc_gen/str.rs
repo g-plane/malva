@@ -1,5 +1,9 @@
 use crate::ctx::Ctx;
-use std::borrow::Cow;
+use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind};
+use std::{borrow::Cow, sync::OnceLock};
+
+static AC_DOUBLE_QUOTES: OnceLock<AhoCorasick> = OnceLock::new();
+static AC_SINGLE_QUOTES: OnceLock<AhoCorasick> = OnceLock::new();
 
 pub(super) fn format_str<'s>(
     raw: &'s str,
@@ -15,18 +19,44 @@ pub(super) fn format_str<'s>(
             if formatter.bound_check("\"") {
                 raw.into()
             } else {
-                formatter
-                    .format('"', content.replace('"', "\\\"").into())
-                    .into()
+                let ac = AC_DOUBLE_QUOTES.get_or_init(|| {
+                    AhoCorasickBuilder::new()
+                        .match_kind(MatchKind::LeftmostFirst)
+                        .build(["\\\\", "\\\"", "\""])
+                        .unwrap()
+                });
+                let mut dst = String::with_capacity(content.len());
+                ac.replace_all_with(content, &mut dst, |_, matched_text, dst| {
+                    if matched_text == "\"" {
+                        dst.push_str("\\\"");
+                    } else {
+                        dst.push_str(matched_text)
+                    }
+                    true
+                });
+                formatter.format('"', dst.into()).into()
             }
         }
         Quotes::AlwaysSingle => {
             if formatter.bound_check("\'") {
                 raw.into()
             } else {
-                formatter
-                    .format('\'', content.replace('\'', "\\'").into())
-                    .into()
+                let ac = AC_SINGLE_QUOTES.get_or_init(|| {
+                    AhoCorasickBuilder::new()
+                        .match_kind(MatchKind::LeftmostFirst)
+                        .build(["\\\\", "\\'", "'"])
+                        .unwrap()
+                });
+                let mut dst = String::with_capacity(content.len());
+                ac.replace_all_with(content, &mut dst, |_, matched_text, dst| {
+                    if matched_text == "'" {
+                        dst.push_str("\\'");
+                    } else {
+                        dst.push_str(matched_text)
+                    }
+                    true
+                });
+                formatter.format('\'', dst.into()).into()
             }
         }
         Quotes::PreferDouble => {
