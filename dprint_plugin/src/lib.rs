@@ -18,14 +18,18 @@ pub struct MalvaPluginHandler {}
 
 impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
     fn plugin_info(&mut self) -> SyncPluginInfo {
+        let version = env!("CARGO_PKG_VERSION").to_string();
         SyncPluginInfo {
             info: PluginInfo {
                 name: env!("CARGO_PKG_NAME").to_string(),
-                version: env!("CARGO_PKG_VERSION").to_string(),
+                version: version.clone(),
                 config_key: "malva".to_string(),
-                help_url: "".to_string(),
-                config_schema_url: "".to_string(),
-                update_url: None,
+                help_url: "https://github.com/g-plane/malva".to_string(),
+                config_schema_url: format!(
+                    "https://plugins.dprint.dev/g-plane/malva/{}/schema.json",
+                    version
+                ),
+                update_url: Some("https://plugins.dprint.dev/g-plane/malva/latest.json".into()),
             },
             file_matching: FileMatchingInfo {
                 file_extensions: vec!["css".into(), "scss".into(), "sass".into(), "less".into()],

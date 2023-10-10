@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://plugins.dprint.dev/g-plane/malva/0.0.0/schema.json",
+  "type": "object",
+  "definitions": {
+    "printWidth": {
+      "type": "integer",
+      "default": 80,
+      "minimum": 0
+    },
+    "useTabs": {
+      "type": "boolean",
+      "default": false
+    },
+    "indentWidth": {
+      "type": "integer",
+      "default": 2,
+      "minimum": 0
+    },
+    "lineBreak": {
+      "type": "string",
+      "enum": ["lf", "crlf"],
+      "default": "lf"
+    },
+    "hexCase": {
+      "type": "string",
+      "enum": ["ignore", "lower", "upper"],
+      "default": "lower"
+    },
+    "quotes": {
+      "type": "string",
+      "enum": ["alwaysDouble", "alwaysSingle", "preferDouble", "preferSingle"],
+      "default": "alwaysDouble"
+    },
+    "operatorLinebreak": {
+      "type": "string",
+      "enum": ["before", "after"],
+      "default": "after"
+    },
+    "blockSelectorLinebreak": {
+      "type": "string",
+      "enum": ["always", "consistent", "wrap"],
+      "default": "consistent"
+    },
+    "omitNumberLeadingZero": {
+      "type": "boolean",
+      "default": false
+    },
+    "trailingComma": {
+      "type": "boolean",
+      "default": false
+    },
+    "padComments": {
+      "type": "boolean",
+      "default": false
+    },
+    "linebreakInPseudoParens": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
