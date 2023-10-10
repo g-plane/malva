@@ -1,4 +1,4 @@
-# Malva
+# 🌷 Malva
 
 Malva is a configurable, smart and fast CSS/SCSS/Sass/Less formatter.
 
@@ -56,7 +56,7 @@ We've provided dprint integration.
 
 After adding the dprint plugin, update your `dprint.json` and add configuration:
 
-```json
+```jsonc
 {
     // ...
     "malva": {
