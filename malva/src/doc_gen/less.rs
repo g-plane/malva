@@ -384,6 +384,7 @@ impl<'s> DocGen<'s> for LessMixinArguments<'s> {
                             if self.is_comma_separated { "," } else { ";" },
                             Doc::line_or_space(),
                         )
+                        .with_trailing()
                         .format(
                             &self.args,
                             &self.separator_spans,
@@ -557,6 +558,7 @@ impl<'s> DocGen<'s> for LessMixinParameters<'s> {
                 if self.is_comma_separated { "," } else { ";" },
                 Doc::line_or_space(),
             )
+            .with_trailing()
             .format(&self.params, &self.separator_spans, self.span.start, ctx),
             self.params
                 .last()
