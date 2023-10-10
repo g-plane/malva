@@ -14,6 +14,9 @@
 //! ", &format_text("a{color:red}", Syntax::Css, &options).unwrap());
 //! ```
 //!
+//! For detailed documentation of configuration,
+//! please refer to [Configuration](https://github.com/g-plane/malva/blob/main/docs/config.md) on GitHub.
+//!
 //! If there're syntax errors in source code, it will return `Err`:
 //!
 //! ```

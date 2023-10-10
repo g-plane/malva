@@ -4,6 +4,8 @@
 use serde::{Deserialize, Serialize};
 
 /// The whole configuration of Malva.
+///
+/// For detail, please refer to [Configuration](https://github.com/g-plane/malva/blob/main/docs/config.md) on GitHub.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
@@ -19,9 +21,13 @@ pub struct FormatOptions {
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
 pub struct LayoutOptions {
+    /// See [`printWidth`](https://github.com/g-plane/malva/blob/main/docs/config.md#printwidth) on GitHub
     pub print_width: usize,
+    /// See [`useTabs`](https://github.com/g-plane/malva/blob/main/docs/config.md#usetabs) on GitHub
     pub use_tabs: bool,
+    /// See [`indentWidth`](https://github.com/g-plane/malva/blob/main/docs/config.md#indentwidth) on GitHub
     pub indent_width: usize,
+    /// See [`lineBreak`](https://github.com/g-plane/malva/blob/main/docs/config.md#linebreak) on GitHub
     pub line_break: LineBreak,
 }
 
@@ -59,13 +65,21 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
 pub struct LanguageOptions {
+    /// See [`hexCase`](https://github.com/g-plane/malva/blob/main/docs/config.md#hexcase) on GitHub
     pub hex_case: HexCase,
+    /// See [`quotes`](https://github.com/g-plane/malva/blob/main/docs/config.md#quotes) on GitHub
     pub quotes: Quotes,
+    /// See [`operatorLinebreak`](https://github.com/g-plane/malva/blob/main/docs/config.md#operatorlinebreak) on GitHub
     pub operator_linebreak: OperatorLineBreak,
+    /// See [`blockSelectorLinebreak`](https://github.com/g-plane/malva/blob/main/docs/config.md#blockselectorlinebreak) on GitHub
     pub block_selector_linebreak: BlockSelectorLineBreak,
+    /// See [`omitNumberLeadingZero`](https://github.com/g-plane/malva/blob/main/docs/config.md#omitnumberleadingzero) on GitHub
     pub omit_number_leading_zero: bool,
+    /// See [`trailingComma`](https://github.com/g-plane/malva/blob/main/docs/config.md#trailingcomma) on GitHub
     pub trailing_comma: bool,
+    /// See [`padComments`](https://github.com/g-plane/malva/blob/main/docs/config.md#padcomments) on GitHub
     pub pad_comments: bool,
+    /// See [`linebreakInPseudoParens`](https://github.com/g-plane/malva/blob/main/docs/config.md#linebreakinpseudoparens) on GitHub
     pub linebreak_in_pseudo_parens: bool,
 }
 
