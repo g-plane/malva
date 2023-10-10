@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg blockSelectorLinebreak = "consistent"*/
+h1, h2, h3, h4, h5, h6 {}
+.very-very-very-very-very-very-long-selector,
+.very-very-very-very-very-very-very-very-very-long-selector {}
+

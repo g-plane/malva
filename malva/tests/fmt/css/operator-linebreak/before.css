@@ -1,0 +1,9 @@
+/*cfg operatorLinebreak = "before"*/
+@container name ((((width: 40px) or (width: 50px)) and (height: 100px))) or (not ((((width: 40px) or (width: 50px)) and (height: 100px)))) {}
+@container name (style(not ((--foo: calc(10px + 2em)) and ((--foo: url(x)))))) or (not (style(not ((--foo: calc(10px + 2em)) and ((--foo: url(x))))))) {}
+@media ((orientation) or ((orientation) and ((orientation) or (orientation) or (not (orientation))))), not all and ((orientation) or ((orientation) and ((orientation) or (orientation) or (not (orientation))))) {}
+@supports ((transform-style: preserve-3d) or ((not (transform-style: preserve)) and (((visibility:hidden))))) {}
+
+a {
+  width: calc(100% - (var(--sidebar-width) * 2 / 3 + var(--padding-horizontal) + var(--border-width) + var(--margin-horizontal) + var(--scrollbar-width)));
+}

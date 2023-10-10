@@ -1,0 +1,20 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg operatorLinebreak = "after"*/
+@for $very-very-very-very-very-very-long-variable-name from
+  $very-very-very-very-very-very-long-variable-name to
+  $very-very-very-very-very-very-long-variable-name {}
+@each $very-very-very-very-very-very-long-variable-name in
+  $very-very-very-very-very-very-long-variable-name {}
+
+$var: (
+  100% -
+    (
+    var(--sidebar-width) * 2 / 3 + var(--padding-horizontal) +
+      var(--border-width) +
+      var(--margin-horizontal) +
+      var(--scrollbar-width)
+  )
+);
+

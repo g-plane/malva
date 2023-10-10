@@ -1,0 +1,7 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg quotes = "preferSingle" */
+$var: 'a#{b}c';
+$var: "a'#{b}c";
+

@@ -38,7 +38,7 @@ fn fmt_snapshot() {
             .unwrap();
         let options = if let Some(config) = comments
             .first()
-            .and_then(|comment| comment.content.strip_prefix("cfg"))
+            .and_then(|comment| comment.content.trim_start().strip_prefix("cfg"))
         {
             toml::from_str::<FormatOptions>(config).unwrap()
         } else {
