@@ -36,13 +36,20 @@ impl<'s> DocGen<'s> for Calc<'s> {
         ) = (&*self.left, &self.op.kind)
         {
             Doc::text("(")
+                .append(Doc::line_or_nil())
                 .append(self.left.doc(ctx))
+                .nest(ctx.indent_width)
+                .append(Doc::line_or_nil())
                 .append(Doc::text(")"))
         } else {
             self.left.doc(ctx)
         };
 
         let right = if let (
+            // a * (b + c)
+            // a * (b - c)
+            // a / (b + c)
+            // a / (b - c)
             CalcOperatorKind::Multiply | CalcOperatorKind::Division,
             ComponentValue::Calc(Calc {
                 op:
@@ -53,8 +60,9 @@ impl<'s> DocGen<'s> for Calc<'s> {
                 ..
             }),
         )
+        // a + (b - c)
         | (
-            CalcOperatorKind::Plus | CalcOperatorKind::Minus,
+            CalcOperatorKind::Plus,
             ComponentValue::Calc(Calc {
                 op:
                     CalcOperator {
@@ -64,8 +72,22 @@ impl<'s> DocGen<'s> for Calc<'s> {
                 ..
             }),
         )
+        // a - (b + c)
+        // a - (b - c)
         | (
-            CalcOperatorKind::Multiply | CalcOperatorKind::Division,
+            CalcOperatorKind::Minus,
+            ComponentValue::Calc(Calc {
+                op:
+                    CalcOperator {
+                        kind: CalcOperatorKind::Plus | CalcOperatorKind::Minus,
+                        ..
+                    },
+                ..
+            }),
+        )
+        // a * (b / c)
+        | (
+            CalcOperatorKind::Multiply,
             ComponentValue::Calc(Calc {
                 op:
                     CalcOperator {
@@ -74,10 +96,26 @@ impl<'s> DocGen<'s> for Calc<'s> {
                     },
                 ..
             }),
+        )
+        // a / (b * c)
+        // a / (b / c)
+        | (
+            CalcOperatorKind::Division,
+            ComponentValue::Calc(Calc {
+                op:
+                    CalcOperator {
+                        kind: CalcOperatorKind::Multiply | CalcOperatorKind::Division,
+                        ..
+                    },
+                ..
+            }),
         ) = (&self.op.kind, &*self.right)
         {
             Doc::text("(")
+                .append(Doc::line_or_nil())
                 .append(self.right.doc(ctx))
+                .nest(ctx.indent_width)
+                .append(Doc::line_or_nil())
                 .append(Doc::text(")"))
         } else {
             self.right.doc(ctx)
