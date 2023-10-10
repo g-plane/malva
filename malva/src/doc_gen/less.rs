@@ -776,9 +776,12 @@ impl<'s> DocGen<'s> for LessVariableDeclaration<'s> {
             docs.push(Doc::line_or_space());
             docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
             docs.push(
-                helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                    .with_trailing()
-                    .format(elements, comma_spans, span.start, ctx),
+                helpers::SeparatedListFormatter::new(",", Doc::line_or_space()).format(
+                    elements,
+                    comma_spans,
+                    span.start,
+                    ctx,
+                ),
             );
             if elements.len() == 1 {
                 docs.push(Doc::text(","));
