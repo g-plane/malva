@@ -89,7 +89,7 @@ impl SeparatedListFormatter {
                         EitherOrBoth::Right(..) => Some(vec![].into_iter()),
                     },
                 ),
-                vec![self.separator, self.space_after_separator].into_iter(),
+                vec![self.separator.clone(), self.space_after_separator].into_iter(),
             )
             .flatten()
             .collect(),
@@ -97,7 +97,7 @@ impl SeparatedListFormatter {
 
         if self.trailing {
             list.append(if ctx.options.trailing_comma {
-                Doc::flat_or_break(Doc::nil(), Doc::text(","))
+                Doc::flat_or_break(Doc::nil(), self.separator)
             } else {
                 Doc::nil()
             })
