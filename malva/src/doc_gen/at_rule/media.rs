@@ -175,7 +175,7 @@ impl<'s> DocGen<'s> for MediaNot<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
-            OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("not"), Doc::space()],
+            OperatorLineBreak::Before => vec![Doc::line_or_nil(), Doc::text("not"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::text("not"), Doc::line_or_space()],
         };
         docs.extend(

@@ -90,7 +90,7 @@ impl<'s> DocGen<'s> for SupportsNot<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
-            OperatorLineBreak::Before => vec![Doc::line_or_space(), Doc::text("not"), Doc::space()],
+            OperatorLineBreak::Before => vec![Doc::line_or_nil(), Doc::text("not"), Doc::space()],
             OperatorLineBreak::After => vec![Doc::text("not"), Doc::line_or_space()],
         };
         docs.extend(ctx.end_spaced_comments(self.keyword.span.end, self.condition.span.start));
