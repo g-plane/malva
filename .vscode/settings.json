@@ -1,6 +1,6 @@
 {
   "rust-analyzer.cargo.features": ["config_serde"],
-  "[css][scss][sass][less]": {
+  "[css][scss][sass][less][markdown]": {
     "editor.formatOnSave": false
   },
   "editor.colorDecorators": false
