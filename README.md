@@ -52,7 +52,13 @@ If you just want a quick try, you can try with the [online playground](https://m
 
 ### dprint
 
-We've provided dprint integration.
+We've provided [dprint](https://dprint.dev/) integration.
+
+Run the command below to add plugin:
+
+```bash
+dprint config add g-plane/malva
+```
 
 After adding the dprint plugin, update your `dprint.json` and add configuration:
 
@@ -64,6 +70,8 @@ After adding the dprint plugin, update your `dprint.json` and add configuration:
     }
 }
 ```
+
+You can also read [dprint CLI documentation](https://dprint.dev/cli/) for using dprint to format files.
 
 ### Standalone CLI
 
