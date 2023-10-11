@@ -1,0 +1,20 @@
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          cargo build --release -p dprint_plugin_malva --target wasm32-unknown-unknown
+          cp target/wasm32-unknown-unknown/release/dprint_plugin_malva.wasm dprint_plugin/deployment/plugin.wasm
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dprint_plugin/deployment/plugin.wasm
+            dprint_plugin/deployment/schema.json
