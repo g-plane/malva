@@ -66,10 +66,13 @@ After adding the dprint plugin, update your `dprint.json` and add configuration:
 
 ```jsonc
 {
-    // ...
-    "malva": {
-        // Malva config comes here
-    }
+  // ...
+  "plugins": [
+    "https://plugins.dprint.dev/g-plane/malva-v0.1.0.wasm"
+  ],
+  "malva": {
+    // Malva config comes here
+  }
 }
 ```
 
