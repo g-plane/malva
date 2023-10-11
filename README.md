@@ -1,6 +1,8 @@
-# 🌷 Malva
+<h1 align="center">🌷 Malva</h1>
 
+<p align="center">
 Malva is a configurable, smart and fast CSS/SCSS/Sass/Less formatter.
+</p>
 
 ## Why?
 
