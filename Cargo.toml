@@ -1,3 +1,8 @@
 [workspace]
 members = ["benchmark", "dprint_plugin", "malva", "malva_cli", "playground_wasm"]
 resolver = "2"
+
+[profile.release]
+lto = true
+opt-level = "s"
+strip = "debuginfo"
