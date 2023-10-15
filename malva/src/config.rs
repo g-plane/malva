@@ -3,12 +3,12 @@
 #[cfg(feature = "config_serde")]
 use serde::{Deserialize, Serialize};
 
-/// The whole configuration of Malva.
-///
-/// For detail, please refer to [Configuration](https://github.com/g-plane/malva/blob/main/docs/config.md) on GitHub.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
+/// The whole configuration of Malva.
+///
+/// For detail, please refer to [Configuration](https://github.com/g-plane/malva/blob/main/docs/config.md) on GitHub.
 pub struct FormatOptions {
     #[cfg_attr(feature = "config_serde", serde(flatten))]
     pub layout: LayoutOptions,
@@ -16,10 +16,10 @@ pub struct FormatOptions {
     pub language: LanguageOptions,
 }
 
-/// Configuration related to layout, such as indentation or print width.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
+/// Configuration related to layout, such as indentation or print width.
 pub struct LayoutOptions {
     /// See [`printWidth`](https://github.com/g-plane/malva/blob/main/docs/config.md#printwidth) on GitHub
     pub print_width: usize,
@@ -60,10 +60,10 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
     }
 }
 
-/// Configuration related to syntax.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase", default))]
+/// Configuration related to syntax.
 pub struct LanguageOptions {
     /// See [`hexCase`](https://github.com/g-plane/malva/blob/main/docs/config.md#hexcase) on GitHub
     pub hex_case: HexCase,
@@ -98,8 +98,8 @@ pub enum HexCase {
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "camelCase"))]
 pub enum Quotes {
-    /// Make all strings to double quoted.
     #[default]
+    /// Make all strings to double quoted.
     AlwaysDouble,
     /// Make all strings to single quoted.
     AlwaysSingle,
