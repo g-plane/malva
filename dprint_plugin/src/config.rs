@@ -1,6 +1,6 @@
 use dprint_core::configuration::{
     get_unknown_property_diagnostics, get_value, ConfigKeyMap, ConfigurationDiagnostic,
-    GlobalConfiguration, ResolveConfigurationResult,
+    GlobalConfiguration, NewLineKind, ResolveConfigurationResult,
 };
 use malva::config::{
     BlockSelectorLineBreak, FormatOptions, HexCase, LanguageOptions, LayoutOptions, LineBreak,
