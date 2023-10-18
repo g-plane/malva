@@ -69,7 +69,7 @@ pub(crate) fn resolve_config(
                         property_name: "hexCase".into(),
                         message: "invalid value for config `hexCase`".into(),
                     });
-                    HexCase::Lower
+                    Default::default()
                 }
             },
             quotes: match &*get_value(
@@ -87,7 +87,7 @@ pub(crate) fn resolve_config(
                         property_name: "quotes".into(),
                         message: "invalid value for config `quotes`".into(),
                     });
-                    Quotes::AlwaysDouble
+                    Default::default()
                 }
             },
             operator_linebreak: match &*get_value(
@@ -103,7 +103,7 @@ pub(crate) fn resolve_config(
                         property_name: "operatorLineBreak".into(),
                         message: "invalid value for config `operatorLineBreak`".into(),
                     });
-                    OperatorLineBreak::After
+                    Default::default()
                 }
             },
             block_selector_linebreak: match &*get_value(
@@ -120,7 +120,7 @@ pub(crate) fn resolve_config(
                         property_name: "blockSelectorLinebreak".into(),
                         message: "invalid value for config `blockSelectorLinebreak`".into(),
                     });
-                    BlockSelectorLineBreak::Consistent
+                    Default::default()
                 }
             },
             omit_number_leading_zero: get_value(
