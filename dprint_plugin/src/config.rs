@@ -35,7 +35,12 @@ pub(crate) fn resolve_config(
             line_break: match &*get_value(
                 &mut config,
                 "lineBreak",
-                "lf".to_string(),
+                match global_config.new_line_kind {
+                    Some(NewLineKind::LineFeed) => "lf",
+                    Some(NewLineKind::CarriageReturnLineFeed) => "crlf",
+                    _ => "lf",
+                }
+                .to_string(),
                 &mut diagnostics,
             ) {
                 "lf" => LineBreak::Lf,
