@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   release:
@@ -18,9 +19,24 @@ jobs:
       - run: |
           cargo build --release -p dprint_plugin_malva --target wasm32-unknown-unknown
           cp target/wasm32-unknown-unknown/release/dprint_plugin_malva.wasm dprint_plugin/deployment/plugin.wasm
-      - name: Release
+      - name: Publish dprint plugin
         uses: softprops/action-gh-release@v1
         with:
           files: |
             dprint_plugin/deployment/plugin.wasm
             dprint_plugin/deployment/schema.json
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Build standalone wasm
+        run: |
+          wasm-pack build --target web --no-typescript standalone_wasm
+          jq '.name = "malva"' standalone_wasm/pkg/package.json > standalone_wasm/pkg/package.json
+          cp README.md standalone_wasm/pkg/README.md
+      - uses: actions/setup-node@v3
+        with:
+          registry-url: "https://registry.npmjs.org"
+      - run: npm install -g npm
+      - name: Publish npm package
+        run: cd standalone_wasm/pkg && npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
