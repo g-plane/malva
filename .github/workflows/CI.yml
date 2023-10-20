@@ -45,8 +45,8 @@ jobs:
           key: ${{ runner.os }}-wasm-${{ hashFiles('**/Cargo.lock') }}
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - run: wasm-pack build --target web --no-typescript playground_wasm
+      - run: wasm-pack build --target web --no-typescript standalone_wasm
       - name: Deploy Production
-        run: netlify deploy --dir=playground_wasm/pkg --site=malva --prod
+        run: netlify deploy --dir=standalone_wasm/pkg --site=malva --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
