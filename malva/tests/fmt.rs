@@ -1,6 +1,6 @@
 use insta::{assert_snapshot, glob, Settings};
 use malva::{config::FormatOptions, format_text};
-use raffia::{ast::Stylesheet, Parser, ParserBuilder, ParserOptions, Syntax};
+use raffia::{ast::Stylesheet, ParserBuilder, ParserOptions, Syntax};
 use std::fs;
 
 #[test]
@@ -51,10 +51,12 @@ fn fmt_snapshot() {
             "'{}' has trailing whitespace",
             path.display()
         );
-        let mut regression_parser = Parser::new(&output, syntax);
-        assert!(
-            regression_parser.parse::<Stylesheet>().is_ok(),
-            "'{}' has syntax errors after formatted",
+
+        let regression_output = format_text(&output, syntax, &options).unwrap();
+        assert_eq!(
+            output,
+            regression_output,
+            "'{}' format is unstable",
             path.display()
         );
 
