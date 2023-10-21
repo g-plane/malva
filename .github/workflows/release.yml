@@ -32,6 +32,12 @@ jobs:
           wasm-pack build --target web --no-typescript standalone_wasm
           jq '.name = "malva"' standalone_wasm/pkg/package.json > standalone_wasm/pkg/package.json
           cp README.md standalone_wasm/pkg/README.md
+      - name: Modify package name
+        shell: pwsh
+        run: |
+          $packageJson = Get-Content standalone_wasm/pkg/package.json | ConvertFrom-Json
+          $packageJson.name = "malva"
+          $packageJson | ConvertTo-Json | Set-Content standalone_wasm/pkg/package.json
       - uses: actions/setup-node@v3
         with:
           registry-url: "https://registry.npmjs.org"
