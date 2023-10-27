@@ -30,7 +30,6 @@ jobs:
       - name: Build standalone wasm
         run: |
           wasm-pack build --target web --no-typescript standalone_wasm
-          jq '.name = "malva"' standalone_wasm/pkg/package.json > standalone_wasm/pkg/package.json
           cp README.md standalone_wasm/pkg/README.md
       - name: Modify package name
         shell: pwsh
