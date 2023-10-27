@@ -26,7 +26,7 @@ impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
                 config_key: "malva".to_string(),
                 help_url: "https://github.com/g-plane/malva".to_string(),
                 config_schema_url: format!(
-                    "https://plugins.dprint.dev/g-plane/malva/{}/schema.json",
+                    "https://plugins.dprint.dev/g-plane/malva/v{}/schema.json",
                     version
                 ),
                 update_url: Some("https://plugins.dprint.dev/g-plane/malva/latest.json".into()),
