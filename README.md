@@ -31,7 +31,7 @@ Given the example below:
 button.disabled/*please use pseudo class as possible*/,button:disabled {}
 ```
 
-There're comments inside selector. Some formatters will failed to format it, but Malva will format as:
+There're comments inside selector. Some formatters will fail to format it, but Malva will format as:
 
 ```css
 button.disabled /*please use pseudo class as possible*/, button:disabled {}
