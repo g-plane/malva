@@ -34,7 +34,7 @@ a {
 
 ## `useTabs`
 
-Specify whether use space or tab for indentation.
+Specify use space or tab for indentation.
 
 Default option is `false`.
 
@@ -48,7 +48,7 @@ Default option is `false`.
 
 ## `indentWidth`
 
-Size of indentation. When enabled `useTabs`, this option may be disregard,
+Size of indentation. When enabled `useTabs`, this option may be disregarded,
 since only one tab will be inserted when indented once.
 
 Default option is `2`. This can't be zero.
@@ -77,7 +77,7 @@ a {
 
 ## `lineBreak`
 
-Specify whether use `\n` (LF) or `\r\n` (CRLF) for line break.
+Specify use `\n` (LF) or `\r\n` (CRLF) for line break.
 
 Default option is `"lf"`. Possible options are `"lf"` and `"crlf"`.
 
