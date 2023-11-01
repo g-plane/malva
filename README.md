@@ -95,6 +95,11 @@ Malva is not opinionated and is configurable,
 and we accept different code styles then switch them with configuration.
 But before proposing a code style change, it's better to open a new issue or discussion.
 
+### My CSS code is in HTML/Vue/Svelte files. How can I format them?
+
+If you're using dprint, you can use [markup_fmt](https://github.com/g-plane/markup_fmt)
+which provides a dprint plugin, then you can use these two plugins together.
+
 ## Credit
 
 Tests come from [Prettier](https://github.com/prettier/prettier/tree/main/tests/format).
