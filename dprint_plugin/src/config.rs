@@ -92,7 +92,7 @@ pub(crate) fn resolve_config(
             },
             operator_linebreak: match &*get_value(
                 &mut config,
-                "operatorLineBreak",
+                "operatorLinebreak",
                 "after".to_string(),
                 &mut diagnostics,
             ) {
@@ -100,8 +100,8 @@ pub(crate) fn resolve_config(
                 "after" => OperatorLineBreak::After,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
-                        property_name: "operatorLineBreak".into(),
-                        message: "invalid value for config `operatorLineBreak`".into(),
+                        property_name: "operatorLinebreak".into(),
+                        message: "invalid value for config `operatorLinebreak`".into(),
                     });
                     Default::default()
                 }
