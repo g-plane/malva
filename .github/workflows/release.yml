@@ -45,3 +45,7 @@ jobs:
         run: cd standalone_wasm/pkg && npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish crates
+        run: cargo publish -p malva
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
