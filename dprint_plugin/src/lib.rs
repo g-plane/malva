@@ -53,10 +53,10 @@ impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
     fn format(
         &mut self,
         file_path: &Path,
-        file_text: &str,
+        file_text: Vec<u8>,
         config: &FormatOptions,
-        _: impl FnMut(&Path, String, &ConfigKeyMap) -> Result<Option<String>>,
-    ) -> Result<Option<String>> {
+        _: impl FnMut(&Path, Vec<u8>, &ConfigKeyMap) -> Result<Option<Vec<u8>>>,
+    ) -> Result<Option<Vec<u8>>> {
         let syntax = match file_path.extension().and_then(|s| s.to_str()) {
             Some(ext) if ext.eq_ignore_ascii_case("css") => Syntax::Css,
             Some(ext) if ext.eq_ignore_ascii_case("scss") => Syntax::Scss,
@@ -69,8 +69,8 @@ impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
                 ));
             }
         };
-        format_text(file_text, syntax, config)
-            .map(Some)
+        format_text(std::str::from_utf8(&file_text)?, syntax, config)
+            .map(|s| Some(s.into_bytes()))
             .map_err(Error::from)
     }
 }
