@@ -48,7 +48,7 @@ jobs:
       - name: Publish npm package
         run: |
           cp target/wasm32-unknown-unknown/release/dprint_plugin_malva.wasm dprint_plugin/deployment/npm/plugin.wasm
-          pnpm -F dprint-plugin-malva publish --provenance --access public
+          pnpm -F dprint-plugin-malva publish --no-git-checks --provenance --access public
           cd standalone_wasm/pkg && npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
