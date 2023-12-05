@@ -1,3 +1,7 @@
 /target
 bench_samples
 wasm/pkg
+node_modules/
+pnpm-lock.yaml
+*.js
+*.d.ts
