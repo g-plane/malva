@@ -78,11 +78,6 @@ After adding the dprint plugin, update your `dprint.json` and add configuration:
 
 You can also read [dprint CLI documentation](https://dprint.dev/cli/) for using dprint to format files.
 
-### Standalone CLI
-
-Currently we don't provide standalone CLI.
-Leave a comment in [Discussion](https://github.com/g-plane/malva/discussions/1) and let us know if you need it.
-
 ## Configuration
 
 Please refer to [Configuration](./docs/config.md).
