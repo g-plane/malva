@@ -3,6 +3,9 @@
 <p align="center">
 Malva is a configurable, smart and fast CSS/SCSS/Sass/Less formatter.
 </p>
+<p align="center">
+<img alt="GitHub Downloads (specific asset, latest release)" src="https://img.shields.io/github/downloads/g-plane/malva/latest/plugin.wasm?style=flat-square">
+</p>
 
 ## Why?
 
