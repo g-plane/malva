@@ -302,9 +302,12 @@ fn format_statements<'s>(
                     ..
                 }))
             ) {
-                use crate::config::DeclarationOrder;
+                use crate::{config::DeclarationOrder, helpers::sort_decl};
                 match declaration_order {
-                    DeclarationOrder::Alphabetical => {}
+                    DeclarationOrder::Alphabetical => {
+                        sortable_decls
+                            .sort_by(|(a, _), (b, _)| sort_decl::compare_in_alphabetical(a, b));
+                    }
                     DeclarationOrder::Smacss => {}
                     DeclarationOrder::Concentric => {}
                 }

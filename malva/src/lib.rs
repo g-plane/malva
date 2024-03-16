@@ -4,6 +4,7 @@ pub mod config;
 mod ctx;
 mod doc_gen;
 mod error;
+mod helpers;
 mod line_bounds;
 mod state;
 
