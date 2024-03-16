@@ -114,6 +114,10 @@ pub struct LanguageOptions {
     )]
     /// See [`linebreakInPseudoParens`](https://github.com/g-plane/malva/blob/main/docs/config.md#linebreakinpseudoparens) on GitHub
     pub linebreak_in_pseudo_parens: bool,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "declarationOrder"))]
+    /// See [`declarationOrder`](https://github.com/g-plane/malva/blob/main/docs/config.md#declarationorder) on GitHub
+    pub declaration_order: Option<DeclarationOrder>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -171,4 +175,16 @@ pub enum BlockSelectorLineBreak {
     /// Put selectors at one line as possible.
     /// If exceeded print width, insert one linebreak where it exceeds.
     Wrap,
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+pub enum DeclarationOrder {
+    /// Order in a simple alphabetical manner from a - z.
+    Alphabetical,
+    /// Order from most important, flow affecting properties, to least important properties.
+    Smacss,
+    /// Order properties applying outside the box model, moving inward to intrinsic changes.
+    Concentric,
 }

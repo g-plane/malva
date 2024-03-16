@@ -268,53 +268,137 @@ fn format_statements<'s>(
     ctx: &Ctx<'_, 's>,
 ) {
     docs.reserve(statements.len() * 2);
-    let (stmts, mut pos) =
-        statements
-            .iter()
-            .fold((docs, outer_span.start), |(stmts, mut pos), stmt| {
-                let span = stmt.span();
 
-                ctx.get_comments_between(pos, span.start)
-                    .for_each(|comment| {
-                        if pos > outer_span.start {
-                            match ctx.line_bounds.line_distance(pos, comment.span.start) {
-                                0 => stmts.push(Doc::space()),
-                                1 => stmts.push(Doc::hard_line()),
-                                _ => {
-                                    stmts.push(Doc::empty_line());
-                                    stmts.push(Doc::hard_line());
-                                }
-                            }
-                        }
-                        stmts.push(comment.doc(ctx));
-                        pos = comment.span.end;
-                    });
+    let mut sortable_decls = Vec::with_capacity(3);
 
-                if pos > outer_span.start {
-                    if ctx.line_bounds.line_distance(pos, span.start) <= 1 {
-                        stmts.push(Doc::hard_line());
-                    } else {
-                        stmts.push(Doc::empty_line());
-                        stmts.push(Doc::hard_line());
-                    }
+    let mut pos = outer_span.start;
+    let mut stmts = statements.iter().peekable();
+    while let Some(stmt) = stmts.next() {
+        let next_stmt = stmts.peek();
+        if let (
+            Some(declaration_order),
+            Statement::Declaration(Declaration {
+                name: InterpolableIdent::Literal(ident),
+                ..
+            }),
+        ) = (&ctx.options.declaration_order, stmt)
+        {
+            sortable_decls.push((
+                &*ident.name,
+                format_single_stmt(
+                    stmt,
+                    next_stmt.copied(),
+                    &mut pos,
+                    outer_span,
+                    true, /* ignore_leading_whitespace */
+                    ctx,
+                ),
+            ));
+            // the end boundary of sortable declarations group
+            if !matches!(
+                next_stmt,
+                Some(Statement::Declaration(Declaration {
+                    name: InterpolableIdent::Literal(..),
+                    ..
+                }))
+            ) {
+                use crate::config::DeclarationOrder;
+                match declaration_order {
+                    DeclarationOrder::Alphabetical => {}
+                    DeclarationOrder::Smacss => {}
+                    DeclarationOrder::Concentric => {}
                 }
-                stmts.push(stmt.doc(ctx));
-                (stmts, span.end)
-            });
+                docs.extend(
+                    itertools::intersperse(
+                        sortable_decls.drain(..).map(|(_, docs)| docs),
+                        vec![Doc::hard_line()],
+                    )
+                    .flatten(),
+                );
+            }
+        } else {
+            docs.append(&mut format_single_stmt(
+                stmt,
+                next_stmt.copied(),
+                &mut pos,
+                outer_span,
+                false, /* ignore_leading_whitespace */
+                ctx,
+            ));
+        }
+    }
 
     ctx.get_comments_between(pos, outer_span.end)
         .for_each(|comment| {
             if pos > outer_span.start {
                 match ctx.line_bounds.line_distance(pos, comment.span.start) {
-                    0 => stmts.push(Doc::space()),
-                    1 => stmts.push(Doc::hard_line()),
+                    0 => docs.push(Doc::space()),
+                    1 => docs.push(Doc::hard_line()),
                     _ => {
-                        stmts.push(Doc::empty_line());
-                        stmts.push(Doc::hard_line());
+                        docs.push(Doc::empty_line());
+                        docs.push(Doc::hard_line());
                     }
                 }
             }
-            stmts.push(comment.doc(ctx));
+            docs.push(comment.doc(ctx));
             pos = comment.span.end;
         });
+}
+
+fn format_single_stmt<'s>(
+    stmt: &Statement<'s>,
+    next_stmt: Option<&Statement<'s>>,
+    pos: &mut usize,
+    outer_span: &Span,
+    ignore_leading_whitespace: bool,
+    ctx: &Ctx<'_, 's>,
+) -> Vec<Doc<'s>> {
+    let mut docs = Vec::with_capacity(3);
+
+    let span = stmt.span();
+
+    let has_comments =
+        ctx.get_comments_between(*pos, span.start)
+            .fold(false, |has_comments, comment| {
+                if (!ignore_leading_whitespace || has_comments) && *pos > outer_span.start {
+                    match ctx.line_bounds.line_distance(*pos, comment.span.start) {
+                        0 => docs.push(Doc::space()),
+                        1 => docs.push(Doc::hard_line()),
+                        _ => {
+                            docs.push(Doc::empty_line());
+                            docs.push(Doc::hard_line());
+                        }
+                    }
+                }
+                docs.push(comment.doc(ctx));
+                *pos = comment.span.end;
+                true
+            });
+
+    if (!ignore_leading_whitespace || has_comments) && *pos > outer_span.start {
+        if ctx.line_bounds.line_distance(*pos, span.start) <= 1 {
+            docs.push(Doc::hard_line());
+        } else {
+            docs.push(Doc::empty_line());
+            docs.push(Doc::hard_line());
+        }
+    }
+    docs.push(stmt.doc(ctx));
+    *pos = span.end;
+
+    ctx.get_comments_between(
+        *pos,
+        next_stmt
+            .map(|next| next.span().start)
+            .unwrap_or_else(|| outer_span.end),
+    )
+    .for_each(|comment| {
+        if *pos > outer_span.start && ctx.line_bounds.line_distance(*pos, comment.span.start) == 0 {
+            docs.push(Doc::space());
+            docs.push(comment.doc(ctx));
+            *pos = comment.span.end;
+        }
+    });
+
+    docs
 }

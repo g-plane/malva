@@ -1,10 +1,10 @@
 use dprint_core::configuration::{
-    get_unknown_property_diagnostics, get_value, ConfigKeyMap, ConfigurationDiagnostic,
-    GlobalConfiguration, NewLineKind, ResolveConfigurationResult,
+    get_nullable_value, get_unknown_property_diagnostics, get_value, ConfigKeyMap,
+    ConfigurationDiagnostic, GlobalConfiguration, NewLineKind, ResolveConfigurationResult,
 };
 use malva::config::{
-    BlockSelectorLineBreak, FormatOptions, HexCase, LanguageOptions, LayoutOptions, LineBreak,
-    OperatorLineBreak, Quotes,
+    BlockSelectorLineBreak, DeclarationOrder, FormatOptions, HexCase, LanguageOptions,
+    LayoutOptions, LineBreak, OperatorLineBreak, Quotes,
 };
 
 pub(crate) fn resolve_config(
@@ -137,6 +137,24 @@ pub(crate) fn resolve_config(
                 false,
                 &mut diagnostics,
             ),
+            declaration_order: get_nullable_value::<String>(
+                &mut config,
+                "declarationOrder",
+                &mut diagnostics,
+            )
+            .as_deref()
+            .and_then(|value| match value {
+                "alphabetical" => Some(DeclarationOrder::Alphabetical),
+                "smacss" => Some(DeclarationOrder::Smacss),
+                "concentric" => Some(DeclarationOrder::Concentric),
+                _ => {
+                    diagnostics.push(ConfigurationDiagnostic {
+                        property_name: "declarationOrder".into(),
+                        message: "invalid value for config `declarationOrder`".into(),
+                    });
+                    None
+                }
+            }),
         },
     };
 
