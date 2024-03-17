@@ -271,6 +271,7 @@ fn format_statements<'s>(
 
     let mut sortable_decls = Vec::with_capacity(3);
 
+    let mut is_first_stmt_or_decls_group = true;
     let mut pos = outer_span.start;
     let mut stmts = statements.iter().peekable();
     while let Some(stmt) = stmts.next() {
@@ -316,6 +317,10 @@ fn format_statements<'s>(
                             .sort_by(|(a, _), (b, _)| sort_decl::compare_in_concentric(a, b));
                     }
                 }
+                if !is_first_stmt_or_decls_group {
+                    docs.push(Doc::hard_line());
+                    is_first_stmt_or_decls_group = false;
+                }
                 docs.extend(
                     itertools::intersperse(
                         sortable_decls.drain(..).map(|(_, docs)| docs),
@@ -333,6 +338,7 @@ fn format_statements<'s>(
                 false, /* ignore_leading_whitespace */
                 ctx,
             ));
+            is_first_stmt_or_decls_group = false;
         }
     }
 
