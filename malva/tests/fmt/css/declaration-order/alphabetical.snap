@@ -1,0 +1,58 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg declarationOrder = "alphabetical"*/
+a {
+  flex: 0;
+  flex: 2;
+}
+
+a {
+  border: 0;
+  flex: 0;
+}
+
+a {
+  border: 0;
+  @import "sii";
+  flex: 0;
+}
+
+a {
+  unknown-a: 0;
+  unknown-b: 0;
+}
+
+a {
+  animation: 0;
+  animation-timeline: none;
+}
+
+a {
+  animation: 0;
+  animation-timeline: none;
+}
+
+a {
+  display: flex;
+  /* below is height */
+  height: 0; /* height */
+  /* below is width */
+  width: 0; /* width */
+  b {}
+}
+
+a {
+  display: flex;
+  height: 0;
+  width: 0;
+  b {}
+
+  /* comment line */
+
+  button {}
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
