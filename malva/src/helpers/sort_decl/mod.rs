@@ -1,6 +1,8 @@
+pub use concentric::compare_in_concentric;
 pub use smacss::compare_in_smacss;
 use std::{cmp::Ordering, ops::ControlFlow};
 
+mod concentric;
 mod smacss;
 
 pub fn compare_in_alphabetical(a: &str, b: &str) -> Ordering {

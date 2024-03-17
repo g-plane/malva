@@ -311,7 +311,10 @@ fn format_statements<'s>(
                     DeclarationOrder::Smacss => {
                         sortable_decls.sort_by(|(a, _), (b, _)| sort_decl::compare_in_smacss(a, b));
                     }
-                    DeclarationOrder::Concentric => {}
+                    DeclarationOrder::Concentric => {
+                        sortable_decls
+                            .sort_by(|(a, _), (b, _)| sort_decl::compare_in_concentric(a, b));
+                    }
                 }
                 docs.extend(
                     itertools::intersperse(
