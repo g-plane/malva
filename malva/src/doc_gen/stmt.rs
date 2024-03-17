@@ -371,25 +371,26 @@ fn format_single_stmt<'s>(
 
     let span = stmt.span();
 
-    let has_comments =
-        ctx.get_comments_between(*pos, span.start)
-            .fold(false, |has_comments, comment| {
-                if (!ignore_leading_whitespace || has_comments) && *pos > outer_span.start {
-                    match ctx.line_bounds.line_distance(*pos, comment.span.start) {
-                        0 => docs.push(Doc::space()),
-                        1 => docs.push(Doc::hard_line()),
-                        _ => {
-                            docs.push(Doc::empty_line());
-                            docs.push(Doc::hard_line());
-                        }
+    let has_comments = ctx.get_comments_between(*pos, span.start).fold(
+        !ignore_leading_whitespace,
+        |has_comments, comment| {
+            if has_comments && *pos > outer_span.start {
+                match ctx.line_bounds.line_distance(*pos, comment.span.start) {
+                    0 => docs.push(Doc::space()),
+                    1 => docs.push(Doc::hard_line()),
+                    _ => {
+                        docs.push(Doc::empty_line());
+                        docs.push(Doc::hard_line());
                     }
                 }
-                docs.push(comment.doc(ctx));
-                *pos = comment.span.end;
-                true
-            });
+            }
+            docs.push(comment.doc(ctx));
+            *pos = comment.span.end;
+            true
+        },
+    );
 
-    if (!ignore_leading_whitespace || has_comments) && *pos > outer_span.start {
+    if has_comments && *pos > outer_span.start {
         if ctx.line_bounds.line_distance(*pos, span.start) <= 1 {
             docs.push(Doc::hard_line());
         } else {

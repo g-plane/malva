@@ -180,6 +180,7 @@ pub enum BlockSelectorLineBreak {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+// https://github.com/Siilwyn/css-declaration-sorter
 pub enum DeclarationOrder {
     /// Order in a simple alphabetical manner from a - z.
     Alphabetical,
