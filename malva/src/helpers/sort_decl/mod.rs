@@ -6,7 +6,11 @@ mod concentric;
 mod smacss;
 
 pub fn compare_in_alphabetical(a: &str, b: &str) -> Ordering {
-    strip_vendor_prefix(a).cmp(strip_vendor_prefix(b))
+    if a.starts_with("--") || b.starts_with("--") {
+        Ordering::Equal
+    } else {
+        strip_vendor_prefix(a).cmp(strip_vendor_prefix(b))
+    }
 }
 
 fn strip_vendor_prefix(s: &str) -> &str {
