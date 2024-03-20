@@ -269,76 +269,88 @@ fn format_statements<'s>(
 ) {
     docs.reserve(statements.len() * 2);
 
-    let mut sortable_decls = Vec::with_capacity(3);
-
-    let mut is_first_stmt_or_decls_group = true;
     let mut pos = outer_span.start;
     let mut stmts = statements.iter().peekable();
-    while let Some(stmt) = stmts.next() {
-        let next_stmt = stmts.peek();
-        if let (
-            Some(declaration_order),
-            Statement::Declaration(Declaration {
+
+    if let Some(declaration_order) = &ctx.options.declaration_order {
+        let mut sortable_decls = Vec::with_capacity(3);
+        let mut is_first_stmt_or_decls_group = true;
+
+        while let Some(stmt) = stmts.next() {
+            let next_stmt = stmts.peek();
+            if let Statement::Declaration(Declaration {
                 name: InterpolableIdent::Literal(ident),
                 ..
-            }),
-        ) = (&ctx.options.declaration_order, stmt)
-        {
-            sortable_decls.push((
-                &*ident.name,
-                format_single_stmt(
+            }) = stmt
+            {
+                sortable_decls.push((
+                    &*ident.name,
+                    format_single_stmt(
+                        stmt,
+                        next_stmt.copied(),
+                        &mut pos,
+                        outer_span,
+                        true, /* ignore_leading_whitespace */
+                        ctx,
+                    ),
+                ));
+                // the end boundary of sortable declarations group
+                if !matches!(
+                    next_stmt,
+                    Some(Statement::Declaration(Declaration {
+                        name: InterpolableIdent::Literal(..),
+                        ..
+                    }))
+                ) {
+                    use crate::{config::DeclarationOrder, helpers::sort_decl};
+                    match declaration_order {
+                        DeclarationOrder::Alphabetical => {
+                            sortable_decls
+                                .sort_by(|(a, _), (b, _)| sort_decl::compare_in_alphabetical(a, b));
+                        }
+                        DeclarationOrder::Smacss => {
+                            sortable_decls
+                                .sort_by(|(a, _), (b, _)| sort_decl::compare_in_smacss(a, b));
+                        }
+                        DeclarationOrder::Concentric => {
+                            sortable_decls
+                                .sort_by(|(a, _), (b, _)| sort_decl::compare_in_concentric(a, b));
+                        }
+                    }
+                    if !is_first_stmt_or_decls_group {
+                        docs.push(Doc::hard_line());
+                        is_first_stmt_or_decls_group = false;
+                    }
+                    docs.extend(
+                        itertools::intersperse(
+                            sortable_decls.drain(..).map(|(_, docs)| docs),
+                            vec![Doc::hard_line()],
+                        )
+                        .flatten(),
+                    );
+                }
+            } else {
+                docs.append(&mut format_single_stmt(
                     stmt,
                     next_stmt.copied(),
                     &mut pos,
                     outer_span,
-                    true, /* ignore_leading_whitespace */
+                    false, /* ignore_leading_whitespace */
                     ctx,
-                ),
-            ));
-            // the end boundary of sortable declarations group
-            if !matches!(
-                next_stmt,
-                Some(Statement::Declaration(Declaration {
-                    name: InterpolableIdent::Literal(..),
-                    ..
-                }))
-            ) {
-                use crate::{config::DeclarationOrder, helpers::sort_decl};
-                match declaration_order {
-                    DeclarationOrder::Alphabetical => {
-                        sortable_decls
-                            .sort_by(|(a, _), (b, _)| sort_decl::compare_in_alphabetical(a, b));
-                    }
-                    DeclarationOrder::Smacss => {
-                        sortable_decls.sort_by(|(a, _), (b, _)| sort_decl::compare_in_smacss(a, b));
-                    }
-                    DeclarationOrder::Concentric => {
-                        sortable_decls
-                            .sort_by(|(a, _), (b, _)| sort_decl::compare_in_concentric(a, b));
-                    }
-                }
-                if !is_first_stmt_or_decls_group {
-                    docs.push(Doc::hard_line());
-                    is_first_stmt_or_decls_group = false;
-                }
-                docs.extend(
-                    itertools::intersperse(
-                        sortable_decls.drain(..).map(|(_, docs)| docs),
-                        vec![Doc::hard_line()],
-                    )
-                    .flatten(),
-                );
+                ));
+                is_first_stmt_or_decls_group = false;
             }
-        } else {
+        }
+    } else {
+        while let Some(stmt) = stmts.next() {
             docs.append(&mut format_single_stmt(
                 stmt,
-                next_stmt.copied(),
+                stmts.peek().copied(),
                 &mut pos,
                 outer_span,
                 false, /* ignore_leading_whitespace */
                 ctx,
             ));
-            is_first_stmt_or_decls_group = false;
         }
     }
 
