@@ -118,6 +118,10 @@ pub struct LanguageOptions {
     #[cfg_attr(feature = "config_serde", serde(alias = "declarationOrder"))]
     /// See [`declarationOrder`](https://github.com/g-plane/malva/blob/main/docs/config.md#declarationorder) on GitHub
     pub declaration_order: Option<DeclarationOrder>,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "singleLineBlockThreshold"))]
+    /// See [`singleLineBlockThreshold`](https://github.com/g-plane/malva/blob/main/docs/config.md#singlelineblockthreshold) on GitHub
+    pub single_line_block_threshold: Option<usize>,
 }
 
 #[derive(Clone, Debug, Default)]

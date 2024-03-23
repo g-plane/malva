@@ -1,0 +1,11 @@
+/*cfg singleLineBlockThreshold = 0*/
+a {
+}
+
+a { /* comment */ }
+
+a {
+  /* comment */
+}
+
+a { width: 0 }

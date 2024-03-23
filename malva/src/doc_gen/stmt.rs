@@ -162,6 +162,11 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
             docs.push(Doc::text("{"));
         }
 
+        let line_break_doc = match ctx.options.single_line_block_threshold {
+            Some(threshold) if self.statements.len() <= threshold => Doc::line_or_space(),
+            _ => Doc::hard_line(),
+        };
+
         let mut stmt_docs = vec![];
         if !self.statements.is_empty()
             || ctx
@@ -175,22 +180,32 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
                 .count()
                 > 0
         {
-            stmt_docs.push(Doc::hard_line());
+            stmt_docs.push(line_break_doc.clone());
         }
 
-        format_statements(&mut stmt_docs, &self.statements, &self.span, ctx);
+        format_statements(
+            &mut stmt_docs,
+            &self.statements,
+            &self.span,
+            line_break_doc.clone(),
+            ctx,
+        );
 
         let has_stmts = !stmt_docs.is_empty();
         docs.push(Doc::list(stmt_docs).nest(ctx.indent_width));
         if has_stmts {
-            docs.push(Doc::hard_line());
+            docs.push(line_break_doc);
         }
 
         if !is_sass {
             docs.push(Doc::text("}"));
         }
 
-        Doc::list(docs)
+        if ctx.options.single_line_block_threshold.is_some() {
+            Doc::list(docs).group()
+        } else {
+            Doc::list(docs)
+        }
     }
 }
 
@@ -253,7 +268,13 @@ impl<'s> DocGen<'s> for Statement<'s> {
 impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let mut stmt_docs = vec![];
-        format_statements(&mut stmt_docs, &self.statements, &self.span, ctx);
+        format_statements(
+            &mut stmt_docs,
+            &self.statements,
+            &self.span,
+            Doc::hard_line(),
+            ctx,
+        );
         if ctx.syntax != Syntax::Sass {
             stmt_docs.push(Doc::empty_line());
         }
@@ -265,6 +286,7 @@ fn format_statements<'s>(
     docs: &mut Vec<Doc<'s>>,
     statements: &[Statement<'s>],
     outer_span: &Span,
+    line_break_doc: Doc<'s>,
     ctx: &Ctx<'_, 's>,
 ) {
     docs.reserve(statements.len() * 2);
@@ -291,6 +313,7 @@ fn format_statements<'s>(
                         &mut pos,
                         outer_span,
                         true, /* ignore_leading_whitespace */
+                        line_break_doc.clone(),
                         ctx,
                     ),
                 ));
@@ -336,6 +359,7 @@ fn format_statements<'s>(
                     &mut pos,
                     outer_span,
                     false, /* ignore_leading_whitespace */
+                    line_break_doc.clone(),
                     ctx,
                 ));
                 is_first_stmt_or_decls_group = false;
@@ -349,6 +373,7 @@ fn format_statements<'s>(
                 &mut pos,
                 outer_span,
                 false, /* ignore_leading_whitespace */
+                line_break_doc.clone(),
                 ctx,
             ));
         }
@@ -377,6 +402,7 @@ fn format_single_stmt<'s>(
     pos: &mut usize,
     outer_span: &Span,
     ignore_leading_whitespace: bool,
+    line_break_doc: Doc<'s>,
     ctx: &Ctx<'_, 's>,
 ) -> Vec<Doc<'s>> {
     let mut docs = Vec::with_capacity(3);
@@ -389,7 +415,7 @@ fn format_single_stmt<'s>(
             if has_comments && *pos > outer_span.start {
                 match ctx.line_bounds.line_distance(*pos, comment.span.start) {
                     0 => docs.push(Doc::space()),
-                    1 => docs.push(Doc::hard_line()),
+                    1 => docs.push(line_break_doc.clone()),
                     _ => {
                         docs.push(Doc::empty_line());
                         docs.push(Doc::hard_line());
@@ -404,7 +430,7 @@ fn format_single_stmt<'s>(
 
     if has_comments && *pos > outer_span.start {
         if ctx.line_bounds.line_distance(*pos, span.start) <= 1 {
-            docs.push(Doc::hard_line());
+            docs.push(line_break_doc);
         } else {
             docs.push(Doc::empty_line());
             docs.push(Doc::hard_line());

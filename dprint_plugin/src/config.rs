@@ -155,6 +155,11 @@ pub(crate) fn resolve_config(
                     None
                 }
             }),
+            single_line_block_threshold: get_nullable_value(
+                &mut config,
+                "singleLineBlockThreshold",
+                &mut diagnostics,
+            ),
         },
     };
 

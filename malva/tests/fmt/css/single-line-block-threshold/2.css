@@ -1,0 +1,28 @@
+/*cfg singleLineBlockThreshold = 2*/
+a {
+}
+
+a {
+  width: 0
+}
+
+a {
+  width: 0;
+  height: 0
+}
+
+a {
+  width: 0; /* width */
+  height: 0; /* height */
+}
+
+a {
+  width: 0;
+  content: "very very very very very very very very very very very very very very long"
+}
+
+a {
+  width: 0;
+  height: 0;
+  display: block;
+}

@@ -1,0 +1,17 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg singleLineBlockThreshold = 1*/
+a { width: 0; }
+
+a { /* leading */ width: 0; /* trailing */ }
+
+a {
+  content: "very very very very very very very very very very very very very very long";
+}
+
+a {
+  width: 0;
+  height: 0;
+}
+
