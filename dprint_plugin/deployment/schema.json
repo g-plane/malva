@@ -59,6 +59,16 @@
     "linebreakInPseudoParens": {
       "type": "boolean",
       "default": false
+    },
+    "declarationOrder": {
+      "type": ["string", "null"],
+      "enum": ["alphabetical", "smacss", "concentric"],
+      "default": null
+    },
+    "singleLineBlockThreshold": {
+      "type": ["integer", "null"],
+      "default": null,
+      "minimum": 0
     }
   }
 }
