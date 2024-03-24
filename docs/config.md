@@ -474,6 +474,17 @@ Control the threshold value for putting block on a single line.
 If the number of statements in a block is less than or equal to this value, the block will be put on a single line as possible,
 but when the code can't fit on single line, it will still break into multiple lines.
 
+This is especially useful for increasing readability when writing atomic CSS. For example:
+
+```css
+.border-0 { border-width: 0px; }
+.border-1 { border-width: 1px; }
+.border-2 { border-width: 2px; }
+.border-3 { border-width: 3px; }
+.border-4 { border-width: 4px; }
+.border-5 { border-width: 5px; }
+```
+
 Default option value is `null` which means always break into multiple lines. The option value can be an integer which is greater than or equal to 0.
 
 ### Example for `null`
