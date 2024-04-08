@@ -53,7 +53,7 @@ fn fmt_snapshot() {
         );
 
         let regression_output = format_text(&output, syntax, &options).unwrap();
-        assert_eq!(
+        similar_asserts::assert_eq!(
             output,
             regression_output,
             "'{}' format is unstable",

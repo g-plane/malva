@@ -18,6 +18,7 @@ tiny_pretty = "0.1"
 
 [dev-dependencies]
 insta = { version = "1.31", features = ["glob"] }
+similar-asserts = "1.5"
 toml = "0.7"
 
 [features]
