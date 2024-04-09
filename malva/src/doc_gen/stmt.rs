@@ -33,21 +33,23 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 })
             )
         });
-        if can_break_before_value {
-            docs.push(Doc::line_or_space().nest(ctx.indent_width));
+        let space_after_colon = if can_break_before_value {
+            Doc::line_or_space().nest(ctx.indent_width)
         } else {
-            docs.push(Doc::space());
-        }
+            Doc::space()
+        };
 
         docs.reserve(self.value.len() * 2);
         let mut pos = self.colon_span.end;
 
-        let mut iter = self.value.iter().peekable();
         match &self.name {
             InterpolableIdent::Literal(Ident { name, .. })
                 if name.starts_with("--") || name.eq_ignore_ascii_case("filter") =>
             {
                 use raffia::token::Token;
+                docs.push(space_after_colon);
+
+                let mut iter = self.value.iter().peekable();
                 while let Some(value) = iter.next() {
                     let span = value.span();
                     docs.push(
@@ -70,7 +72,36 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     pos = span.end;
                 }
             }
+            InterpolableIdent::Literal(Ident { name, .. })
+                if name.eq_ignore_ascii_case("grid")
+                    || name.eq_ignore_ascii_case("grid-template")
+                    || name.eq_ignore_ascii_case("grid-template-areas") =>
+            {
+                for (index, value) in self.value.iter().enumerate() {
+                    let span = value.span();
+                    let comments = ctx.end_spaced_comments(pos, span.start).collect::<Vec<_>>();
+
+                    if !comments.is_empty() {
+                        docs.push(Doc::space());
+                    } else if ctx.line_bounds.line_distance(pos, span.start) == 0 {
+                        if index == 0 {
+                            docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                        } else {
+                            docs.push(Doc::space());
+                        }
+                    } else {
+                        docs.push(Doc::hard_line().nest(ctx.indent_width));
+                    }
+                    docs.push(Doc::list(comments).nest(ctx.indent_width));
+                    docs.push(value.doc(ctx));
+
+                    pos = span.end;
+                }
+            }
             _ => {
+                docs.push(space_after_colon);
+
+                let mut iter = self.value.iter().peekable();
                 while let Some(value) = iter.next() {
                     let span = value.span();
                     docs.push(
