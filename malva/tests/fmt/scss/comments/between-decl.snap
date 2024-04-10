@@ -17,7 +17,8 @@ selector {
     "sidebar content content" //
     "footer footer footer";
 
-  grid-template-areas: "header header header" //
+  grid-template-areas:
+    "header header header" //
     "sidebar content content" //
     "footer footer footer";
 }
