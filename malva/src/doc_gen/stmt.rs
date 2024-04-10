@@ -78,24 +78,28 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                         .get(0..13)
                         .is_some_and(|s| s.eq_ignore_ascii_case("grid-template")) =>
             {
-                for (index, value) in self.value.iter().enumerate() {
-                    let span = value.span();
-                    let comments = ctx.end_spaced_comments(pos, span.start).collect::<Vec<_>>();
+                pos = self
+                    .value
+                    .iter()
+                    .enumerate()
+                    .fold(pos, |pos, (index, value)| {
+                        let span = value.span();
+                        let comments = ctx.end_spaced_comments(pos, span.start).collect::<Vec<_>>();
 
-                    if !comments.is_empty() {
-                        docs.push(Doc::space());
-                    } else if index == 0 {
-                        docs.push(Doc::line_or_space().nest(ctx.indent_width));
-                    } else if ctx.line_bounds.line_distance(pos, span.start) == 0 {
-                        docs.push(Doc::space());
-                    } else {
-                        docs.push(Doc::hard_line().nest(ctx.indent_width));
-                    }
-                    docs.push(Doc::list(comments).nest(ctx.indent_width));
-                    docs.push(value.doc(ctx));
+                        if !comments.is_empty() {
+                            docs.push(Doc::space());
+                        } else if index == 0 {
+                            docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                        } else if ctx.line_bounds.line_distance(pos, span.start) == 0 {
+                            docs.push(Doc::space());
+                        } else {
+                            docs.push(Doc::hard_line().nest(ctx.indent_width));
+                        }
+                        docs.push(Doc::list(comments).nest(ctx.indent_width));
+                        docs.push(value.doc(ctx));
 
-                    pos = span.end;
-                }
+                        span.end
+                    });
             }
             _ => {
                 docs.push(space_after_colon);
