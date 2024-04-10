@@ -74,8 +74,9 @@ impl<'s> DocGen<'s> for Declaration<'s> {
             }
             InterpolableIdent::Literal(Ident { name, .. })
                 if name.eq_ignore_ascii_case("grid")
-                    || name.eq_ignore_ascii_case("grid-template")
-                    || name.eq_ignore_ascii_case("grid-template-areas") =>
+                    || name
+                        .get(0..13)
+                        .is_some_and(|s| s.eq_ignore_ascii_case("grid-template")) =>
             {
                 for (index, value) in self.value.iter().enumerate() {
                     let span = value.span();
@@ -83,12 +84,10 @@ impl<'s> DocGen<'s> for Declaration<'s> {
 
                     if !comments.is_empty() {
                         docs.push(Doc::space());
+                    } else if index == 0 {
+                        docs.push(Doc::line_or_space().nest(ctx.indent_width));
                     } else if ctx.line_bounds.line_distance(pos, span.start) == 0 {
-                        if index == 0 {
-                            docs.push(Doc::line_or_space().nest(ctx.indent_width));
-                        } else {
-                            docs.push(Doc::space());
-                        }
+                        docs.push(Doc::space());
                     } else {
                         docs.push(Doc::hard_line().nest(ctx.indent_width));
                     }
