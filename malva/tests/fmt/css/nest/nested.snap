@@ -14,4 +14,9 @@ source: malva/tests/fmt.rs
   img {
     display: block;
   }
+
+  > img {}
+  + img {}
+  ~ img {}
+  || img {}
 }

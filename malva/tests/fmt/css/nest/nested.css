@@ -11,4 +11,9 @@
     img {
         display: block;
     }
+
+    >img{}
+    +img{}
+    ~img{}
+    ||img{}
 }
