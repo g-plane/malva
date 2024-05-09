@@ -40,4 +40,3 @@ source: malva/tests/fmt.rs
 @page vertical {
   size: A4 portrait;
 }
-

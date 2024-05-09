@@ -12,4 +12,3 @@ source: malva/tests/fmt.rs
 a {
   backround: url(concat("http://", "example.com", "/image.png"));
 }
-

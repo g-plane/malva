@@ -32,4 +32,3 @@ source: malva/tests/fmt.rs
     nice-style: 12;
   }
 }
-

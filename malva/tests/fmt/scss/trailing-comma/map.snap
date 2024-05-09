@@ -8,4 +8,3 @@ $map: (
   "huge": (min-width: 1200px)
 );
 $map: (small: 767px, medium: 992px, large: 1200px);
-

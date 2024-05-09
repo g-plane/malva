@@ -10,4 +10,3 @@ source: malva/tests/fmt.rs
 ::unknown(
   #p0:checked ~ #play:checked ~ #c1:checked, #p1:checked ~ #play:checked ~ #c2:checked, #p2:checked ~ #play:checked ~ #co:checked
 ) {}
-

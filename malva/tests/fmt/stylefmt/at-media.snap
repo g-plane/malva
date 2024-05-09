@@ -13,4 +13,3 @@ source: malva/tests/fmt.rs
   (min--moz-device-pixel-ratio: 2),
   (min-resolution: 2dppx),
   (min-resolution: 192dpi) {}
-

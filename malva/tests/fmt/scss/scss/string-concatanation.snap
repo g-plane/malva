@@ -8,4 +8,3 @@ a {
   background-image: url("../test/" + "static/test.jpg");
   background-image: url($test-path+$test-path);
 }
-

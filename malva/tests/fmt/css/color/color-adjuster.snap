@@ -130,4 +130,3 @@ source: malva/tests/fmt.rs
   color: color(red hue(* 20deg));
   color: color(var(--highlightColor) blackness(+ 20%));
 }
-

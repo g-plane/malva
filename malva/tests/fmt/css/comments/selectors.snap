@@ -173,4 +173,3 @@ article
   --centered /* comments 193 */: /* comments 194 */ { display: flex;
     align-items: center; justify-content: center; };
 }
-

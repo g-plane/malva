@@ -9,4 +9,3 @@ source: malva/tests/fmt.rs
     )
   );
 }
-

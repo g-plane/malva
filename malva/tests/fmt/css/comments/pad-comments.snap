@@ -2,4 +2,3 @@
 source: malva/tests/fmt.rs
 ---
 /* cfg padComments = true */
-

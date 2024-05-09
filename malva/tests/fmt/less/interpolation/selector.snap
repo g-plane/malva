@@ -6,4 +6,3 @@ source: malva/tests/fmt.rs
 @{prefix}-title {
   color: red;
 }
-

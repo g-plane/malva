@@ -20,4 +20,3 @@ $var: /* comment 1 */ all /* comment 2 */
   !global; /* comment 18 */ /* comment 19 */
   /* comment 20 */
 }
-

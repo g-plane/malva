@@ -1559,4 +1559,3 @@ label {
 .hello {
   &:extend(.input:disabled);
 }
-

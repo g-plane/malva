@@ -31,4 +31,3 @@ source: malva/tests/fmt.rs
 .bar {
   @extend %base;
 }
-

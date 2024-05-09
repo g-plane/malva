@@ -26,4 +26,3 @@ source: malva/tests/fmt.rs
 @namespace url("http://example.com/foo/very/very/very/very/very/very/very/very/very/very/very/very/very/very");
 @namespace url("http://example.com/foo/very/very/very/very/very/very/very/very/very/very/very/very/very/very/very");
 @namespace url("http://example.com/foo/very/very/very/very/very/very/very/very/very/very/very/very/very/very/very");
-

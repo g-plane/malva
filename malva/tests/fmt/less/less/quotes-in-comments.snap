@@ -48,4 +48,3 @@ source: malva/tests/fmt.rs
   opacity: // '!' "?"
     1;
 }
-

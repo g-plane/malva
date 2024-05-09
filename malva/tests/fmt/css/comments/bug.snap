@@ -3,4 +3,3 @@ source: malva/tests/fmt.rs
 ---
 /* Catchall baseclass */
 .glyphicon {}
-

@@ -4,4 +4,3 @@ source: malva/tests/fmt.rs
 button
   width: 12px
   height: 12px
-

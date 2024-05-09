@@ -4,4 +4,3 @@ source: malva/tests/fmt.rs
 .toolbar {
   @apply --toolbar-theme;
 }
-

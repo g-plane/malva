@@ -21,4 +21,3 @@ source: malva/tests/fmt.rs
   --like-a-apply-rule: { color:red; } /* no semi here*/
     --another-one-like-a-apply-rule: { color:red; };
 }
-

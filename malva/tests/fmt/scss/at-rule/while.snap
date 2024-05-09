@@ -43,4 +43,3 @@ source: malva/tests/fmt.rs
   $very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var >
     $other-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var
 ) {}
-

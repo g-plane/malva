@@ -17,4 +17,3 @@ $map: (
 
 // #10000
 $map: (("my list"): "hello world");
-

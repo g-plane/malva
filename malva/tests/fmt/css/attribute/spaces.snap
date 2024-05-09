@@ -57,4 +57,3 @@ section:has(:not([type="radio" i], [type="checkbox" i])) {}
 [|att] {}
 [|att] {}
 [|att] {}
-

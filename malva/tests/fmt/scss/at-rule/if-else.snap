@@ -67,4 +67,3 @@ p {
   @if (str-slice($item, 0, 3) == " : ") {}
   @if ($type == ocean) {} @else if ($type == matador) {} @else {}
 }
-

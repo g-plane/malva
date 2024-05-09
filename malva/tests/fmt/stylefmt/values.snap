@@ -10,4 +10,3 @@ source: malva/tests/fmt.rs
   background-position: 20% -26px;
   transform-style: preserve-3d;
 }
-

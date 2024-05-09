@@ -26,4 +26,3 @@ source: malva/tests/fmt.rs
 @custom-media --tablet (min-width: 768px) and (max-width: 1279px);
 
 @custom-media --tablet (min-width: 768px) and (max-width: 1279px);
-

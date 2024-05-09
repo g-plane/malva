@@ -4,4 +4,3 @@ source: malva/tests/fmt.rs
 .foo {
   color: #abcdef;
 }
-

@@ -97,4 +97,3 @@ a.important {
   @extend .very-very-very-very-very-very-very-very-very-very-very-very-very-long-selector,
     .very-very-very-very-very-very-very-very-very-very-very-very-very-long-selector;
 }
-

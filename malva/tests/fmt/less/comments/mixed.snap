@@ -10,4 +10,3 @@ source: malva/tests/fmt.rs
 @import "b";
 // another comment
 //no-space before
-

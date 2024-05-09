@@ -41,4 +41,3 @@ $light-blue: $nice-blue + #111;
     padding: $padding;
   }
 }
-

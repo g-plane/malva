@@ -6,4 +6,3 @@ source: malva/tests/fmt.rs
 :--camelCase {
   content: red;
 }
-

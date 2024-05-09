@@ -4,4 +4,3 @@ source: malva/tests/fmt.rs
 .class {
   border: 1px solid $color;
 }
-

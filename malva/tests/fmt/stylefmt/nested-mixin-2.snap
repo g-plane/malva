@@ -16,4 +16,3 @@ source: malva/tests/fmt.rs
     color: $k;
   }
 }
-

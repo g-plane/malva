@@ -15,4 +15,3 @@ source: malva/tests/fmt.rs
 .mixin() when (@aaaaaaaaaaaaaaaaaa = @bbbbbbbbbbbbbbbbbbb) or
   (@cccccccccccccccccc = @ddddddddddddddddddd) and
   (@eeeeeeeee = @ffffffffffffff) {}
-

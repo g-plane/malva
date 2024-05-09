@@ -5,4 +5,3 @@ source: malva/tests/fmt.rs
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-

@@ -10,4 +10,3 @@ source: malva/tests/fmt.rs
 @import "b";
 /* block */
 /*no-space block*/
-

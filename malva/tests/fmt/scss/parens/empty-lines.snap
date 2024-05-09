@@ -7,4 +7,3 @@ $colours: (
   "background-secondary": $dark-200,
   "background-tertiary": $dark-100
 );
-

@@ -39,4 +39,3 @@ source: malva/tests/fmt.rs
     url("/fonts/OpenSans-Regular-webfont.woff2") format("woff2"),
     url("/fonts/OpenSans-Regular-webfont.woff") format("woff");
 }
-

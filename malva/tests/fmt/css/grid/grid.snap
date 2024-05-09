@@ -115,4 +115,3 @@ div {
   grid-area: main;
   grid-area: 1 / main-start / 3 / main-end;
 }
-

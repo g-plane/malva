@@ -7,4 +7,3 @@ div {
   margin: -moz-calc(100% - 320px);
   background-image: url() center center no-repeat black;
 }
-

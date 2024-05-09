@@ -9,4 +9,3 @@ source: malva/tests/fmt.rs
   color: hsl(270 60% 50% / 0.15);
   color: hsla(240, 100%, 50%, 0.05);
 }
-

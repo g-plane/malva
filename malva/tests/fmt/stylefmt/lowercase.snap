@@ -49,4 +49,3 @@ $myVar7: linear-gradient(to right, RGBA(0, 0, 0, 0.5), RGB(255, 255, 255));
   transform: SCALEX(1);
   transform: SCALEY(1);
 }
-

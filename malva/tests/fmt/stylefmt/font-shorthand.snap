@@ -6,4 +6,3 @@ source: malva/tests/fmt.rs
   font: normal normal normal 12px/20px myfont;
   font: normal 300 0.875em/1.3 "myfont", sans-serif;
 }
-

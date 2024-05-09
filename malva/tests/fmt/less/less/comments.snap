@@ -13,4 +13,3 @@ source: malva/tests/fmt.rs
 
 /// Computes an exponent.
 ///// Computes an exponent.
-

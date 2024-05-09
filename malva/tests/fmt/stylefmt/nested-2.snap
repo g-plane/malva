@@ -24,4 +24,3 @@ source: malva/tests/fmt.rs
     color: green;
   }
 }
-

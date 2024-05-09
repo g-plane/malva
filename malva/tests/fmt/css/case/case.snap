@@ -63,4 +63,3 @@ x-panel {
 :host(:hover) {
   transform: scale(1.1);
 }
-

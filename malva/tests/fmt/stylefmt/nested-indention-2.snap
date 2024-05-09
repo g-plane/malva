@@ -20,4 +20,3 @@ source: malva/tests/fmt.rs
     justify-content: flex-start;
   }
 }
-

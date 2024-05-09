@@ -5,4 +5,3 @@ source: malva/tests/fmt.rs
   border: 1px dashed currentColor;
   border: 1px dashed currentcolor;
 }
-

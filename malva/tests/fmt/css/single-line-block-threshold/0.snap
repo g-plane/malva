@@ -11,4 +11,3 @@ a { /* comment */ }
 a {
   width: 0;
 }
-

@@ -10,4 +10,3 @@ source: malva/tests/fmt.rs
 );
 
 @use "library" with ($black: #222, $border-radius: 0.1rem);
-

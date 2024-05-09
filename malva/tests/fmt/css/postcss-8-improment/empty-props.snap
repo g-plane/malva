@@ -7,4 +7,3 @@ source: malva/tests/fmt.rs
   --two-space: ;
   --many-space: ;
 }
-

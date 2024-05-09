@@ -8,4 +8,3 @@ source: malva/tests/fmt.rs
 }
 
 @include foo(); // comment
-

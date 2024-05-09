@@ -60,4 +60,3 @@ source: malva/tests/fmt.rs
 @import url("foo.css");
 @import "https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600";
 @import url("foo.css,800");
-

@@ -37,4 +37,3 @@ h1 {
 some-element:is(::before, ::after) {
   display: block;
 }
-

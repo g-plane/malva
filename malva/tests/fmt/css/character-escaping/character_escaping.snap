@@ -62,4 +62,3 @@ source: malva/tests/fmt.rs
 .grid {
   grid-template-rows: [row-1-00\:00] auto;
 }
-

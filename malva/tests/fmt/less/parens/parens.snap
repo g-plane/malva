@@ -28,4 +28,3 @@ source: malva/tests/fmt.rs
 .binary_minus {
   margin: 0 - (@a);
 }
-

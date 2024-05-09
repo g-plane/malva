@@ -88,4 +88,3 @@ source: malva/tests/fmt.rs
 @foo ("one");
 @foo ("one");
 @foo ("one" two "three");
-

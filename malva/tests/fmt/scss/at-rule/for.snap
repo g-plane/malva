@@ -28,4 +28,3 @@ source: malva/tests/fmt.rs
   $very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var-2 +
     $very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-var-2
 ) {}
-

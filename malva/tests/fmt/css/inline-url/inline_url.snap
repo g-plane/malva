@@ -44,4 +44,3 @@ source: malva/tests/fmt.rs
   background: no-repeat center/80% url(path/to/123.jpg);
   background: no-repeat center/80% url(#123.foo);
 }
-

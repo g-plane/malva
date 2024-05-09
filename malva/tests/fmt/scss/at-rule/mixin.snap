@@ -36,4 +36,3 @@ source: malva/tests/fmt.rs
 @mixin sexy-border($color, $width, $foo: (color: red)) {}
 
 @mixin selector($param: "value") {}
-

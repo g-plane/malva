@@ -70,4 +70,3 @@ source: malva/tests/fmt.rs
   canchangecase: @var[notVar];
   canchangecase: @var[notVar];
 }
-

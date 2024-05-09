@@ -15,4 +15,3 @@ source: malva/tests/fmt.rs
   color: pink;
   background: #fff;
 }
-

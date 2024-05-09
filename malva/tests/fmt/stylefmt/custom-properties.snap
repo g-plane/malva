@@ -7,4 +7,3 @@ source: malva/tests/fmt.rs
 a {
   color: var(--mainColor);
 }
-

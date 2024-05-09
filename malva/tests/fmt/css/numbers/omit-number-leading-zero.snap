@@ -72,4 +72,3 @@ source: malva/tests/fmt.rs
     height: attr(data-size em, .01);
   }
 }
-

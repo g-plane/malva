@@ -32,4 +32,3 @@ source: malva/tests/fmt.rs
 
   max-width: 800px;
 }
-

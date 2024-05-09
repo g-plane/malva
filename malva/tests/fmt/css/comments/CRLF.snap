@@ -20,4 +20,3 @@ source: malva/tests/fmt.rs
     color: red; /* Comment 5 */
   }
 }
-
