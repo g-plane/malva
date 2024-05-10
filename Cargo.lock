@@ -332,7 +332,7 @@ dependencies = [
 
 [[package]]
 name = "dprint_plugin_malva"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "dprint-core",
@@ -601,7 +601,7 @@ checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
 name = "malva"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aho-corasick",
  "insta",
@@ -616,7 +616,7 @@ dependencies = [
 
 [[package]]
 name = "malva_cli"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -931,7 +931,7 @@ dependencies = [
 
 [[package]]
 name = "standalone_wasm"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "malva",
  "serde",
