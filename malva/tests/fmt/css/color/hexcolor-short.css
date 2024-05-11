@@ -1,0 +1,19 @@
+/*cfg
+  hexColorLength = "short"
+  hexCase = "ignore"
+*/
+.foo {
+    color: #AAA;
+    -o-color: #fabcd3;
+    -webkit-color: #873;
+    -moz-color: #6bcdef;
+    -ms-color: #AabBCc;
+    color: #F09F;
+    color: #FF0099FF;
+
+    ignore: #a;
+    ignore: #aabbccddee;
+    ignore: #\61\61\61;
+    ignore: #\61\61\61\61\61\61;
+    ignore: #测测试试测试;
+}

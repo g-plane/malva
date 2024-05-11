@@ -2,10 +2,7 @@ use dprint_core::configuration::{
     get_nullable_value, get_unknown_property_diagnostics, get_value, ConfigKeyMap,
     ConfigurationDiagnostic, GlobalConfiguration, NewLineKind, ResolveConfigurationResult,
 };
-use malva::config::{
-    BlockSelectorLineBreak, DeclarationOrder, FormatOptions, HexCase, LanguageOptions,
-    LayoutOptions, LineBreak, OperatorLineBreak, Quotes,
-};
+use malva::config::*;
 
 pub(crate) fn resolve_config(
     mut config: ConfigKeyMap,
@@ -72,6 +69,23 @@ pub(crate) fn resolve_config(
                     Default::default()
                 }
             },
+            hex_color_length: get_nullable_value::<String>(
+                &mut config,
+                "hexColorLength",
+                &mut diagnostics,
+            )
+            .as_deref()
+            .and_then(|value| match value {
+                "short" => Some(HexColorLength::Short),
+                "long" => Some(HexColorLength::Long),
+                _ => {
+                    diagnostics.push(ConfigurationDiagnostic {
+                        property_name: "hexColorLength".into(),
+                        message: "invalid value for config `hexColorLength`".into(),
+                    });
+                    None
+                }
+            }),
             quotes: match &*get_value(
                 &mut config,
                 "quotes",

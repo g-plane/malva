@@ -650,13 +650,49 @@ impl<'s> DocGen<'s> for UrlValue<'s> {
 }
 
 fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
-    use crate::config::HexCase;
+    use crate::config::{HexCase, HexColorLength};
+
+    let chars = raw.chars().collect::<Vec<_>>();
+    let mut hex = if chars.iter().all(|c| c.is_ascii_hexdigit()) {
+        match (chars.as_slice(), &ctx.options.hex_color_length) {
+            ([c1, c2, c3], Some(HexColorLength::Long)) => {
+                format!("#{c1}{c1}{c2}{c2}{c3}{c3}")
+            }
+            ([c1, c2, c3, c4], Some(HexColorLength::Long)) => {
+                format!("#{c1}{c1}{c2}{c2}{c3}{c3}{c4}{c4}")
+            }
+            ([c1, c2, c3, c4, c5, c6], Some(HexColorLength::Short))
+                if c1.eq_ignore_ascii_case(c2)
+                    && c3.eq_ignore_ascii_case(c4)
+                    && c5.eq_ignore_ascii_case(c6) =>
+            {
+                format!("#{c1}{c3}{c5}")
+            }
+            ([c1, c2, c3, c4, c5, c6, c7, c8], Some(HexColorLength::Short))
+                if c1.eq_ignore_ascii_case(c2)
+                    && c3.eq_ignore_ascii_case(c4)
+                    && c5.eq_ignore_ascii_case(c6)
+                    && c7.eq_ignore_ascii_case(c8) =>
+            {
+                format!("#{c1}{c3}{c5}{c7}")
+            }
+            _ => format!("#{raw}"),
+        }
+    } else {
+        format!("#{raw}")
+    };
 
     match ctx.options.hex_case {
-        HexCase::Ignore => format!("#{}", raw),
-        HexCase::Lower => format!("#{}", raw.to_ascii_lowercase()),
-        HexCase::Upper => format!("#{}", raw.to_ascii_uppercase()),
-    }
+        HexCase::Ignore => {}
+        HexCase::Lower => {
+            hex.make_ascii_lowercase();
+        }
+        HexCase::Upper => {
+            hex.make_ascii_uppercase();
+        }
+    };
+
+    hex
 }
 
 fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {

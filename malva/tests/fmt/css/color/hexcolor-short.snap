@@ -1,0 +1,22 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg
+  hexColorLength = "short"
+  hexCase = "ignore"
+*/
+.foo {
+  color: #AAA;
+  -o-color: #fabcd3;
+  -webkit-color: #873;
+  -moz-color: #6bcdef;
+  -ms-color: #AbC;
+  color: #F09F;
+  color: #F09F;
+
+  ignore: #a;
+  ignore: #aabbccddee;
+  ignore: #\61\61\61;
+  ignore: #\61\61\61\61\61\61;
+  ignore: #测测试试测试;
+}

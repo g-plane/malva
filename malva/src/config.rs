@@ -79,6 +79,10 @@ pub struct LanguageOptions {
     /// See [`hexCase`](https://github.com/g-plane/malva/blob/main/docs/config.md#hexcase) on GitHub
     pub hex_case: HexCase,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "hexColorLength"))]
+    /// See [`hexColorLength`](https://github.com/g-plane/malva/blob/main/docs/config.md#hexcolorlength) on GitHub
+    pub hex_color_length: Option<HexColorLength>,
+
     /// See [`quotes`](https://github.com/g-plane/malva/blob/main/docs/config.md#quotes) on GitHub
     pub quotes: Quotes,
 
@@ -133,6 +137,14 @@ pub enum HexCase {
     #[default]
     Lower,
     Upper,
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+pub enum HexColorLength {
+    Short,
+    Long,
 }
 
 #[derive(Clone, Debug, Default)]

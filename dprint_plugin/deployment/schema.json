@@ -29,6 +29,11 @@
       "enum": ["ignore", "lower", "upper"],
       "default": "lower"
     },
+    "hexColorLength": {
+      "type": ["string", "null"],
+      "enum": ["short", "long"],
+      "default": null
+    },
     "quotes": {
       "type": "string",
       "enum": ["alwaysDouble", "alwaysSingle", "preferDouble", "preferSingle"],
