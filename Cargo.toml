@@ -3,7 +3,6 @@ members = [
     "benchmark",
     "dprint_plugin",
     "malva",
-    "malva_cli",
     "standalone_wasm",
 ]
 resolver = "2"
