@@ -12,6 +12,7 @@ use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen};
 pub use crate::{error::Error, line_bounds::LineBounds};
 pub use raffia::Syntax;
 use raffia::{ast::Stylesheet, token::Comment, ParserBuilder, ParserOptions};
+use std::path::Path;
 
 /// Format the given source code.
 pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Result<String, Error> {
@@ -72,4 +73,15 @@ pub fn print_stylesheet<'a, 's>(
             tab_size: options.layout.indent_width,
         },
     )
+}
+
+/// Detect syntax from file extension.
+pub fn detect_syntax(path: impl AsRef<Path>) -> Option<Syntax> {
+    match path.as_ref().extension().and_then(std::ffi::OsStr::to_str) {
+        Some(ext) if ext.eq_ignore_ascii_case("css") => Some(Syntax::Css),
+        Some(ext) if ext.eq_ignore_ascii_case("scss") => Some(Syntax::Scss),
+        Some(ext) if ext.eq_ignore_ascii_case("sass") => Some(Syntax::Sass),
+        Some(ext) if ext.eq_ignore_ascii_case("less") => Some(Syntax::Less),
+        _ => None,
+    }
 }

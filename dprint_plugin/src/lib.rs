@@ -6,7 +6,7 @@ use dprint_core::{
     configuration::{ConfigKeyMap, GlobalConfiguration, ResolveConfigurationResult},
     plugins::{FileMatchingInfo, PluginInfo, SyncPluginHandler, SyncPluginInfo},
 };
-use malva::{config::FormatOptions, format_text, Syntax};
+use malva::{config::FormatOptions, detect_syntax, format_text};
 use std::path::Path;
 
 mod config;
@@ -57,17 +57,11 @@ impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
         config: &FormatOptions,
         _: impl FnMut(&Path, Vec<u8>, &ConfigKeyMap) -> Result<Option<Vec<u8>>>,
     ) -> Result<Option<Vec<u8>>> {
-        let syntax = match file_path.extension().and_then(|s| s.to_str()) {
-            Some(ext) if ext.eq_ignore_ascii_case("css") => Syntax::Css,
-            Some(ext) if ext.eq_ignore_ascii_case("scss") => Syntax::Scss,
-            Some(ext) if ext.eq_ignore_ascii_case("sass") => Syntax::Sass,
-            Some(ext) if ext.eq_ignore_ascii_case("less") => Syntax::Less,
-            _ => {
-                return Err(anyhow::anyhow!(
-                    "unknown file extension of file: {}",
-                    file_path.display()
-                ));
-            }
+        let Some(syntax) = detect_syntax(file_path) else {
+            return Err(anyhow::anyhow!(
+                "unknown file extension of file: {}",
+                file_path.display()
+            ));
         };
         format_text(std::str::from_utf8(&file_text)?, syntax, config)
             .map(|s| Some(s.into_bytes()))
