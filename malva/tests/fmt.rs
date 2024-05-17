@@ -52,7 +52,9 @@ fn fmt_snapshot() {
             path.display()
         );
 
-        let regression_output = format_text(&output, syntax, &options).unwrap();
+        let regression_output = format_text(&output, syntax, &options).expect(&format!(
+            "Failed to parse in stability test. Output:\n{output}"
+        ));
         similar_asserts::assert_eq!(
             output,
             regression_output,
