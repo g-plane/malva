@@ -126,6 +126,10 @@ pub struct LanguageOptions {
     #[cfg_attr(feature = "config_serde", serde(alias = "singleLineBlockThreshold"))]
     /// See [`singleLineBlockThreshold`](https://github.com/g-plane/malva/blob/main/docs/config.md#singlelineblockthreshold) on GitHub
     pub single_line_block_threshold: Option<usize>,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "keyframeSelectorNotation"))]
+    /// See [`keyframeSelectorNotation`](https://github.com/g-plane/malva/blob/main/docs/config.md#keyframeselectornotation) on GitHub
+    pub keyframe_selector_notation: Option<KeyframeSelectorNotation>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -204,4 +208,12 @@ pub enum DeclarationOrder {
     Smacss,
     /// Order properties applying outside the box model, moving inward to intrinsic changes.
     Concentric,
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+pub enum KeyframeSelectorNotation {
+    Keyword,
+    Percentage,
 }

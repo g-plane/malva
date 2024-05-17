@@ -36,17 +36,40 @@ impl<'s> DocGen<'s> for KeyframesName<'s> {
 
 impl<'s> DocGen<'s> for KeyframeSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        use crate::config::KeyframeSelectorNotation;
+
         match self {
-            KeyframeSelector::Percentage(percentage) => percentage.doc(ctx),
+            KeyframeSelector::Percentage(percentage) => {
+                match (
+                    percentage.value.value,
+                    &ctx.options.keyframe_selector_notation,
+                ) {
+                    (0.0, Some(KeyframeSelectorNotation::Keyword)) => Doc::text("from"),
+                    (100.0, Some(KeyframeSelectorNotation::Keyword)) => Doc::text("to"),
+                    _ => percentage.doc(ctx),
+                }
+            }
             KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
                 if name.eq_ignore_ascii_case("from") =>
             {
-                Doc::text("from")
+                if let Some(KeyframeSelectorNotation::Percentage) =
+                    ctx.options.keyframe_selector_notation
+                {
+                    Doc::text("0%")
+                } else {
+                    Doc::text("from")
+                }
             }
             KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
                 if name.eq_ignore_ascii_case("to") =>
             {
-                Doc::text("to")
+                if let Some(KeyframeSelectorNotation::Percentage) =
+                    ctx.options.keyframe_selector_notation
+                {
+                    Doc::text("100%")
+                } else {
+                    Doc::text("to")
+                }
             }
             KeyframeSelector::Ident(ident) => ident.doc(ctx),
         }

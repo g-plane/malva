@@ -1,0 +1,47 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg keyframeSelectorNotation = "percentage" */
+
+@keyframes foo {
+  0% {}
+}
+@keyframes foo {
+  100% {}
+}
+@keyframes foo {
+  0% {}
+  100% {}
+}
+@keyframes foo {
+  0% {}
+  0% {}
+  100% {}
+}
+@keyframes foo {
+  0%, 100% {}
+}
+
+@keyframes foo {
+  0% {}
+}
+@keyframes foo {
+  100% {}
+}
+@keyframes foo {
+  0% {}
+  100% {}
+}
+@keyframes foo {
+  0% {}
+  0% {}
+  100% {}
+}
+@keyframes foo {
+  0% {}
+  50% {}
+  100% {}
+}
+@keyframes foo {
+  0%, 100% {}
+}

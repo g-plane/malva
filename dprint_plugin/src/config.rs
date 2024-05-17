@@ -174,6 +174,23 @@ pub(crate) fn resolve_config(
                 "singleLineBlockThreshold",
                 &mut diagnostics,
             ),
+            keyframe_selector_notation: get_nullable_value::<String>(
+                &mut config,
+                "keyframeSelectorNotation",
+                &mut diagnostics,
+            )
+            .as_deref()
+            .and_then(|value| match value {
+                "keyword" => Some(KeyframeSelectorNotation::Keyword),
+                "percentage" => Some(KeyframeSelectorNotation::Percentage),
+                _ => {
+                    diagnostics.push(ConfigurationDiagnostic {
+                        property_name: "keyframeSelectorNotation".into(),
+                        message: "invalid value for config `keyframeSelectorNotation`".into(),
+                    });
+                    None
+                }
+            }),
         },
     };
 

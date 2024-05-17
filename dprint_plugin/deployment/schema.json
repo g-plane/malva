@@ -74,6 +74,11 @@
       "type": ["integer", "null"],
       "default": null,
       "minimum": 0
+    },
+    "keyframeSelectorNotation": {
+      "type": ["string", "null"],
+      "enum": ["keyword", "percentage"],
+      "default": null
     }
   }
 }

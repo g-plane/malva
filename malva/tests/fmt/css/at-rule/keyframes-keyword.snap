@@ -1,0 +1,52 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg keyframeSelectorNotation = "keyword" */
+
+@keyframes foo {
+  from {}
+}
+@keyframes foo {
+  to {}
+}
+@keyframes foo {
+  from {}
+  to {}
+}
+@keyframes foo {
+  from {}
+  from {}
+  to {}
+}
+@keyframes foo {
+  from {}
+  50% {}
+  to {}
+}
+@keyframes foo {
+  from, to {}
+}
+
+@keyframes foo {
+  from {}
+}
+@keyframes foo {
+  to {}
+}
+@keyframes foo {
+  from {}
+  to {}
+}
+@keyframes foo {
+  from {}
+  from {}
+  to {}
+}
+@keyframes foo {
+  from {}
+  50% {}
+  to {}
+}
+@keyframes foo {
+  from, to {}
+}
