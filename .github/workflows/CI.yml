@@ -47,6 +47,8 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: wasm-pack build --target web --no-typescript standalone_wasm
       - name: Deploy Production
-        run: netlify deploy --dir=standalone_wasm/pkg --site=malva --prod
+        run: |
+          cp dprint_plugin/deployment/schema.json standalone_wasm/pkg
+          netlify deploy --dir=standalone_wasm/pkg --site=malva --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
