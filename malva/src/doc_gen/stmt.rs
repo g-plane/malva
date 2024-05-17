@@ -245,7 +245,7 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
 
 impl<'s> DocGen<'s> for Statement<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let stmt = match self {
+        match self {
             Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx),
             Statement::AtRule(at_rule) => at_rule.doc(ctx),
             Statement::Declaration(declaration) => declaration.doc(ctx),
@@ -266,35 +266,6 @@ impl<'s> DocGen<'s> for Statement<'s> {
                 sass_variable_declaration.doc(ctx)
             }
             Statement::UnknownSassAtRule(unknown_sass_at_rule) => unknown_sass_at_rule.doc(ctx),
-        };
-        if ctx.syntax == Syntax::Sass {
-            stmt
-        } else {
-            match self {
-                Statement::AtRule(at_rule) if at_rule.block.is_none() => {
-                    stmt.append(Doc::text(";"))
-                }
-                Statement::Declaration(decl)
-                    if !matches!(
-                        decl.value.last(),
-                        Some(ComponentValue::SassNestingDeclaration(..))
-                    ) =>
-                {
-                    stmt.append(Doc::text(";"))
-                }
-                Statement::LessExtendRule(..)
-                | Statement::LessFunctionCall(..)
-                | Statement::LessMixinCall(..)
-                | Statement::LessVariableCall(..)
-                | Statement::LessVariableDeclaration(..)
-                | Statement::SassVariableDeclaration(..) => stmt.append(Doc::text(";")),
-                Statement::UnknownSassAtRule(unknown_sass_at_rule)
-                    if unknown_sass_at_rule.block.is_none() =>
-                {
-                    stmt.append(Doc::text(";"))
-                }
-                _ => stmt,
-            }
         }
     }
 }
@@ -443,24 +414,25 @@ fn format_single_stmt<'s>(
 
     let span = stmt.span();
 
-    let has_comments = ctx.get_comments_between(*pos, span.start).fold(
-        !ignore_leading_whitespace,
-        |has_comments, comment| {
-            if has_comments && *pos > outer_span.start {
-                match ctx.line_bounds.line_distance(*pos, comment.span.start) {
-                    0 => docs.push(Doc::space()),
-                    1 => docs.push(line_break_doc.clone()),
-                    _ => {
-                        docs.push(Doc::empty_line());
-                        docs.push(Doc::hard_line());
+    let comments = ctx.get_comments_between(*pos, span.start);
+    let has_comments =
+        comments
+            .clone()
+            .fold(!ignore_leading_whitespace, |has_comments, comment| {
+                if has_comments && *pos > outer_span.start {
+                    match ctx.line_bounds.line_distance(*pos, comment.span.start) {
+                        0 => docs.push(Doc::space()),
+                        1 => docs.push(line_break_doc.clone()),
+                        _ => {
+                            docs.push(Doc::empty_line());
+                            docs.push(Doc::hard_line());
+                        }
                     }
                 }
-            }
-            docs.push(comment.doc(ctx));
-            *pos = comment.span.end;
-            true
-        },
-    );
+                docs.push(comment.doc(ctx));
+                *pos = comment.span.end;
+                true
+            });
 
     if has_comments && *pos > outer_span.start {
         if ctx.line_bounds.line_distance(*pos, span.start) <= 1 {
@@ -470,8 +442,49 @@ fn format_single_stmt<'s>(
             docs.push(Doc::hard_line());
         }
     }
-    docs.push(stmt.doc(ctx));
+    if comments
+        .last()
+        .and_then(|comment| comment.content.trim_start().strip_prefix("malva-ignore"))
+        .is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_whitespace()))
+    {
+        if let Some(source) = ctx.source {
+            docs.extend(itertools::intersperse(
+                source[span.start..span.end].lines().map(Doc::text),
+                Doc::empty_line(),
+            ));
+        } else {
+            docs.push(stmt.doc(ctx));
+        }
+    } else {
+        docs.push(stmt.doc(ctx));
+    }
     *pos = span.end;
+
+    if ctx.syntax != Syntax::Sass {
+        match stmt {
+            Statement::AtRule(at_rule) if at_rule.block.is_none() => docs.push(Doc::text(";")),
+            Statement::Declaration(decl)
+                if !matches!(
+                    decl.value.last(),
+                    Some(ComponentValue::SassNestingDeclaration(..))
+                ) =>
+            {
+                docs.push(Doc::text(";"));
+            }
+            Statement::LessExtendRule(..)
+            | Statement::LessFunctionCall(..)
+            | Statement::LessMixinCall(..)
+            | Statement::LessVariableCall(..)
+            | Statement::LessVariableDeclaration(..)
+            | Statement::SassVariableDeclaration(..) => docs.push(Doc::text(";")),
+            Statement::UnknownSassAtRule(unknown_sass_at_rule)
+                if unknown_sass_at_rule.block.is_none() =>
+            {
+                docs.push(Doc::text(";"));
+            }
+            _ => {}
+        }
+    }
 
     ctx.get_comments_between(
         *pos,

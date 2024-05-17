@@ -34,6 +34,7 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
     Ok(print_stylesheet(
         &stylesheet,
         &comments,
+        Some(input),
         line_bounds,
         syntax,
         options,
@@ -45,6 +46,7 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
 pub fn print_stylesheet<'a, 's>(
     stylesheet: &'a Stylesheet<'s>,
     comments: &'a [Comment<'s>],
+    source: Option<&'s str>,
     line_bounds: LineBounds,
     syntax: Syntax,
     options: &'a FormatOptions,
@@ -52,6 +54,7 @@ pub fn print_stylesheet<'a, 's>(
     use tiny_pretty::{IndentKind, PrintOptions};
 
     let ctx = Ctx {
+        source,
         syntax,
         options: &options.language,
         comments,

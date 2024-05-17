@@ -7,6 +7,7 @@ use std::{array, cell::Cell, iter::Peekable, mem};
 use tiny_pretty::Doc;
 
 pub(crate) struct Ctx<'a, 's: 'a> {
+    pub source: Option<&'s str>,
     pub syntax: Syntax,
     pub options: &'a LanguageOptions,
     pub comments: &'a [Comment<'s>],
@@ -20,7 +21,7 @@ impl<'a, 's> Ctx<'a, 's> {
         &self,
         start: usize,
         end: usize,
-    ) -> impl Iterator<Item = &Comment<'s>> {
+    ) -> impl Iterator<Item = &Comment<'s>> + Clone {
         self.comments
             .iter()
             .filter(move |comment| comment.span.start >= start && comment.span.end <= end)

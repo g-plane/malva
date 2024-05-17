@@ -52,5 +52,5 @@ let line_bounds = LineBounds::new(input);
 assert_eq!("a {
   color: red;
 }
-", &print_stylesheet(&stylesheet, &comments, line_bounds, Syntax::Css, &options));
+", &print_stylesheet(&stylesheet, &comments, Some(input), line_bounds, Syntax::Css, &options));
 ```
