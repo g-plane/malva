@@ -191,6 +191,12 @@ pub(crate) fn resolve_config(
                     None
                 }
             }),
+            ignore_comment_directive: get_value(
+                &mut config,
+                "ignoreCommentDirective",
+                "malva-ignore".into(),
+                &mut diagnostics,
+            ),
         },
     };
 

@@ -70,7 +70,7 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
     }
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(default))]
 /// Configuration related to syntax.
@@ -130,6 +130,30 @@ pub struct LanguageOptions {
     #[cfg_attr(feature = "config_serde", serde(alias = "keyframeSelectorNotation"))]
     /// See [`keyframeSelectorNotation`](https://github.com/g-plane/malva/blob/main/docs/config.md#keyframeselectornotation) on GitHub
     pub keyframe_selector_notation: Option<KeyframeSelectorNotation>,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "ignoreCommentDirective"))]
+    /// See [`ignoreCommentDirective`](https://github.com/g-plane/malva/blob/main/docs/config.md#ignorecommentdirective) on GitHub
+    pub ignore_comment_directive: String,
+}
+
+impl Default for LanguageOptions {
+    fn default() -> Self {
+        LanguageOptions {
+            hex_case: HexCase::default(),
+            hex_color_length: None,
+            quotes: Quotes::default(),
+            operator_linebreak: OperatorLineBreak::default(),
+            block_selector_linebreak: BlockSelectorLineBreak::default(),
+            omit_number_leading_zero: false,
+            trailing_comma: false,
+            pad_comments: false,
+            linebreak_in_pseudo_parens: false,
+            declaration_order: None,
+            single_line_block_threshold: None,
+            keyframe_selector_notation: None,
+            ignore_comment_directive: "malva-ignore".into(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default)]

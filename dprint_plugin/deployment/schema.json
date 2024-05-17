@@ -79,6 +79,10 @@
       "type": ["string", "null"],
       "enum": ["keyword", "percentage"],
       "default": null
+    },
+    "ignoreCommentDirective": {
+      "type": "string",
+      "default": "malva-ignore"
     }
   }
 }

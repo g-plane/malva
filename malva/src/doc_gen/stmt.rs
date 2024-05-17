@@ -444,7 +444,12 @@ fn format_single_stmt<'s>(
     }
     if comments
         .last()
-        .and_then(|comment| comment.content.trim_start().strip_prefix("malva-ignore"))
+        .and_then(|comment| {
+            comment
+                .content
+                .trim_start()
+                .strip_prefix(&ctx.options.ignore_comment_directive)
+        })
         .is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_whitespace()))
     {
         if let Some(source) = ctx.source {
