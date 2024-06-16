@@ -20,28 +20,22 @@ impl LineBounds {
             "end {end} must be greater than or equal start {start}"
         );
 
-        let start = self
-            .0
-            .iter()
-            .try_fold(0, |i, offset| match start.cmp(offset) {
-                Ordering::Less => ControlFlow::Break(i),
-                Ordering::Equal => ControlFlow::Continue(i),
-                Ordering::Greater => ControlFlow::Continue(i + 1),
-            });
-        let end = self
-            .0
-            .iter()
-            .try_fold(0, |i, offset| match end.cmp(offset) {
-                Ordering::Less => ControlFlow::Break(i),
-                Ordering::Equal => ControlFlow::Continue(i),
-                Ordering::Greater => ControlFlow::Continue(i + 1),
-            });
-
-        match (start, end) {
-            (ControlFlow::Break(start), ControlFlow::Break(end)) => end - start,
-            (ControlFlow::Break(start), ControlFlow::Continue(end)) => end - start,
-            (ControlFlow::Continue(start), ControlFlow::Break(end)) => end - start,
-            (ControlFlow::Continue(start), ControlFlow::Continue(end)) => end - start,
-        }
+        let (ControlFlow::Break(start) | ControlFlow::Continue(start)) =
+            self.0
+                .iter()
+                .try_fold(0, |i, offset| match start.cmp(offset) {
+                    Ordering::Less => ControlFlow::Break(i),
+                    Ordering::Equal => ControlFlow::Continue(i),
+                    Ordering::Greater => ControlFlow::Continue(i + 1),
+                });
+        let (ControlFlow::Break(end) | ControlFlow::Continue(end)) =
+            self.0
+                .iter()
+                .try_fold(0, |i, offset| match end.cmp(offset) {
+                    Ordering::Less => ControlFlow::Break(i),
+                    Ordering::Equal => ControlFlow::Continue(i),
+                    Ordering::Greater => ControlFlow::Continue(i + 1),
+                });
+        end - start
     }
 }
