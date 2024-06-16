@@ -262,3 +262,19 @@ pub(super) fn ident_to_lowercase<'s>(
         name => name.doc(ctx),
     }
 }
+
+pub(super) fn get_smart_linebreak<'s, N>(
+    start: usize,
+    elements: &[N],
+    ctx: &Ctx<'_, 's>,
+) -> Doc<'static>
+where
+    N: Spanned,
+{
+    match elements.first() {
+        Some(element) if ctx.line_bounds.line_distance(start, element.span().start) > 0 => {
+            Doc::hard_line()
+        }
+        _ => Doc::line_or_space(),
+    }
+}

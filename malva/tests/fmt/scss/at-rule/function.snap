@@ -13,16 +13,36 @@ source: malva/tests/fmt.rs
 @function func($arg, $arg1, $arg2: 10, $args...) {
   @return "Func";
 }
-@function func($arg, $arg1, $arg2: 10, $args...) {
+@function func(
+  $arg,
+  $arg1,
+  $arg2: 10,
+  $args...
+) {
   @return "Func";
 }
-@function func($arg, $arg1, $arg2: 10, $args...) {
+@function func(
+  $arg,
+  $arg1,
+  $arg2: 10,
+  $args...
+) {
   @return "Func";
 }
-@function func($arg, $arg1, $arg2: 10, $args...) {
+@function func(
+  $arg,
+  $arg1,
+  $arg2: 10,
+  $args...
+) {
   @return "Func";
 }
-@function func($arg, $arg1, $arg2: 10, $args...) {
+@function func(
+  $arg,
+  $arg1,
+  $arg2: 10,
+  $args...
+) {
   @return "Func";
 }
 @function func(

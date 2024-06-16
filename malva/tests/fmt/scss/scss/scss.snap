@@ -47,10 +47,22 @@ $map: (key: value, other-key: other-value) !default;
 $map: (key: value, other-key: other-value) !default;
 $map: (key: value, other-key: other-value);
 $map: (key: value, other-key: other-value);
-$map: (key: value, other-key: other-value);
-$map: (key: value, other-key: other-value);
-$map: (key: value, other-key: other-value);
-$map: (key: value, other-key: other-value);
+$map: (
+  key: value,
+  other-key: other-value
+);
+$map: (
+  key: value,
+  other-key: other-value
+);
+$map: (
+  key: value,
+  other-key: other-value
+);
+$map: (
+  key: value,
+  other-key: other-value
+);
 $map: (
   very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-verylong-key: very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-verylong-value,
   very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-verylong-other-key: very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-verylong-other-value
@@ -681,9 +693,21 @@ $extmods: (eot: "?", svg: "#" + str-replace($name, " ", "_"));
 }
 
 $colors: (
-  primary: (base: #00abc9, light: #daf1f6, dark: #12799a),
-  secondary: (base: #424d55, light: #ccc, lightest: #efefef, dark: #404247),
-  success: (base: #bbd33e, light: #eaf0c6)
+  primary: (
+    base: #00abc9,
+    light: #daf1f6,
+    dark: #12799a
+  ),
+  secondary: (
+    base: #424d55,
+    light: #ccc,
+    lightest: #efefef,
+    dark: #404247
+  ),
+  success: (
+    base: #bbd33e,
+    light: #eaf0c6
+  )
 );
 
 @function color($color, $tone: "base") {
@@ -733,7 +757,12 @@ $o-grid-default-config: (
   gutter: 10px,
   min-width: 240px,
   max-width: 1330px,
-  layouts: (S: 370px, M: 610px, L: 850px, XL: 1090px),
+  layouts: (
+    S: 370px,
+    M: 610px,
+    L: 850px,
+    XL: 1090px
+  ),
   fluid: true,
   debug: false,
   fixed-layout: M,
@@ -748,7 +777,10 @@ $d: (null);
 $threads-properties: map-merge($threads-properties, ($border-label: ()));
 $o-grid-default-config: (layouts: (S: 370px));
 
-$map: (key: (value), other-key: (key: other-other-value));
+$map: (
+  key: (value),
+  other-key: (key: other-other-value)
+);
 
 a {
   content: "#{".5"}";

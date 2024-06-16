@@ -26,7 +26,11 @@ $form-selectors: "input.name", "input.address", "input.zip" !default;
   background-color: nth($gradients, 1);
   background-image: linear-gradient($direction, $gradients...);
 }
-$parameters: ("c": "kittens", "a": true, "b": 42);
+$parameters: (
+  "c": "kittens",
+  "a": true,
+  "b": 42
+);
 $value: dummy($parameters...);
 
 body {

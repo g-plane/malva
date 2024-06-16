@@ -3,7 +3,10 @@ source: malva/tests/fmt.rs
 ---
 a {
   @include section-type-1(
-    $header: (margin: 0 0 $margin-base, text-align: left),
+    $header: (
+      margin: 0 0 $margin-base,
+      text-align: left
+    ),
     $decoration: (
       type: base,
       margin: 0 auto -1px 0,

@@ -31,12 +31,11 @@ impl<'s> DocGen<'s> for CustomSelectorArg<'s> {
 impl<'s> DocGen<'s> for CustomSelectorArgs<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::SeparatedListFormatter::new(",", Doc::line_or_space()).format(
-                &self.args,
-                &self.comma_spans,
-                self.span.start,
-                ctx,
-            ),
+            helpers::SeparatedListFormatter::new(
+                ",",
+                helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+            )
+            .format(&self.args, &self.comma_spans, self.span.start, ctx),
             self.args
                 .last()
                 .map(|arg| arg.span.end)

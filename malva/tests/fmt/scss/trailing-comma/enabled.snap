@@ -3,7 +3,10 @@ source: malva/tests/fmt.rs
 ---
 /*cfg trailingComma = true*/
 @include section-type-1(
-  $header: (margin: 0 0 $margin-base, text-align: left),
+  $header: (
+    margin: 0 0 $margin-base,
+    text-align: left,
+  ),
   $decoration: (
     type: base,
     margin: 0 auto -1px 0,
@@ -25,8 +28,16 @@ $list: ("Helvetica", "Arial", sans-serif);
 $colors: ("red", "blue");
 $config: (
   themes: (
-    mist: (header: #dcfac0, content: #00968b, footer: #85c79c),
-    $spring: (header: #f4fac7, content: #c2454e, footer: #ffb158),
+    mist: (
+      header: #dcfac0,
+      content: #00968b,
+      footer: #85c79c,
+    ),
+    $spring: (
+      header: #f4fac7,
+      content: #c2454e,
+      footer: #ffb158,
+    ),
   ),
 );
 

@@ -135,9 +135,12 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
 impl<'s> DocGen<'s> for SassContent<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                .with_trailing()
-                .format(&self.args, &self.comma_spans, self.span.start, ctx),
+            helpers::SeparatedListFormatter::new(
+                ",",
+                helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+            )
+            .with_trailing()
+            .format(&self.args, &self.comma_spans, self.span.start, ctx),
             self.args
                 .len()
                 .checked_sub(1)
@@ -409,9 +412,12 @@ impl<'s> DocGen<'s> for SassInclude<'s> {
 impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                .with_trailing()
-                .format(&self.args, &self.comma_spans, self.span.start, ctx),
+            helpers::SeparatedListFormatter::new(
+                ",",
+                helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+            )
+            .with_trailing()
+            .format(&self.args, &self.comma_spans, self.span.start, ctx),
             self.args
                 .len()
                 .checked_sub(1)
@@ -576,9 +582,12 @@ impl<'s> DocGen<'s> for SassList<'s> {
 impl<'s> DocGen<'s> for SassMap<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                .with_trailing()
-                .format(&self.items, &self.comma_spans, self.span.start, ctx),
+            helpers::SeparatedListFormatter::new(
+                ",",
+                helpers::get_smart_linebreak(self.span.start, &self.items, ctx),
+            )
+            .with_trailing()
+            .format(&self.items, &self.comma_spans, self.span.start, ctx),
             self.items
                 .last()
                 .map(|item| item.span.end)
@@ -616,9 +625,12 @@ impl<'s> DocGen<'s> for SassModuleConfig<'s> {
         Doc::text("with ")
             .concat(ctx.end_spaced_comments(self.with_span.end, self.lparen_span.start))
             .append(helpers::format_parenthesized(
-                helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                    .with_trailing()
-                    .format(&self.items, &self.comma_spans, self.lparen_span.end, ctx),
+                helpers::SeparatedListFormatter::new(
+                    ",",
+                    helpers::get_smart_linebreak(self.span.start, &self.items, ctx),
+                )
+                .with_trailing()
+                .format(&self.items, &self.comma_spans, self.lparen_span.end, ctx),
                 self.items
                     .last()
                     .map(|item| item.span.end)
@@ -727,9 +739,12 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
             )
             .collect::<Vec<_>>();
         helpers::format_parenthesized(
-            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                .with_trailing()
-                .format(&params, &self.comma_spans, self.span.start, ctx),
+            helpers::SeparatedListFormatter::new(
+                ",",
+                helpers::get_smart_linebreak(self.span.start, &params, ctx),
+            )
+            .with_trailing()
+            .format(&params, &self.comma_spans, self.span.start, ctx),
             self.params
                 .len()
                 .checked_sub(1)

@@ -5,11 +5,31 @@ source: malva/tests/fmt.rs
 @include mix(1px, 2px, $arg2: 10, 2px 4px 6px);
 @include mix(1px, 2px, $arg2: 10, 2px 4px 6px);
 @include mix(1px, 2px, $arg2: 10, 2px 4px 6px);
-@include mix(1px, 2px, $arg2: 10, 2px 4px 6px);
-@include mix(1px, 2px, $arg2: 10, 2px 4px 6px);
-@include mix(1px, 2px, $arg2: 10, 2px 4px 6px);
+@include mix(
+  1px,
+  2px,
+  $arg2: 10,
+  2px 4px 6px
+);
+@include mix(
+  1px,
+  2px,
+  $arg2: 10,
+  2px 4px 6px
+);
+@include mix(
+  1px,
+  2px,
+  $arg2: 10,
+  2px 4px 6px
+);
 
-@include mix(1px, 2px, $arg2: 10, 2px 4px 6px);
+@include mix(
+  1px,
+  2px,
+  $arg2: 10,
+  2px 4px 6px
+);
 
 @include mix(
   $very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-arg: 1px,
@@ -61,7 +81,10 @@ a {
 a {
   @include item-spotlight-properties-transition(
     "-title",
-    (box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15), border-color: $brand-primary)
+    (
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15),
+      border-color: $brand-primary
+    )
   );
 }
 

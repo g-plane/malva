@@ -178,9 +178,12 @@ impl<'s> DocGen<'s> for LessFormatFunction {
 impl<'s> DocGen<'s> for LessImportOptions<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         helpers::format_parenthesized(
-            helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                .with_trailing()
-                .format(&self.names, &self.comma_spans, self.span.start, ctx),
+            helpers::SeparatedListFormatter::new(
+                ",",
+                helpers::get_smart_linebreak(self.span.start, &self.names, ctx),
+            )
+            .with_trailing()
+            .format(&self.names, &self.comma_spans, self.span.start, ctx),
             self.names
                 .last()
                 .map(|name| name.span.end)
@@ -382,7 +385,7 @@ impl<'s> DocGen<'s> for LessMixinArguments<'s> {
                     .append(
                         helpers::SeparatedListFormatter::new(
                             if self.is_comma_separated { "," } else { ";" },
-                            Doc::line_or_space(),
+                            helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
                         )
                         .with_trailing()
                         .format(
@@ -556,7 +559,7 @@ impl<'s> DocGen<'s> for LessMixinParameters<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 if self.is_comma_separated { "," } else { ";" },
-                Doc::line_or_space(),
+                helpers::get_smart_linebreak(self.span.start, &self.params, ctx),
             )
             .with_trailing()
             .format(&self.params, &self.separator_spans, self.span.start, ctx),

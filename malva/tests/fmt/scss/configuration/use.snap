@@ -9,4 +9,7 @@ source: malva/tests/fmt.rs
   $h3-font-weight: 500
 );
 
-@use "library" with ($black: #222, $border-radius: 0.1rem);
+@use "library" with (
+  $black: #222,
+  $border-radius: 0.1rem
+);
