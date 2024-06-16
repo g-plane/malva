@@ -38,3 +38,5 @@ a, b {}
 
 // malva-ignore-will-not-apply
 a, b {}
+
+$size: (sm: 16px, md: 24px);
