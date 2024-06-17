@@ -167,7 +167,11 @@ impl<'s> DocGen<'s> for SassEach<'s> {
             .append(Doc::text("in"))
             .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_spaced_comments(self.in_span.end, self.expr.span().start))
-            .append(self.expr.doc(ctx))
+            .append(if matches!(self.expr, ComponentValue::SassList(..)) {
+                self.expr.doc(ctx)
+            } else {
+                self.expr.doc(ctx).nest(ctx.indent_width)
+            })
             .group()
     }
 }
