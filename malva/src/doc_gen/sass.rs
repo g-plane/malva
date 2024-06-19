@@ -167,11 +167,7 @@ impl<'s> DocGen<'s> for SassEach<'s> {
             .append(Doc::text("in"))
             .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_spaced_comments(self.in_span.end, self.expr.span().start))
-            .append(if let ComponentValue::SassList(sass_list) = &self.expr {
-                sass_list.doc(ctx)
-            } else {
-                self.expr.doc(ctx).nest(ctx.indent_width)
-            })
+            .append(self.expr.doc(ctx).nest(ctx.indent_width))
             .group()
     }
 }
@@ -770,10 +766,7 @@ impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
                 ctx.end_spaced_comments(self.span.start, expr_span.start)
                     .collect(),
             )
-            .append(match &*self.expr {
-                ComponentValue::SassList(sass_list) => sass_list.doc(ctx),
-                expr => expr.doc(ctx),
-            }),
+            .append(self.expr.doc(ctx)),
             expr_span.end,
             self.span.end,
             ctx,
@@ -874,29 +867,37 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
         docs.extend(ctx.start_spaced_comments(self.name.span.end, self.colon_span.start));
         docs.push(Doc::text(":"));
 
-        let should_group = if let ComponentValue::SassList(SassList {
-            elements,
-            comma_spans: Some(comma_spans),
-            span,
-            ..
-        }) = &self.value
-        {
-            docs.push(Doc::line_or_space());
-            docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
-            docs.push(
-                helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
-                    .with_trailing()
-                    .format(elements, comma_spans, span.start, ctx),
-            );
-            if elements.len() == 1 {
-                docs.push(Doc::text(","));
+        let should_group = match &self.value {
+            ComponentValue::SassList(SassList {
+                elements,
+                comma_spans: Some(comma_spans),
+                span,
+                ..
+            }) => {
+                docs.push(Doc::line_or_space());
+                docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
+                docs.push(
+                    helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
+                        .with_trailing()
+                        .format(elements, comma_spans, span.start, ctx),
+                );
+                if elements.len() == 1 {
+                    docs.push(Doc::text(","));
+                }
+                true
             }
-            true
-        } else {
-            docs.push(Doc::space());
-            docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
-            docs.push(self.value.doc(ctx));
-            false
+            ComponentValue::SassList(sass_list) => {
+                docs.push(Doc::space());
+                docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
+                docs.push(sass_list.doc(ctx).nest(ctx.indent_width));
+                false
+            }
+            _ => {
+                docs.push(Doc::space());
+                docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
+                docs.push(self.value.doc(ctx));
+                false
+            }
         };
 
         docs.extend(
