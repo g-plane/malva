@@ -167,8 +167,8 @@ impl<'s> DocGen<'s> for SassEach<'s> {
             .append(Doc::text("in"))
             .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_spaced_comments(self.in_span.end, self.expr.span().start))
-            .append(if matches!(self.expr, ComponentValue::SassList(..)) {
-                self.expr.doc(ctx)
+            .append(if let ComponentValue::SassList(sass_list) = &self.expr {
+                sass_list.doc(ctx)
             } else {
                 self.expr.doc(ctx).nest(ctx.indent_width)
             })
