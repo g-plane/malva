@@ -6,81 +6,193 @@
   "type": "object",
   "properties": {
     "printWidth": {
+      "description": "The line width limitation that Malva should *(but not must)* avoid exceeding. Malva will try its best to keep line width less than this value, but it may exceed for some cases, for example, a very very long single word.",
       "type": "integer",
       "default": 80,
       "minimum": 0
     },
     "useTabs": {
+      "description": "Specify use space or tab for indentation.",
       "type": "boolean",
       "default": false
     },
     "indentWidth": {
+      "description": "Size of indentation. When enabled `useTabs`, this option may be disregarded, since only one tab will be inserted when indented once.",
       "type": "integer",
       "default": 2,
       "minimum": 0
     },
     "lineBreak": {
+      "description": "Specify use `\\n` (LF) or `\\r\\n` (CRLF) for line break.",
       "type": "string",
       "enum": ["lf", "crlf"],
       "default": "lf"
     },
     "hexCase": {
+      "description": "Control the case of hex color values.",
       "type": "string",
-      "enum": ["ignore", "lower", "upper"],
+      "oneOf": [
+        {
+          "const": "ignore",
+          "description": "Hex color values will be kept as-is."
+        },
+        {
+          "const": "lower",
+          "description": "Hex color values will be converted to lower case."
+        },
+        {
+          "const": "upper",
+          "description": "Hex color values will be converted to upper case."
+        }
+      ],
       "default": "lower"
     },
     "hexColorLength": {
+      "description": "Control the hex color values in short-hand form or long-hand form.",
       "type": ["string", "null"],
-      "enum": ["short", "long"],
+      "oneOf": [
+        {
+          "const": "short",
+          "description": "Hex color values will be converted to short-hand form."
+        },
+        {
+          "const": "long",
+          "description": "Hex color values will be converted to long-hand form."
+        },
+        {
+          "const": null,
+          "description": "Hex color values will be kept as-is."
+        }
+      ],
       "default": null
     },
     "quotes": {
+      "description": "Control the quotes of strings.",
       "type": "string",
-      "enum": ["alwaysDouble", "alwaysSingle", "preferDouble", "preferSingle"],
+      "oneOf": [
+        {
+          "const": "alwaysDouble",
+          "description": "Always use double quotes. Double quotes in strings will be escaped."
+        },
+        {
+          "const": "alwaysSingle",
+          "description": "Always use single quotes. Single quotes in strings will be escaped."
+        },
+        {
+          "const": "preferDouble",
+          "description": "Use double quotes as possible. However if there're double quotes in strings, quotes will be kept as-is."
+        },
+        {
+          "const": "preferSingle",
+          "description": "Use single quotes as possible. However if there're single quotes in strings, quotes will be kept as-is."
+        }
+      ],
       "default": "alwaysDouble"
     },
     "operatorLinebreak": {
+      "description": "Control whether line break should come before or after operators.",
       "type": "string",
-      "enum": ["before", "after"],
+      "oneOf": [
+        {
+          "const": "before",
+          "description": "Line break will come before operators."
+        },
+        {
+          "const": "after",
+          "description": "Line break will come after operators."
+        }
+      ],
       "default": "after"
     },
     "blockSelectorLinebreak": {
+      "description": "Control line break behavior after selector commas.",
       "type": "string",
-      "enum": ["always", "consistent", "wrap"],
+      "oneOf": [
+        {
+          "const": "always",
+          "description": "Always insert line break after comma."
+        },
+        {
+          "const": "consistent",
+          "description": "If the whole selector can be put on a single line, there won't be line breaks; otherwise, there will be line breaks after each comma."
+        },
+        {
+          "const": "wrap",
+          "description": "Selector will be put on one line as possible. Once it exceeds `printWidth`, line break will be inserted where the code exceeds `printWidth`."
+        }
+      ],
       "default": "consistent"
     },
     "omitNumberLeadingZero": {
+      "description": "Control whether omit leading zero before dot of numbers or not.",
       "type": "boolean",
       "default": false
     },
     "trailingComma": {
+      "description": "Control whether trailing comma should be inserted or not.",
       "type": "boolean",
       "default": false
     },
     "padComments": {
+      "description": "Control whether whitespace should be inserted at the beginning and end of comments.",
       "type": "boolean",
       "default": false
     },
     "linebreakInPseudoParens": {
+      "description": "Control whether line break should be inserted in pseudo class/element parens or not if current line is too long.",
       "type": "boolean",
       "default": false
     },
     "declarationOrder": {
+      "description": "Control the strategy of sorting CSS declarations (a.k.a. properties). If it's `null`, it won't sort CSS declarations.",
       "type": ["string", "null"],
-      "enum": ["alphabetical", "smacss", "concentric"],
+      "oneOf": [
+        {
+          "const": "alphabetical",
+          "description": "Order in a simple alphabetical manner from a - z. This strategy will also sort unknown properties."
+        },
+        {
+          "const": "smacss",
+          "description": "Order from most important, flow affecting properties, to least important properties. Unknown properties won't be sorted."
+        },
+        {
+          "const": "concentric",
+          "description": "Order properties applying outside the box model, moving inward to intrinsic changes. Unknown properties won't be sorted."
+        },
+        {
+          "const": "null",
+          "description": "Don't sort CSS declarations."
+        }
+      ],
       "default": null
     },
     "singleLineBlockThreshold": {
+      "description": "Control the threshold value for putting block on a single line. If the number of statements in a block is less than or equal to this value, the block will be put on a single line as possible, but when the code can't fit on single line, it will still break into multiple lines.",
       "type": ["integer", "null"],
       "default": null,
       "minimum": 0
     },
     "keyframeSelectorNotation": {
+      "description": "Control whether to use percentage or keyword (`from` and `to`) notation as keyframe selectors.",
       "type": ["string", "null"],
-      "enum": ["keyword", "percentage"],
+      "oneOf": [
+        {
+          "const": "keyword",
+          "description": "Use keyword notation. This only affects `0%` and `100%`. For other percentage values, they will be kept as-is."
+        },
+        {
+          "const": "percentage",
+          "description": "Use percentage notation."
+        },
+        {
+          "const": null,
+          "description": "Keyframe selector notation will be kept as-is."
+        }
+      ],
       "default": null
     },
     "ignoreCommentDirective": {
+      "description": "Text directive for ignoring formatting specific statement.",
       "type": "string",
       "default": "malva-ignore"
     }
