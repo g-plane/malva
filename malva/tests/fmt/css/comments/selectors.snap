@@ -10,7 +10,9 @@ source: malva/tests/fmt.rs
 .powerPathNavigator .helm button.pressedButton,
 .powerPathNavigator .helm button:active:not(.disabledButton) {}
 
-.foo, /* comment 3 */ .bar {
+.foo,
+/* comment 3 */
+.bar {
   display: block;
 }
 
@@ -28,7 +30,9 @@ source: malva/tests/fmt.rs
 /* comment 15 */
 .element /* comment 16 */, /* comment 17 */ .element /* comment 18 */ {}
 /* comment 19 */
-.element /* comment 20 */, /* comment 21 */ .element /* comment 22 */ {}
+.element /* comment 20 */,
+/* comment 21 */
+.element /* comment 22 */ {}
 
 /* comment 23 */
 .element /* comment 24 */ .element /* comment 25 */ {}

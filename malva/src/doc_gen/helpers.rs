@@ -66,23 +66,50 @@ impl SeparatedListFormatter {
                     start,
                     |pos, either_or_both| match either_or_both {
                         EitherOrBoth::Both(list_item, separator_span) => {
+                            let mut comment_end = None;
                             let list_item_span = list_item.span();
                             let mut docs = ctx
-                                .end_spaced_comments(
-                                    mem::replace(pos, separator_span.end),
+                                .end_spaced_comments_without_last_space(
+                                    *pos,
                                     list_item_span.start,
+                                    &mut comment_end,
                                 )
                                 .collect::<Vec<_>>();
+                            if let Some(end) = comment_end {
+                                if ctx.line_bounds.line_distance(end, list_item_span.start) > 0
+                                    && ctx.line_bounds.line_distance(*pos, end) > 0
+                                {
+                                    docs.push(Doc::hard_line());
+                                } else {
+                                    docs.push(Doc::soft_line());
+                                }
+                            }
                             docs.push(list_item.doc(ctx));
                             docs.extend(
                                 ctx.start_spaced_comments(list_item_span.end, separator_span.start),
                             );
+                            *pos = separator_span.end;
                             Some(docs.into_iter())
                         }
                         EitherOrBoth::Left(list_item) => {
+                            let mut comment_end = None;
+                            let list_item_span = list_item.span();
                             let mut docs = ctx
-                                .end_spaced_comments(*pos, list_item.span().start)
+                                .end_spaced_comments_without_last_space(
+                                    *pos,
+                                    list_item_span.start,
+                                    &mut comment_end,
+                                )
                                 .collect::<Vec<_>>();
+                            if let Some(end) = comment_end {
+                                if ctx.line_bounds.line_distance(end, list_item_span.start) > 0
+                                    && ctx.line_bounds.line_distance(*pos, end) > 0
+                                {
+                                    docs.push(Doc::hard_line());
+                                } else {
+                                    docs.push(Doc::soft_line());
+                                }
+                            }
                             docs.push(list_item.doc(ctx));
                             Some(docs.into_iter())
                         }

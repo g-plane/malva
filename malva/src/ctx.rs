@@ -90,6 +90,22 @@ impl<'a, 's> Ctx<'a, 's> {
         })
     }
 
+    pub(crate) fn end_spaced_comments_without_last_space(
+        &'a self,
+        start: usize,
+        end: usize,
+        comment_end: &'a mut Option<usize>,
+    ) -> impl Iterator<Item = Doc<'s>> + 'a {
+        debug_assert!(start <= end);
+
+        EndSpacedCommentsWithoutLastSpace {
+            ctx: self,
+            iter: self.get_comments_between(start, end).peekable(),
+            comment_end,
+        }
+        .flatten()
+    }
+
     pub(crate) fn unspaced_comments(
         &'a self,
         start: usize,
@@ -150,6 +166,48 @@ where
                 match comment.kind {
                     CommentKind::Line if self.iter.peek().is_some() => Doc::hard_line(),
                     _ => Doc::nil(),
+                },
+            ]
+            .into_iter()
+        })
+    }
+}
+
+struct EndSpacedCommentsWithoutLastSpace<'a, 's, I>
+where
+    's: 'a,
+    I: Iterator<Item = &'a Comment<'s>>,
+{
+    ctx: &'a Ctx<'a, 's>,
+    iter: Peekable<I>,
+    comment_end: &'a mut Option<usize>,
+}
+
+impl<'a, 's, I> Iterator for EndSpacedCommentsWithoutLastSpace<'a, 's, I>
+where
+    's: 'a,
+    I: Iterator<Item = &'a Comment<'s>>,
+{
+    type Item = array::IntoIter<Doc<'s>, 2>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|comment| {
+            let is_last = self.iter.peek().is_none();
+            if is_last && comment.kind == CommentKind::Block {
+                *self.comment_end = Some(comment.span.end);
+            }
+
+            [
+                comment.doc(self.ctx),
+                match comment.kind {
+                    CommentKind::Block => {
+                        if is_last {
+                            Doc::nil()
+                        } else {
+                            Doc::soft_line()
+                        }
+                    }
+                    CommentKind::Line => Doc::hard_line(),
                 },
             ]
             .into_iter()
