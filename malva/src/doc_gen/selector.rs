@@ -135,7 +135,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                 .fold((docs, pos), |(mut docs, pos), child| match child {
                     ComplexSelectorChild::CompoundSelector(selector) => {
                         docs.extend(ctx.end_spaced_comments(pos, selector.span.start));
-                        docs.push(selector.doc(ctx));
+                        docs.push(selector.doc(ctx).nest(ctx.indent_width));
                         (docs, selector.span.end)
                     }
                     ComplexSelectorChild::Combinator(Combinator {

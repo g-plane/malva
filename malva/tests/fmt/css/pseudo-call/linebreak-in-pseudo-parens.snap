@@ -10,3 +10,11 @@ source: malva/tests/fmt.rs
 ::unknown(
   #p0:checked ~ #play:checked ~ #c1:checked, #p1:checked ~ #play:checked ~ #c2:checked, #p2:checked ~ #play:checked ~ #co:checked
 ) {}
+
+[data-rgh-conversation-activity-filter="hideEventsAndCollapsedComments"]
+  :is(
+    .rgh-conversation-activity-collapsed,
+      .js-resolvable-timeline-thread-container[data-resolved="true"],
+      .js-resolvable-timeline-thread-container[data-resolved="false"]
+        .minimized-comment
+  ) {}
