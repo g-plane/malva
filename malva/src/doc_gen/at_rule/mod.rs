@@ -70,7 +70,7 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
             AtRulePrelude::Namespace(namespace) => namespace.doc(ctx),
             AtRulePrelude::Nest(nest) => nest.doc(ctx).group().nest(ctx.indent_width),
             AtRulePrelude::Page(page) => page.doc(ctx),
-            AtRulePrelude::PositionFallback(position_fallback) => position_fallback.doc(ctx),
+            AtRulePrelude::PositionTry(position_try) => position_try.doc(ctx),
             AtRulePrelude::Property(property) => property.doc(ctx),
             AtRulePrelude::SassAtRoot(sass_at_root) => sass_at_root.doc(ctx),
             AtRulePrelude::SassContent(sass_content) => sass_content.doc(ctx),

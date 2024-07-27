@@ -295,31 +295,31 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
         if let Some(arg) = &self.arg {
             docs.push(Doc::text("("));
 
-            let arg_span = arg.span();
+            let arg_span = arg.kind.span();
             let mut arg_doc = vec![];
 
             if ctx.options.linebreak_in_pseudo_parens {
                 arg_doc.push(Doc::line_or_nil());
             }
 
-            arg_doc.extend(ctx.end_spaced_comments(self.span.start, arg_span.start));
-            arg_doc.push(match arg {
-                PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
+            arg_doc.extend(ctx.end_spaced_comments(arg.l_paren.end, arg_span.start));
+            arg_doc.push(match &arg.kind {
+                PseudoClassSelectorArgKind::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
                 }
-                PseudoClassSelectorArg::CompoundSelectorList(compound_selector_list) => {
+                PseudoClassSelectorArgKind::CompoundSelectorList(compound_selector_list) => {
                     compound_selector_list.doc(ctx)
                 }
-                PseudoClassSelectorArg::Ident(ident) => ident.doc(ctx),
-                PseudoClassSelectorArg::LanguageRangeList(language_range_list) => {
+                PseudoClassSelectorArgKind::Ident(ident) => ident.doc(ctx),
+                PseudoClassSelectorArgKind::LanguageRangeList(language_range_list) => {
                     language_range_list.doc(ctx)
                 }
-                PseudoClassSelectorArg::Nth(nth) => nth.doc(ctx),
-                PseudoClassSelectorArg::Number(number) => number.doc(ctx),
-                PseudoClassSelectorArg::RelativeSelectorList(relative_selector_list) => {
+                PseudoClassSelectorArgKind::Nth(nth) => nth.doc(ctx),
+                PseudoClassSelectorArgKind::Number(number) => number.doc(ctx),
+                PseudoClassSelectorArgKind::RelativeSelectorList(relative_selector_list) => {
                     relative_selector_list.doc(ctx)
                 }
-                PseudoClassSelectorArg::SelectorList(selector_list) => {
+                PseudoClassSelectorArgKind::SelectorList(selector_list) => {
                     if ctx.options.linebreak_in_pseudo_parens {
                         selector_list.doc(ctx).group().nest(ctx.indent_width)
                     } else {
@@ -331,18 +331,20 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                         )
                     }
                 }
-                PseudoClassSelectorArg::LessExtendList(less_extend_list) => {
+                PseudoClassSelectorArgKind::LessExtendList(less_extend_list) => {
                     less_extend_list.doc(ctx)
                 }
-                PseudoClassSelectorArg::TokenSeq(token_seq) => format_pseudo_selector_arg_tokens(
-                    token_seq,
-                    ctx,
-                    token_seq.span.start,
-                    token_seq.span.end,
-                ),
+                PseudoClassSelectorArgKind::TokenSeq(token_seq) => {
+                    format_pseudo_selector_arg_tokens(
+                        token_seq,
+                        ctx,
+                        token_seq.span.start,
+                        token_seq.span.end,
+                    )
+                }
             });
 
-            arg_doc.extend(ctx.start_spaced_comments(arg_span.end, self.span.end));
+            arg_doc.extend(ctx.start_spaced_comments(arg_span.end, arg.r_paren.start));
             if ctx.options.linebreak_in_pseudo_parens {
                 docs.push(
                     Doc::list(arg_doc)
@@ -369,28 +371,30 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
         if let Some(arg) = &self.arg {
             docs.push(Doc::text("("));
 
-            let arg_span = arg.span();
+            let arg_span = arg.kind.span();
             let mut arg_doc = vec![];
 
             if ctx.options.linebreak_in_pseudo_parens {
                 arg_doc.push(Doc::line_or_nil());
             }
 
-            arg_doc.extend(ctx.end_spaced_comments(self.span.start, arg_span.start));
-            arg_doc.push(match arg {
-                PseudoElementSelectorArg::CompoundSelector(compound_selector) => {
+            arg_doc.extend(ctx.end_spaced_comments(arg.l_paren.end, arg_span.start));
+            arg_doc.push(match &arg.kind {
+                PseudoElementSelectorArgKind::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
                 }
-                PseudoElementSelectorArg::Ident(ident) => ident.doc(ctx),
-                PseudoElementSelectorArg::TokenSeq(token_seq) => format_pseudo_selector_arg_tokens(
-                    token_seq,
-                    ctx,
-                    token_seq.span.start,
-                    token_seq.span.end,
-                ),
+                PseudoElementSelectorArgKind::Ident(ident) => ident.doc(ctx),
+                PseudoElementSelectorArgKind::TokenSeq(token_seq) => {
+                    format_pseudo_selector_arg_tokens(
+                        token_seq,
+                        ctx,
+                        token_seq.span.start,
+                        token_seq.span.end,
+                    )
+                }
             });
 
-            arg_doc.extend(ctx.start_spaced_comments(arg_span.end, self.span.end));
+            arg_doc.extend(ctx.start_spaced_comments(arg_span.end, arg.r_paren.start));
             if ctx.options.linebreak_in_pseudo_parens {
                 docs.push(
                     Doc::list(arg_doc)
