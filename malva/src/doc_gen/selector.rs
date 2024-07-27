@@ -296,10 +296,18 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
             docs.push(Doc::text("("));
 
             let arg_span = arg.kind.span();
+            let force_break = ctx
+                .line_bounds
+                .line_distance(arg.l_paren.end, arg_span.start)
+                > 0;
             let mut arg_doc = vec![];
 
             if ctx.options.linebreak_in_pseudo_parens {
-                arg_doc.push(Doc::line_or_nil());
+                if force_break {
+                    arg_doc.push(Doc::hard_line());
+                } else {
+                    arg_doc.push(Doc::line_or_nil());
+                }
             }
 
             arg_doc.extend(ctx.end_spaced_comments(arg.l_paren.end, arg_span.start));
@@ -321,7 +329,12 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                 }
                 PseudoClassSelectorArgKind::SelectorList(selector_list) => {
                     if ctx.options.linebreak_in_pseudo_parens {
-                        selector_list.doc(ctx).group().nest(ctx.indent_width)
+                        let doc = selector_list.doc(ctx);
+                        if force_break {
+                            doc
+                        } else {
+                            doc.group()
+                        }
                     } else {
                         helpers::SeparatedListFormatter::new(",", Doc::space()).format(
                             &selector_list.selectors,

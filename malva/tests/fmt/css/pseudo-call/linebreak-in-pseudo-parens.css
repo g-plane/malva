@@ -7,3 +7,9 @@
   .js-resolvable-timeline-thread-container[data-resolved='true'],
   .js-resolvable-timeline-thread-container[data-resolved='false'] .minimized-comment
 ) {}
+
+/* force break */
+:where(
+  .a,
+  .b, .c
+) {}
