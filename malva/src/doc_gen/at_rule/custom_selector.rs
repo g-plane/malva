@@ -51,9 +51,9 @@ impl<'s> DocGen<'s> for CustomSelectorPrelude<'s> {
         self.custom_selector
             .doc(ctx)
             .append(Doc::line_or_space().nest(ctx.indent_width))
-            .concat(
-                ctx.end_spaced_comments(self.custom_selector.span.end, self.selector.span.start),
-            )
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.custom_selector.span.end, self.selector.span.start),
+            ))
             .append(self.selector.doc(ctx))
             .group()
     }

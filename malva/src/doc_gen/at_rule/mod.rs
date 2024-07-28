@@ -31,7 +31,7 @@ impl<'s> DocGen<'s> for AtRule<'s> {
         if let Some(prelude) = &self.prelude {
             docs.push(Doc::space());
             let span = prelude.span();
-            docs.extend(ctx.end_spaced_comments(pos, span.start));
+            docs.extend(ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start)));
             docs.push(prelude.doc(ctx));
             pos = span.end;
         }

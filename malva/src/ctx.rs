@@ -22,6 +22,8 @@ impl<'a, 's> Ctx<'a, 's> {
         start: usize,
         end: usize,
     ) -> impl Iterator<Item = &Comment<'s>> + Clone {
+        debug_assert!(start <= end);
+
         self.comments
             .iter()
             .filter(move |comment| comment.span.start >= start && comment.span.end <= end)
@@ -29,12 +31,9 @@ impl<'a, 's> Ctx<'a, 's> {
 
     pub(crate) fn start_spaced_comments(
         &'a self,
-        start: usize,
-        end: usize,
+        comments: impl Iterator<Item = &'a Comment<'s>> + 'a,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
-        debug_assert!(start <= end);
-
-        self.get_comments_between(start, end)
+        comments
             .scan(CommentKind::Block, |prev_kind, comment| {
                 Some(
                     [
@@ -56,15 +55,12 @@ impl<'a, 's> Ctx<'a, 's> {
 
     pub(crate) fn start_spaced_comments_without_last_hard_line(
         &'a self,
-        start: usize,
-        end: usize,
+        comments: impl Iterator<Item = &'a Comment<'s>> + 'a,
         has_last_line_comment: &'a mut bool,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
-        debug_assert!(start <= end);
-
         StartSpacedCommentsWithoutLastHardLine {
             ctx: self,
-            iter: self.get_comments_between(start, end).peekable(),
+            iter: comments.peekable(),
             prev_kind: CommentKind::Block,
             has_last_line_comment,
         }
@@ -73,12 +69,9 @@ impl<'a, 's> Ctx<'a, 's> {
 
     pub(crate) fn end_spaced_comments(
         &'a self,
-        start: usize,
-        end: usize,
+        comments: impl Iterator<Item = &'a Comment<'s>> + 'a,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
-        debug_assert!(start <= end);
-
-        self.get_comments_between(start, end).flat_map(|comment| {
+        comments.flat_map(|comment| {
             [
                 comment.doc(self),
                 match comment.kind {
@@ -92,15 +85,12 @@ impl<'a, 's> Ctx<'a, 's> {
 
     pub(crate) fn end_spaced_comments_without_last_space(
         &'a self,
-        start: usize,
-        end: usize,
+        comments: impl Iterator<Item = &'a Comment<'s>> + 'a,
         comment_end: &'a mut Option<usize>,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
-        debug_assert!(start <= end);
-
         EndSpacedCommentsWithoutLastSpace {
             ctx: self,
-            iter: self.get_comments_between(start, end).peekable(),
+            iter: comments.peekable(),
             comment_end,
         }
         .flatten()
@@ -108,16 +98,12 @@ impl<'a, 's> Ctx<'a, 's> {
 
     pub(crate) fn unspaced_comments(
         &'a self,
-        start: usize,
-        end: usize,
+        comments: impl Iterator<Item = &'a Comment<'s>> + 'a,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
-        debug_assert!(start <= end);
-
-        self.get_comments_between(start, end)
-            .filter_map(|comment| match comment.kind {
-                CommentKind::Block => Some(comment.doc(self)),
-                CommentKind::Line => None,
-            })
+        comments.filter_map(|comment| match comment.kind {
+            CommentKind::Block => Some(comment.doc(self)),
+            CommentKind::Line => None,
+        })
     }
 
     pub(crate) fn with_state(

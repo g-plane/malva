@@ -16,11 +16,13 @@ impl<'s> DocGen<'s> for Declaration<'s> {
 
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx));
-            docs.extend(
-                ctx.start_spaced_comments(less_property_merge.span.end, self.colon_span.start),
-            );
+            docs.extend(ctx.start_spaced_comments(
+                ctx.get_comments_between(less_property_merge.span.end, self.colon_span.start),
+            ));
         } else {
-            docs.extend(ctx.start_spaced_comments(self.name.span().end, self.colon_span.start));
+            docs.extend(ctx.start_spaced_comments(
+                ctx.get_comments_between(self.name.span().end, self.colon_span.start),
+            ));
         }
 
         docs.push(Doc::text(":"));
@@ -53,8 +55,11 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 while let Some(value) = iter.next() {
                     let span = value.span();
                     docs.push(
-                        Doc::list(ctx.end_spaced_comments(pos, span.start).collect())
-                            .nest(ctx.indent_width),
+                        Doc::list(
+                            ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start))
+                                .collect(),
+                        )
+                        .nest(ctx.indent_width),
                     );
 
                     docs.push(value.doc(ctx));
@@ -84,7 +89,9 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     .enumerate()
                     .fold(pos, |pos, (index, value)| {
                         let span = value.span();
-                        let comments = ctx.end_spaced_comments(pos, span.start).collect::<Vec<_>>();
+                        let comments = ctx
+                            .end_spaced_comments(ctx.get_comments_between(pos, span.start))
+                            .collect::<Vec<_>>();
 
                         if !comments.is_empty() {
                             docs.push(Doc::space());
@@ -108,8 +115,11 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 while let Some(value) = iter.next() {
                     let span = value.span();
                     docs.push(
-                        Doc::list(ctx.end_spaced_comments(pos, span.start).collect())
-                            .nest(ctx.indent_width),
+                        Doc::list(
+                            ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start))
+                                .collect(),
+                        )
+                        .nest(ctx.indent_width),
                     );
 
                     docs.push(value.doc(ctx));
@@ -152,8 +162,11 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         if let Some(important) = &self.important {
             docs.push(Doc::soft_line().nest(ctx.indent_width));
             docs.push(
-                Doc::list(ctx.end_spaced_comments(pos, important.span.start).collect())
-                    .nest(ctx.indent_width),
+                Doc::list(
+                    ctx.end_spaced_comments(ctx.get_comments_between(pos, important.span.start))
+                        .collect(),
+                )
+                .nest(ctx.indent_width),
             );
             docs.push(important.doc(ctx));
         }

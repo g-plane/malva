@@ -9,7 +9,9 @@ impl<'s> DocGen<'s> for NamespacePrelude<'s> {
             prefix
                 .doc(ctx)
                 .append(Doc::line_or_space())
-                .concat(ctx.end_spaced_comments(prefix.span().end, self.uri.span().start))
+                .concat(ctx.end_spaced_comments(
+                    ctx.get_comments_between(prefix.span().end, self.uri.span().start),
+                ))
                 .append(self.uri.doc(ctx))
                 .group()
                 .nest(ctx.indent_width)

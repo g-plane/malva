@@ -6,7 +6,9 @@ use tiny_pretty::Doc;
 impl<'s> DocGen<'s> for ScopeEnd<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text("to ")
-            .concat(ctx.end_spaced_comments(self.to_span.end, self.lparen_span.start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.to_span.end, self.lparen_span.start),
+            ))
             .append(helpers::format_parenthesized(
                 self.selector.doc(ctx),
                 self.selector.span.end,

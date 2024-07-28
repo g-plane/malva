@@ -14,7 +14,7 @@ impl<'s> DocGen<'s> for TokenSeq<'s> {
         let mut iter = self.tokens.iter().peekable();
         while let Some(token) = iter.next() {
             let span = token.span();
-            docs.extend(ctx.start_spaced_comments(pos, span.start));
+            docs.extend(ctx.start_spaced_comments(ctx.get_comments_between(pos, span.start)));
 
             docs.push(token.doc(ctx));
             if let TokenWithSpan {

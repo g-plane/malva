@@ -70,8 +70,7 @@ impl SeparatedListFormatter {
                             let list_item_span = list_item.span();
                             let mut docs = ctx
                                 .end_spaced_comments_without_last_space(
-                                    *pos,
-                                    list_item_span.start,
+                                    ctx.get_comments_between(*pos, list_item_span.start),
                                     &mut comment_end,
                                 )
                                 .collect::<Vec<_>>();
@@ -85,9 +84,9 @@ impl SeparatedListFormatter {
                                 }
                             }
                             docs.push(list_item.doc(ctx));
-                            docs.extend(
-                                ctx.start_spaced_comments(list_item_span.end, separator_span.start),
-                            );
+                            docs.extend(ctx.start_spaced_comments(
+                                ctx.get_comments_between(list_item_span.end, separator_span.start),
+                            ));
                             *pos = separator_span.end;
                             Some(docs.into_iter())
                         }
@@ -96,8 +95,7 @@ impl SeparatedListFormatter {
                             let list_item_span = list_item.span();
                             let mut docs = ctx
                                 .end_spaced_comments_without_last_space(
-                                    *pos,
-                                    list_item_span.start,
+                                    ctx.get_comments_between(*pos, list_item_span.start),
                                     &mut comment_end,
                                 )
                                 .collect::<Vec<_>>();
@@ -151,20 +149,22 @@ pub(super) fn format_values_list<'s>(
                         EitherOrBoth::Both(value, comma_span) => {
                             let value_span = value.span();
                             let mut docs = ctx
-                                .end_spaced_comments(
+                                .end_spaced_comments(ctx.get_comments_between(
                                     mem::replace(pos, comma_span.end),
                                     value_span.start,
-                                )
+                                ))
                                 .collect::<Vec<_>>();
                             docs.push(value.doc(ctx));
-                            docs.extend(
-                                ctx.start_spaced_comments(value_span.end, comma_span.start),
-                            );
+                            docs.extend(ctx.start_spaced_comments(
+                                ctx.get_comments_between(value_span.end, comma_span.start),
+                            ));
                             Some(docs.into_iter())
                         }
                         EitherOrBoth::Left(value) => {
                             let mut docs = ctx
-                                .end_spaced_comments(*pos, value.span().start)
+                                .end_spaced_comments(
+                                    ctx.get_comments_between(*pos, value.span().start),
+                                )
                                 .collect::<Vec<_>>();
                             docs.push(value.doc(ctx));
                             Some(docs.into_iter())
@@ -185,23 +185,29 @@ pub(super) fn format_values_list<'s>(
         })
         .group()
     } else {
-        let mut docs = itertools::intersperse(
-            values.iter().scan(list_span.start, |pos, value| {
-                let value_span = value.span();
-                Some(
-                    ctx.end_spaced_comments(mem::replace(pos, value_span.end), value_span.start)
+        let mut docs =
+            itertools::intersperse(
+                values.iter().scan(list_span.start, |pos, value| {
+                    let value_span = value.span();
+                    Some(
+                        ctx.end_spaced_comments(ctx.get_comments_between(
+                            mem::replace(pos, value_span.end),
+                            value_span.start,
+                        ))
                         .chain(iter::once(value.doc(ctx)))
                         .collect::<Vec<_>>()
                         .into_iter(),
-                )
-            }),
-            vec![Doc::line_or_space()].into_iter(),
-        )
-        .flatten()
-        .collect::<Vec<_>>();
+                    )
+                }),
+                vec![Doc::line_or_space()].into_iter(),
+            )
+            .flatten()
+            .collect::<Vec<_>>();
 
         if let Some(last) = values.last() {
-            docs.extend(ctx.start_spaced_comments(last.span().end, list_span.end));
+            docs.extend(
+                ctx.start_spaced_comments(ctx.get_comments_between(last.span().end, list_span.end)),
+            );
         }
 
         Doc::list(docs).group()
@@ -243,8 +249,7 @@ pub(super) fn format_parenthesized<'s>(
             Doc::line_or_nil()
                 .append(body)
                 .concat(ctx.start_spaced_comments_without_last_hard_line(
-                    trailing_comments_start,
-                    trailing_comments_end,
+                    ctx.get_comments_between(trailing_comments_start, trailing_comments_end),
                     &mut has_last_line_comment,
                 ))
                 .nest(ctx.indent_width)
@@ -267,14 +272,14 @@ pub(super) fn format_space_before_block<'s>(
         let mut has_last_line_comment = false;
         Doc::list(
             ctx.start_spaced_comments_without_last_hard_line(
-                previous_end,
-                block_start,
+                ctx.get_comments_between(previous_end, block_start),
                 &mut has_last_line_comment,
             )
             .collect(),
         )
     } else {
-        Doc::space().concat(ctx.end_spaced_comments(previous_end, block_start))
+        Doc::space()
+            .concat(ctx.end_spaced_comments(ctx.get_comments_between(previous_end, block_start)))
     }
 }
 

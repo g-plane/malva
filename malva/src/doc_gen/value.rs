@@ -122,10 +122,14 @@ impl<'s> DocGen<'s> for Calc<'s> {
         };
 
         left.append(helpers::format_operator_prefix_space(ctx))
-            .concat(ctx.end_spaced_comments(self.left.span().end, self.op.span.start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.left.span().end, self.op.span.start),
+            ))
             .append(self.op.doc(ctx))
             .append(helpers::format_operator_suffix_space(ctx))
-            .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.op.span.end, self.right.span().start),
+            ))
             .append(right)
             .group()
     }
@@ -284,10 +288,10 @@ impl<'s> DocGen<'s> for Function<'s> {
                     group.iter().map(|arg| {
                         let arg_span = arg.span();
                         Doc::list(
-                            ctx.end_spaced_comments(
+                            ctx.end_spaced_comments(ctx.get_comments_between(
                                 mem::replace(pos, arg_span.end),
                                 arg_span.start,
-                            )
+                            ))
                             .collect(),
                         )
                         .append(arg.doc(ctx))
@@ -313,10 +317,10 @@ impl<'s> DocGen<'s> for Function<'s> {
                 )] = group
                 {
                     format_group(group, &mut pos, separator.clone(), ctx)
-                        .concat(ctx.start_spaced_comments(
+                        .concat(ctx.start_spaced_comments(ctx.get_comments_between(
                             mem::replace(&mut pos, delimiter_span.end),
                             delimiter_span.start,
-                        ))
+                        )))
                         .append(delimiter.doc(ctx))
                 } else {
                     format_group(group, &mut pos, separator.clone(), ctx)
@@ -327,8 +331,7 @@ impl<'s> DocGen<'s> for Function<'s> {
 
         let mut has_last_line_comment = false;
         arg_docs.extend(ctx.start_spaced_comments_without_last_hard_line(
-            pos,
-            self.span.end,
+            ctx.get_comments_between(pos, self.span.end),
             &mut has_last_line_comment,
         ));
 

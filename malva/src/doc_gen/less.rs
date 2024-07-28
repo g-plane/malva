@@ -16,10 +16,14 @@ impl<'s> DocGen<'s> for LessBinaryCondition<'s> {
         self.left
             .doc(ctx)
             .append(helpers::format_operator_prefix_space(ctx))
-            .concat(ctx.end_spaced_comments(self.left.span().end, self.op.span.start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.left.span().end, self.op.span.start),
+            ))
             .append(self.op.doc(ctx))
             .append(helpers::format_operator_suffix_space(ctx))
-            .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.op.span.end, self.right.span().start),
+            ))
             .append(self.right.doc(ctx))
             .group()
     }
@@ -46,10 +50,14 @@ impl<'s> DocGen<'s> for LessBinaryOperation<'s> {
         self.left
             .doc(ctx)
             .append(helpers::format_operator_prefix_space(ctx))
-            .concat(ctx.end_spaced_comments(self.left.span().end, self.op.span.start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.left.span().end, self.op.span.start),
+            ))
             .append(self.op.doc(ctx))
             .append(helpers::format_operator_suffix_space(ctx))
-            .concat(ctx.end_spaced_comments(self.op.span.end, self.right.span().start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.op.span.end, self.right.span().start),
+            ))
             .append(self.right.doc(ctx))
             .group()
     }
@@ -76,7 +84,9 @@ impl<'s> DocGen<'s> for LessConditionalQualifiedRule<'s> {
         )
         .append(Doc::soft_line())
         .append(self.guard.doc(ctx))
-        .concat(ctx.end_spaced_comments(self.selector.span.end, self.guard.span.start))
+        .concat(ctx.end_spaced_comments(
+            ctx.get_comments_between(self.selector.span.end, self.guard.span.start),
+        ))
         .append(helpers::format_space_before_block(
             self.guard.span.end,
             self.block.span.start,
@@ -140,10 +150,10 @@ impl<'s> DocGen<'s> for LessExtendRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.nesting_selector
             .doc(ctx)
-            .concat(ctx.unspaced_comments(
+            .concat(ctx.unspaced_comments(ctx.get_comments_between(
                 self.nesting_selector.span.end,
                 self.name_of_extend.span.start,
-            ))
+            )))
             .append(Doc::text(":extend("))
             .append({
                 let mut extend_doc = vec![];
@@ -152,10 +162,14 @@ impl<'s> DocGen<'s> for LessExtendRule<'s> {
                     extend_doc.push(Doc::line_or_nil());
                 }
 
-                extend_doc.extend(ctx.end_spaced_comments(self.span.start, self.extend.span.start));
+                extend_doc.extend(ctx.end_spaced_comments(
+                    ctx.get_comments_between(self.span.start, self.extend.span.start),
+                ));
                 extend_doc.push(self.extend.doc(ctx));
 
-                extend_doc.extend(ctx.start_spaced_comments(self.extend.span.end, self.span.end));
+                extend_doc.extend(ctx.start_spaced_comments(
+                    ctx.get_comments_between(self.extend.span.end, self.span.end),
+                ));
                 if ctx.options.linebreak_in_pseudo_parens {
                     Doc::list(extend_doc)
                         .nest(ctx.indent_width)
@@ -202,14 +216,14 @@ impl<'s> DocGen<'s> for LessImportPrelude<'s> {
 
         docs.push(Doc::line_or_space());
         let href_span = self.href.span();
-        docs.extend(
-            ctx.end_spaced_comments(mem::replace(&mut pos, href_span.end), href_span.start),
-        );
+        docs.extend(ctx.end_spaced_comments(
+            ctx.get_comments_between(mem::replace(&mut pos, href_span.end), href_span.start),
+        ));
         docs.push(self.href.doc(ctx));
 
         if let Some(media) = &self.media {
             docs.push(Doc::line_or_space());
-            docs.extend(ctx.end_spaced_comments(pos, media.span.start));
+            docs.extend(ctx.end_spaced_comments(ctx.get_comments_between(pos, media.span.start)));
             docs.push(media.doc(ctx));
         }
 
@@ -305,13 +319,23 @@ impl<'s> DocGen<'s> for LessLookup<'s> {
         if let Some(name) = &self.name {
             let name_span = name.span();
             Doc::text("[")
-                .concat(ctx.end_spaced_comments(self.span.start, name_span.start))
+                .concat(ctx.end_spaced_comments(
+                    ctx.get_comments_between(self.span.start, name_span.start),
+                ))
                 .append(name.doc(ctx))
-                .concat(ctx.start_spaced_comments(name_span.end, self.span.end))
+                .concat(
+                    ctx.start_spaced_comments(
+                        ctx.get_comments_between(name_span.end, self.span.end),
+                    ),
+                )
                 .append(Doc::text("]"))
         } else {
             Doc::text("[")
-                .concat(ctx.end_spaced_comments(self.span.start, self.span.end))
+                .concat(
+                    ctx.end_spaced_comments(
+                        ctx.get_comments_between(self.span.start, self.span.end),
+                    ),
+                )
                 .append(Doc::text("]"))
         }
     }
@@ -339,10 +363,10 @@ impl<'s> DocGen<'s> for LessLookups<'s> {
                 .iter()
                 .scan(self.span.start, |pos, lookup| {
                     Some(
-                        ctx.start_spaced_comments(
+                        ctx.start_spaced_comments(ctx.get_comments_between(
                             mem::replace(pos, lookup.span.end),
                             lookup.span.start,
-                        )
+                        ))
                         .chain(iter::once(lookup.doc(ctx))),
                     )
                 })
@@ -397,11 +421,13 @@ impl<'s> DocGen<'s> for LessMixinArguments<'s> {
                     )
                     .concat(
                         ctx.start_spaced_comments_without_last_hard_line(
-                            self.args
-                                .last()
-                                .map(|arg| arg.span().end)
-                                .unwrap_or(self.span.start),
-                            self.span.end,
+                            ctx.get_comments_between(
+                                self.args
+                                    .last()
+                                    .map(|arg| arg.span().end)
+                                    .unwrap_or(self.span.start),
+                                self.span.end,
+                            ),
                             &mut has_last_line_comment,
                         ),
                     )
@@ -433,7 +459,9 @@ impl<'s> DocGen<'s> for LessMixinCall<'s> {
 
         if let Some(important) = &self.important {
             docs.push(Doc::soft_line().nest(ctx.indent_width));
-            docs.extend(ctx.end_spaced_comments(pos, important.span.start));
+            docs.extend(
+                ctx.end_spaced_comments(ctx.get_comments_between(pos, important.span.start)),
+            );
             docs.push(important.doc(ctx));
         }
 
@@ -455,9 +483,11 @@ impl<'s> DocGen<'s> for LessMixinCallee<'s> {
         let (docs, _) = iter.fold((docs, pos), |(mut docs, pos), child| {
             if pos < child.span.start {
                 docs.push(Doc::line_or_space().nest(ctx.indent_width));
-                docs.extend(ctx.end_spaced_comments(pos, child.span.start));
+                docs.extend(
+                    ctx.end_spaced_comments(ctx.get_comments_between(pos, child.span.start)),
+                );
             } else {
-                docs.extend(ctx.unspaced_comments(pos, child.span.start));
+                docs.extend(ctx.unspaced_comments(ctx.get_comments_between(pos, child.span.start)));
             }
             docs.push(child.doc(ctx));
             (docs, child.span.end)
@@ -473,7 +503,9 @@ impl<'s> DocGen<'s> for LessMixinCalleeChild<'s> {
             combinator
                 .doc(ctx)
                 .append(Doc::space())
-                .concat(ctx.end_spaced_comments(combinator.span.end, self.name.span().start))
+                .concat(ctx.end_spaced_comments(
+                    ctx.get_comments_between(combinator.span.end, self.name.span().start),
+                ))
                 .append(self.name.doc(ctx))
         } else {
             self.name.doc(ctx)
@@ -488,7 +520,9 @@ impl<'s> DocGen<'s> for LessMixinDefinition<'s> {
 
         if let Some(guard) = &self.guard {
             docs.push(Doc::soft_line());
-            docs.extend(ctx.end_spaced_comments(self.params.span.end, guard.span.start));
+            docs.extend(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.params.span.end, guard.span.start),
+            ));
             docs.push(guard.doc(ctx));
             pos = guard.span.end;
         }
@@ -517,9 +551,13 @@ impl<'s> DocGen<'s> for LessMixinNamedArgument<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.name
             .doc(ctx)
-            .concat(ctx.start_spaced_comments(self.name.span().end, self.colon_span.start))
+            .concat(ctx.start_spaced_comments(
+                ctx.get_comments_between(self.name.span().end, self.colon_span.start),
+            ))
             .append(Doc::text(": "))
-            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.colon_span.end, self.value.span().start),
+            ))
             .append(self.value.doc(ctx))
     }
 }
@@ -528,8 +566,10 @@ impl<'s> DocGen<'s> for LessMixinNamedParameter<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         let name = self.name.doc(ctx);
         if let Some(value) = &self.value {
-            name.concat(ctx.start_spaced_comments(self.name.span().end, value.span.start))
-                .append(value.doc(ctx))
+            name.concat(ctx.start_spaced_comments(
+                ctx.get_comments_between(self.name.span().end, value.span.start),
+            ))
+            .append(value.doc(ctx))
         } else {
             name
         }
@@ -539,7 +579,9 @@ impl<'s> DocGen<'s> for LessMixinNamedParameter<'s> {
 impl<'s> DocGen<'s> for LessMixinNamedParameterDefaultValue<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         Doc::text(": ")
-            .concat(ctx.end_spaced_comments(self.colon_span.end, self.value.span().start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.colon_span.end, self.value.span().start),
+            ))
             .append(self.value.doc(ctx))
     }
 }
@@ -610,7 +652,9 @@ impl<'s> DocGen<'s> for LessNamespaceValue<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
         self.callee
             .doc(ctx)
-            .concat(ctx.unspaced_comments(self.callee.span().end, self.lookups.span.start))
+            .concat(ctx.unspaced_comments(
+                ctx.get_comments_between(self.callee.span().end, self.lookups.span.start),
+            ))
             .append(self.lookups.doc(ctx))
     }
 }
@@ -629,8 +673,10 @@ impl<'s> DocGen<'s> for LessNegatedCondition<'s> {
         let condition_span = self.condition.span();
         Doc::text("not").append(helpers::format_parenthesized(
             Doc::list(
-                ctx.end_spaced_comments(self.span.start, condition_span.start)
-                    .collect(),
+                ctx.end_spaced_comments(
+                    ctx.get_comments_between(self.span.start, condition_span.start),
+                )
+                .collect(),
             )
             .append(self.condition.doc(ctx)),
             condition_span.end,
@@ -662,8 +708,10 @@ impl<'s> DocGen<'s> for LessParenthesizedCondition<'s> {
         let condition_span = self.condition.span();
         helpers::format_parenthesized(
             Doc::list(
-                ctx.end_spaced_comments(self.span.start, condition_span.start)
-                    .collect(),
+                ctx.end_spaced_comments(
+                    ctx.get_comments_between(self.span.start, condition_span.start),
+                )
+                .collect(),
             )
             .append(self.condition.doc(ctx)),
             condition_span.end,
@@ -678,8 +726,10 @@ impl<'s> DocGen<'s> for LessParenthesizedOperation<'s> {
         let operation_span = self.operation.span();
         helpers::format_parenthesized(
             Doc::list(
-                ctx.end_spaced_comments(self.span.start, operation_span.start)
-                    .collect(),
+                ctx.end_spaced_comments(
+                    ctx.get_comments_between(self.span.start, operation_span.start),
+                )
+                .collect(),
             )
             .append(self.operation.doc(ctx)),
             operation_span.end,
@@ -766,7 +816,9 @@ impl<'s> DocGen<'s> for LessVariableDeclaration<'s> {
 
         docs.push(self.name.doc(ctx));
 
-        docs.extend(ctx.start_spaced_comments(self.name.span.end, self.colon_span.start));
+        docs.extend(ctx.start_spaced_comments(
+            ctx.get_comments_between(self.name.span.end, self.colon_span.start),
+        ));
         docs.push(Doc::text(":"));
 
         let should_group = if let ComponentValue::LessList(LessList {
@@ -777,7 +829,9 @@ impl<'s> DocGen<'s> for LessVariableDeclaration<'s> {
         }) = &self.value
         {
             docs.push(Doc::line_or_space());
-            docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
+            docs.extend(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.colon_span.end, value_span.start),
+            ));
             docs.push(
                 helpers::SeparatedListFormatter::new(",", Doc::line_or_space()).format(
                     elements,
@@ -792,7 +846,9 @@ impl<'s> DocGen<'s> for LessVariableDeclaration<'s> {
             true
         } else {
             docs.push(Doc::space());
-            docs.extend(ctx.end_spaced_comments(self.colon_span.end, value_span.start));
+            docs.extend(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.colon_span.end, value_span.start),
+            ));
             docs.push(self.value.doc(ctx));
             false
         };

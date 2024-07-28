@@ -8,7 +8,9 @@ impl<'s> DocGen<'s> for CustomMedia<'s> {
         self.name
             .doc(ctx)
             .append(Doc::space())
-            .concat(ctx.end_spaced_comments(self.name.span().end, self.value.span().start))
+            .concat(ctx.end_spaced_comments(
+                ctx.get_comments_between(self.name.span().end, self.value.span().start),
+            ))
             .append(self.value.doc(ctx))
     }
 }
