@@ -14,7 +14,7 @@ mod config;
 #[cfg(target_arch = "wasm32")]
 type Configuration = FormatOptions;
 
-pub struct MalvaPluginHandler {}
+pub struct MalvaPluginHandler;
 
 impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
     fn plugin_info(&mut self) -> SyncPluginInfo {
@@ -70,4 +70,4 @@ impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
 }
 
 #[cfg(target_arch = "wasm32")]
-generate_plugin_code!(MalvaPluginHandler, MalvaPluginHandler {});
+generate_plugin_code!(MalvaPluginHandler, MalvaPluginHandler);
