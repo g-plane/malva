@@ -60,75 +60,87 @@ impl SeparatedListFormatter {
     where
         N: DocGen<'s> + Spanned,
     {
-        let list = Doc::list(
-            itertools::intersperse(
-                list.iter().zip_longest(separator_spans.iter()).scan(
-                    start,
-                    |pos, either_or_both| match either_or_both {
-                        EitherOrBoth::Both(list_item, separator_span) => {
-                            let mut comment_end = None;
-                            let list_item_span = list_item.span();
-                            let mut docs = ctx
-                                .end_spaced_comments_without_last_space(
-                                    ctx.get_comments_between(*pos, list_item_span.start),
-                                    &mut comment_end,
-                                )
-                                .collect::<Vec<_>>();
-                            if let Some(end) = comment_end {
-                                if ctx.line_bounds.line_distance(end, list_item_span.start) > 0
-                                    && ctx.line_bounds.line_distance(*pos, end) > 0
-                                {
-                                    docs.push(Doc::hard_line());
-                                } else {
-                                    docs.push(Doc::soft_line());
-                                }
-                            }
-                            docs.push(list_item.doc(ctx));
-                            docs.extend(ctx.start_spaced_comments(
-                                ctx.get_comments_between(list_item_span.end, separator_span.start),
-                            ));
-                            *pos = separator_span.end;
-                            Some(docs.into_iter())
+        let mut pos = start;
+        let mut docs = Vec::<Doc<'s>>::with_capacity(list.len() * 2);
+        let mut iter = list.iter().zip_longest(separator_spans.iter()).peekable();
+        while let Some(either_or_both) = iter.next() {
+            match either_or_both {
+                EitherOrBoth::Both(list_item, separator_span) => {
+                    let mut comment_end = None;
+                    let list_item_span = list_item.span();
+                    docs.extend(ctx.end_spaced_comments_without_last_space(
+                        ctx.get_comments_between(pos, list_item_span.start),
+                        &mut comment_end,
+                    ));
+                    if let Some(end) = comment_end {
+                        if ctx.line_bounds.line_distance(end, list_item_span.start) > 0
+                            && ctx.line_bounds.line_distance(pos, end) > 0
+                        {
+                            docs.push(Doc::hard_line());
+                        } else {
+                            docs.push(Doc::soft_line());
                         }
-                        EitherOrBoth::Left(list_item) => {
-                            let mut comment_end = None;
-                            let list_item_span = list_item.span();
-                            let mut docs = ctx
-                                .end_spaced_comments_without_last_space(
-                                    ctx.get_comments_between(*pos, list_item_span.start),
-                                    &mut comment_end,
-                                )
-                                .collect::<Vec<_>>();
-                            if let Some(end) = comment_end {
-                                if ctx.line_bounds.line_distance(end, list_item_span.start) > 0
-                                    && ctx.line_bounds.line_distance(*pos, end) > 0
-                                {
-                                    docs.push(Doc::hard_line());
-                                } else {
-                                    docs.push(Doc::soft_line());
-                                }
-                            }
-                            docs.push(list_item.doc(ctx));
-                            Some(docs.into_iter())
+                    }
+                    docs.push(list_item.doc(ctx));
+                    docs.extend(ctx.start_spaced_comments(
+                        ctx.get_comments_between(list_item_span.end, separator_span.start),
+                    ));
+                    pos = separator_span.end;
+                    if let Some(peeked) = iter.peek() {
+                        docs.push(self.separator.clone());
+                        let mut has_last_line_comment = false;
+                        if let EitherOrBoth::Both(list_item, _) | EitherOrBoth::Left(list_item) =
+                            peeked
+                        {
+                            docs.extend(
+                                ctx.start_spaced_comments_without_last_hard_line(
+                                    ctx.get_comments_between(
+                                        separator_span.end,
+                                        list_item.span().start,
+                                    )
+                                    .take_while(|comment| {
+                                        ctx.line_bounds
+                                            .line_distance(separator_span.end, comment.span.start)
+                                            == 0
+                                    })
+                                    .inspect(|comment| pos = comment.span.end),
+                                    &mut has_last_line_comment,
+                                ),
+                            );
                         }
-                        EitherOrBoth::Right(..) => unreachable!(),
-                    },
-                ),
-                vec![self.separator.clone(), self.space_after_separator].into_iter(),
-            )
-            .flatten()
-            .collect(),
-        );
-
-        if self.trailing {
-            list.append(if ctx.options.trailing_comma {
-                Doc::flat_or_break(Doc::nil(), self.separator)
-            } else {
-                Doc::nil()
-            })
-        } else {
-            list
+                        if has_last_line_comment {
+                            docs.push(Doc::hard_line());
+                        } else {
+                            docs.push(self.space_after_separator.clone());
+                        }
+                    }
+                }
+                EitherOrBoth::Left(list_item) => {
+                    let mut comment_end = None;
+                    let list_item_span = list_item.span();
+                    docs.extend(ctx.end_spaced_comments_without_last_space(
+                        ctx.get_comments_between(pos, list_item_span.start),
+                        &mut comment_end,
+                    ));
+                    if let Some(end) = comment_end {
+                        if ctx.line_bounds.line_distance(end, list_item_span.start) > 0
+                            && ctx.line_bounds.line_distance(pos, end) > 0
+                        {
+                            docs.push(Doc::hard_line());
+                        } else {
+                            docs.push(Doc::soft_line());
+                        }
+                    }
+                    docs.push(list_item.doc(ctx));
+                }
+                EitherOrBoth::Right(..) => unreachable!(),
+            }
         }
+
+        if self.trailing && ctx.options.trailing_comma {
+            docs.push(Doc::flat_or_break(Doc::nil(), self.separator));
+        }
+        Doc::list(docs)
     }
 }
 

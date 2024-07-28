@@ -1,8 +1,8 @@
 ---
 source: malva/tests/fmt.rs
 ---
-.powerPathNavigator .helm button.pressedButton,
-/* comment 1 */ .powerPathNavigator .helm button:active:not(.disabledButton),
+.powerPathNavigator .helm button.pressedButton, /* comment 1 */
+.powerPathNavigator .helm button:active:not(.disabledButton),
 .powerPathNavigator table.powerPathInfo th:active,
 .powerPathNavigator table.powerPathInfo th:active + th:last-child {}
 
@@ -110,9 +110,9 @@ input:not(/* comment 125 */ [/* comment 126 */ disabled /* comment 127 */]
 /* comment 128 */) {}
 
 /* comment 129 */
-h1 /* comment 130 */,
-/* comment 131 */ h2 /* comment 132 */,
-/* comment 133 */ h3 /* comment 134 */ {}
+h1 /* comment 130 */, /* comment 131 */
+h2 /* comment 132 */, /* comment 133 */
+h3 /* comment 134 */ {}
 
 /* comment 135 */
 .phone /* comment 136 */ {

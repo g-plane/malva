@@ -2,8 +2,7 @@
 source: malva/tests/fmt.rs
 ---
 $my-list:
-  "foo",
-  // Foo
+  "foo", // Foo
   "bar"; // Bar
 
 $my-list2: a

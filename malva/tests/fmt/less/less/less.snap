@@ -1508,10 +1508,8 @@ li + li {
 // Variables
 @link-color: #428bca; // Comment
 
-[href]:hover &,
-// Comment'
-[href]:focus &,
-// Comment"
+[href]:hover &, // Comment'
+[href]:focus &, // Comment"
 [href]:active & {
   .tooltip {
     opacity: 1;

@@ -1,8 +1,7 @@
 ---
 source: malva/tests/fmt.rs
 ---
-.powerPathNavigator .helm button.pressedButton,
-// comment 1
+.powerPathNavigator .helm button.pressedButton, // comment 1
 .powerPathNavigator .helm button:active:not(.disabledButton),
 .powerPathNavigator table.powerPathInfo th:active,
 .powerPathNavigator table.powerPathInfo th:active + th:last-child {}
@@ -18,10 +17,8 @@ source: malva/tests/fmt.rs
 }
 
 .field {
-  &[data-field-id="1"],
-  // comment 4
-  &[data-field-id="2"],
-  // comment 5
+  &[data-field-id="1"], // comment 4
+  &[data-field-id="2"], // comment 5
   &[data-field-id="3"] // comment 6
   {
     background: green;
@@ -33,13 +30,11 @@ source: malva/tests/fmt.rs
 {
   // comment 9
   // comment 10
-  &[data-field-id="1"],
-  // comment 11
+  &[data-field-id="1"], // comment 11
   // comment 12
   &[data-field-id="2"] // comment 13
   // comment 14
-  ,
-  // comment 15
+  , // comment 15
   // comment 16
   &[data-field-id="3"] // comment 17
   // comment 18
