@@ -144,9 +144,27 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                     }
                     ComplexSelectorChild::Combinator(Combinator {
                         kind: CombinatorKind::Descendant,
-                        ..
+                        span,
                     }) => {
-                        docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                        let mut has_last_line_comment = false;
+                        let mut pos = pos;
+                        docs.extend(
+                            ctx.start_spaced_comments_without_last_hard_line(
+                                ctx.get_comments_between(pos, span.end)
+                                    .take_while(|comment| {
+                                        ctx.line_bounds
+                                            .line_distance(span.start, comment.span.start)
+                                            == 0
+                                    })
+                                    .inspect(|comment| pos = comment.span.end),
+                                &mut has_last_line_comment,
+                            ),
+                        );
+                        if has_last_line_comment {
+                            docs.push(Doc::hard_line().nest(ctx.indent_width));
+                        } else {
+                            docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                        }
                         (docs, pos)
                     }
                     ComplexSelectorChild::Combinator(combinator) => {
