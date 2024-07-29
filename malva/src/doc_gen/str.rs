@@ -1,5 +1,5 @@
 use crate::ctx::Ctx;
-use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind};
+use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind, PatternID};
 use std::{borrow::Cow, sync::OnceLock};
 
 static AC_DOUBLE_QUOTES: OnceLock<AhoCorasick> = OnceLock::new();
@@ -26,8 +26,9 @@ pub(super) fn format_str<'s>(
                         .unwrap()
                 });
                 let mut dst = String::with_capacity(content.len());
-                ac.replace_all_with(content, &mut dst, |_, matched_text, dst| {
-                    if matched_text == "\"" {
+                let pattern_id = PatternID::must(2);
+                ac.replace_all_with(content, &mut dst, |mat, matched_text, dst| {
+                    if mat.pattern() == pattern_id {
                         dst.push_str("\\\"");
                     } else {
                         dst.push_str(matched_text)
@@ -48,8 +49,9 @@ pub(super) fn format_str<'s>(
                         .unwrap()
                 });
                 let mut dst = String::with_capacity(content.len());
-                ac.replace_all_with(content, &mut dst, |_, matched_text, dst| {
-                    if matched_text == "'" {
+                let pattern_id = PatternID::must(2);
+                ac.replace_all_with(content, &mut dst, |mat, matched_text, dst| {
+                    if mat.pattern() == pattern_id {
                         dst.push_str("\\'");
                     } else {
                         dst.push_str(matched_text)
