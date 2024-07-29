@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.80.0
       - run: rustup target add wasm32-unknown-unknown
       - run: |
           cargo build --release -p dprint_plugin_malva --target wasm32-unknown-unknown
