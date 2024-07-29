@@ -138,8 +138,8 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|comment| {
-            let peeked = self.iter.peek();
-            if peeked.is_none() {
+            let has_next = self.iter.peek().is_some();
+            if !has_next {
                 *self.has_last_line_comment = comment.kind == CommentKind::Line;
             }
 
@@ -150,7 +150,7 @@ where
                 },
                 comment.doc(self.ctx),
                 match comment.kind {
-                    CommentKind::Line if self.iter.peek().is_some() => Doc::hard_line(),
+                    CommentKind::Line if has_next => Doc::hard_line(),
                     _ => Doc::nil(),
                 },
             ]
