@@ -36,7 +36,7 @@ source: malva/tests/fmt.rs
     content: '"\'';
 
     /* One of each with unnecessary escapes. */
-    content: "\"\'";
+    content: '\"\'';
     content: '\"\'';
 
     /* More double quotes than single quotes. */

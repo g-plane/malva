@@ -4,6 +4,7 @@ use super::{
     DocGen,
 };
 use crate::ctx::Ctx;
+use aho_corasick::PatternID;
 use raffia::{ast::*, token::TokenWithSpan, Spanned};
 use std::{borrow::Cow, mem};
 use tiny_pretty::Doc;
@@ -735,11 +736,22 @@ fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
 }
 
 fn is_preferred_quote_allowed(raw: &str, ctx: &Ctx) -> bool {
+    use super::str::{AC_DOUBLE_QUOTES, AC_SINGLE_QUOTES};
     use crate::config::Quotes;
 
     match ctx.options.quotes {
         Quotes::AlwaysDouble | Quotes::AlwaysSingle => false,
-        Quotes::PreferDouble => raw.contains('"'),
-        Quotes::PreferSingle => raw.contains('\''),
+        Quotes::PreferDouble => {
+            let pattern_id = PatternID::must(2);
+            AC_DOUBLE_QUOTES
+                .find_iter(raw)
+                .any(|mat| mat.pattern() == pattern_id)
+        }
+        Quotes::PreferSingle => {
+            let pattern_id = PatternID::must(2);
+            AC_SINGLE_QUOTES
+                .find_iter(raw)
+                .any(|mat| mat.pattern() == pattern_id)
+        }
     }
 }
