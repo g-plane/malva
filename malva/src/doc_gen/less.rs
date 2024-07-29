@@ -403,46 +403,38 @@ impl<'s> DocGen<'s> for LessMixinArguments<'s> {
         };
 
         Doc::text("(")
+            .append(doc_close_to_paren.clone())
             .append(
-                doc_close_to_paren
-                    .clone()
-                    .append(
-                        helpers::SeparatedListFormatter::new(
-                            if self.is_comma_separated { "," } else { ";" },
-                            helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
-                        )
-                        .with_trailing()
-                        .format(
-                            &self.args,
-                            &self.separator_spans,
-                            self.span.start,
-                            ctx,
-                        ),
-                    )
-                    .concat(
-                        ctx.start_spaced_comments_without_last_hard_line(
-                            ctx.get_comments_between(
-                                self.args
-                                    .last()
-                                    .map(|arg| arg.span().end)
-                                    .unwrap_or(self.span.start),
-                                self.span.end,
-                            ),
-                            &mut has_last_line_comment,
-                        ),
-                    )
-                    .nest(if is_detached_rulset_only {
-                        0
-                    } else {
-                        ctx.indent_width
-                    })
-                    .append(if has_last_line_comment {
-                        Doc::hard_line()
-                    } else {
-                        doc_close_to_paren
-                    })
-                    .group(),
+                helpers::SeparatedListFormatter::new(
+                    if self.is_comma_separated { "," } else { ";" },
+                    helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+                )
+                .with_trailing()
+                .format(&self.args, &self.separator_spans, self.span.start, ctx),
             )
+            .concat(
+                ctx.start_spaced_comments_without_last_hard_line(
+                    ctx.get_comments_between(
+                        self.args
+                            .last()
+                            .map(|arg| arg.span().end)
+                            .unwrap_or(self.span.start),
+                        self.span.end,
+                    ),
+                    &mut has_last_line_comment,
+                ),
+            )
+            .nest(if is_detached_rulset_only {
+                0
+            } else {
+                ctx.indent_width
+            })
+            .append(if has_last_line_comment {
+                Doc::hard_line()
+            } else {
+                doc_close_to_paren
+            })
+            .group()
             .append(Doc::text(")"))
     }
 }

@@ -257,21 +257,19 @@ pub(super) fn format_parenthesized<'s>(
     let mut has_last_line_comment = false;
 
     Doc::text("(")
-        .append(
+        .append(Doc::line_or_nil())
+        .append(body)
+        .concat(ctx.start_spaced_comments_without_last_hard_line(
+            ctx.get_comments_between(trailing_comments_start, trailing_comments_end),
+            &mut has_last_line_comment,
+        ))
+        .nest(ctx.indent_width)
+        .append(if has_last_line_comment {
+            Doc::hard_line()
+        } else {
             Doc::line_or_nil()
-                .append(body)
-                .concat(ctx.start_spaced_comments_without_last_hard_line(
-                    ctx.get_comments_between(trailing_comments_start, trailing_comments_end),
-                    &mut has_last_line_comment,
-                ))
-                .nest(ctx.indent_width)
-                .append(if has_last_line_comment {
-                    Doc::hard_line()
-                } else {
-                    Doc::line_or_nil()
-                })
-                .group(),
-        )
+        })
+        .group()
         .append(Doc::text(")"))
 }
 
