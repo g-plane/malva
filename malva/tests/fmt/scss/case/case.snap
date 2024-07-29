@@ -10,7 +10,7 @@ source: malva/tests/fmt.rs
 @import "Keep";
 
 html#KeepId.KeepClass,
-a[HREF=KeepAttrValue]:hover::first-letter,
+a[HREF="KeepAttrValue"]:hover::first-letter,
 svg[viewBox] lineargradient,
 :not(:nth-child(2n+1)) {
   color: #aabbcc;
@@ -68,7 +68,7 @@ $KeepTopLevelVar: val;
   @keeplessvar : val;
   @extend %KeepPlaceholderSelector;
 
-  #{$Keep}[#{$Keep}][#{Keep}^=#{Keep-1A}]:#{$Keep} {
+  #{$Keep}[#{$Keep}][#{Keep}^="#{Keep-1A}"]:#{$Keep} {
     prop: val;
   }
 

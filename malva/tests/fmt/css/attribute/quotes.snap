@@ -1,7 +1,7 @@
 ---
 source: malva/tests/fmt.rs
 ---
-a[id=test] {}
+a[id="test"] {}
 a[id="test"] {}
 a[id="test"] {}
 a[class="(╯°□°）╯︵ ┻━┻"] {}

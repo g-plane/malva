@@ -88,8 +88,20 @@ impl<'s> DocGen<'s> for AttributeSelectorModifier<'s> {
 
 impl<'s> DocGen<'s> for AttributeSelectorValue<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+        use crate::config::{AttrValueQuotes, Quotes};
+
         match self {
-            AttributeSelectorValue::Ident(ident) => ident.doc(ctx),
+            AttributeSelectorValue::Ident(ident) => match ctx.options.attr_value_quotes {
+                AttrValueQuotes::Always => match ctx.options.quotes {
+                    Quotes::AlwaysDouble | Quotes::PreferDouble => Doc::text("\"")
+                        .append(ident.doc(ctx))
+                        .append(Doc::text("\"")),
+                    Quotes::AlwaysSingle | Quotes::PreferSingle => {
+                        Doc::text("'").append(ident.doc(ctx)).append(Doc::text("'"))
+                    }
+                },
+                AttrValueQuotes::Ignore => ident.doc(ctx),
+            },
             AttributeSelectorValue::Str(str) => str.doc(ctx),
             AttributeSelectorValue::Percentage(percentage) => percentage.doc(ctx),
             AttributeSelectorValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),

@@ -410,7 +410,7 @@ link:hover:visited {
   color: blue;
 }
 
-[title=identifier] {
+[title="identifier"] {
   color: blue;
 }
 [title="identifier"] {
@@ -420,11 +420,11 @@ link:hover:visited {
   color: blue;
 }
 
-.noQuote:extend([title=identifier]) {}
+.noQuote:extend([title="identifier"]) {}
 .singleQuote:extend([title="identifier"]) {}
 .doubleQuote:extend([title="identifier"]) {}
 
-[title=identifier], .noQuote, .singleQuote, .doubleQuote {
+[title="identifier"], .noQuote, .singleQuote, .doubleQuote {
   color: blue;
 }
 

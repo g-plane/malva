@@ -131,6 +131,10 @@ pub struct LanguageOptions {
     /// See [`keyframeSelectorNotation`](https://github.com/g-plane/malva/blob/main/docs/config.md#keyframeselectornotation) on GitHub
     pub keyframe_selector_notation: Option<KeyframeSelectorNotation>,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "attrValueQuotes"))]
+    /// See [`attrValueQuotes`](https://github.com/g-plane/malva/blob/main/docs/config.md#attrvaluequotes) on GitHub
+    pub attr_value_quotes: AttrValueQuotes,
+
     #[cfg_attr(feature = "config_serde", serde(alias = "ignoreCommentDirective"))]
     /// See [`ignoreCommentDirective`](https://github.com/g-plane/malva/blob/main/docs/config.md#ignorecommentdirective) on GitHub
     pub ignore_comment_directive: String,
@@ -151,6 +155,7 @@ impl Default for LanguageOptions {
             declaration_order: None,
             single_line_block_threshold: None,
             keyframe_selector_notation: None,
+            attr_value_quotes: AttrValueQuotes::default(),
             ignore_comment_directive: "malva-ignore".into(),
         }
     }
@@ -240,4 +245,13 @@ pub enum DeclarationOrder {
 pub enum KeyframeSelectorNotation {
     Keyword,
     Percentage,
+}
+
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+pub enum AttrValueQuotes {
+    #[default]
+    Always,
+    Ignore,
 }

@@ -1,0 +1,5 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg quotes = "alwaysSingle"*/
+[key='\'value\''], [key='\"value\"'] {}

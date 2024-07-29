@@ -191,6 +191,22 @@ pub(crate) fn resolve_config(
                     None
                 }
             }),
+            attr_value_quotes: match &*get_value(
+                &mut config,
+                "attrValueQuotes",
+                "always".to_string(),
+                &mut diagnostics,
+            ) {
+                "always" => AttrValueQuotes::Always,
+                "ignore" => AttrValueQuotes::Ignore,
+                _ => {
+                    diagnostics.push(ConfigurationDiagnostic {
+                        property_name: "attrValueQuotes".into(),
+                        message: "invalid value for config `attrValueQuotes`".into(),
+                    });
+                    Default::default()
+                }
+            },
             ignore_comment_directive: get_value(
                 &mut config,
                 "ignoreCommentDirective",

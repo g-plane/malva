@@ -2,7 +2,7 @@
 source: malva/tests/fmt.rs
 ---
 @namespace foo "http://www.example.com";
-[foo|att=val] {}
+[foo|att="val"] {}
 [*|att] {}
 [|att] {}
 [att] {}

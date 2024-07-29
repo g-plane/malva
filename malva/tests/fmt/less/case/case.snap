@@ -8,7 +8,7 @@ source: malva/tests/fmt.rs
 // - Other things should mostly be lowercase.
 
 html#KeepId.KeepClass,
-a[HREF=KeepAttrValue]:hover::first-letter,
+a[HREF="KeepAttrValue"]:hover::first-letter,
 svg[viewBox] lineargradient,
 :not(:nth-child(2n+1)) {
   color: #aabbcc;
@@ -55,7 +55,7 @@ svg[viewBox] lineargradient,
   @KeepVar: KeepName; /*:*/
   @{KeepInterpolationVar}: val;
 
-  @{Keep}[@{Keep}][@{Keep}^=@{Keep-1A}]:@{Keep} {
+  @{Keep}[@{Keep}][@{Keep}^="@{Keep-1A}"]:@{Keep} {
     prop: val;
   }
 

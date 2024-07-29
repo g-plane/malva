@@ -74,7 +74,7 @@ a[/* comment 83 */ target/* comment 84 */ *=/* comment 85 */ "_blank"
 /* comment 86 */] {}
 
 [/* comment 87 */ foo/* comment 88 */|/* comment 89 */att/* comment 90 */
-=/* comment 91 */ val /* comment 92 */] {}
+=/* comment 91 */ "val" /* comment 92 */] {}
 [/* comment 93 */ */* comment 94 */|/* comment 95 */att /* comment 96 */] {}
 [/* comment 97 */ |/* comment 98 */att /* comment 99 */] {}
 

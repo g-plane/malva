@@ -191,6 +191,21 @@
       ],
       "default": null
     },
+    "attrValueQuotes": {
+      "description": "Control whether should add quotes to attribute value in selector or not if it's not quoted.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "always",
+          "description": "Always add quotes."
+        },
+        {
+          "const": "ignore",
+          "description": "Don't add quotes to those that're not quoted. For quoted value, quotes won't be removed."
+        }
+      ],
+      "default": "always"
+    },
     "ignoreCommentDirective": {
       "description": "Text directive for ignoring formatting specific statement.",
       "type": "string",
