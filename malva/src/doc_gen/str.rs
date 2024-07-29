@@ -1,9 +1,19 @@
 use crate::ctx::Ctx;
 use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind, PatternID};
-use std::{borrow::Cow, sync::OnceLock};
+use std::{borrow::Cow, sync::LazyLock};
 
-static AC_DOUBLE_QUOTES: OnceLock<AhoCorasick> = OnceLock::new();
-static AC_SINGLE_QUOTES: OnceLock<AhoCorasick> = OnceLock::new();
+pub(super) static AC_DOUBLE_QUOTES: LazyLock<AhoCorasick> = LazyLock::new(|| {
+    AhoCorasickBuilder::new()
+        .match_kind(MatchKind::LeftmostFirst)
+        .build(["\\\\", "\\\"", "\""])
+        .unwrap()
+});
+pub(super) static AC_SINGLE_QUOTES: LazyLock<AhoCorasick> = LazyLock::new(|| {
+    AhoCorasickBuilder::new()
+        .match_kind(MatchKind::LeftmostFirst)
+        .build(["\\\\", "\\'", "'"])
+        .unwrap()
+});
 
 pub(super) fn format_str<'s>(
     raw: &'s str,
@@ -19,15 +29,9 @@ pub(super) fn format_str<'s>(
             if formatter.bound_check("\"") {
                 raw.into()
             } else {
-                let ac = AC_DOUBLE_QUOTES.get_or_init(|| {
-                    AhoCorasickBuilder::new()
-                        .match_kind(MatchKind::LeftmostFirst)
-                        .build(["\\\\", "\\\"", "\""])
-                        .unwrap()
-                });
                 let mut dst = String::with_capacity(content.len());
                 let pattern_id = PatternID::must(2);
-                ac.replace_all_with(content, &mut dst, |mat, matched_text, dst| {
+                AC_DOUBLE_QUOTES.replace_all_with(content, &mut dst, |mat, matched_text, dst| {
                     if mat.pattern() == pattern_id {
                         dst.push_str("\\\"");
                     } else {
@@ -42,15 +46,9 @@ pub(super) fn format_str<'s>(
             if formatter.bound_check("\'") {
                 raw.into()
             } else {
-                let ac = AC_SINGLE_QUOTES.get_or_init(|| {
-                    AhoCorasickBuilder::new()
-                        .match_kind(MatchKind::LeftmostFirst)
-                        .build(["\\\\", "\\'", "'"])
-                        .unwrap()
-                });
                 let mut dst = String::with_capacity(content.len());
                 let pattern_id = PatternID::must(2);
-                ac.replace_all_with(content, &mut dst, |mat, matched_text, dst| {
+                AC_SINGLE_QUOTES.replace_all_with(content, &mut dst, |mat, matched_text, dst| {
                     if mat.pattern() == pattern_id {
                         dst.push_str("\\'");
                     } else {
