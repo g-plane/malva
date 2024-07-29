@@ -25,3 +25,15 @@ source: malva/tests/fmt.rs
   .b,
   .c
 ) {}
+
+@media (-webkit-min-device-pixel-ratio: 2) {
+  [rgh-emphasize-draft-pr-label]
+    .js-issue-row
+    :is(
+      /* Repo PR lists */
+      [aria-label="Open draft pull request"],
+      /* Global PR lists */
+      [aria-label="Draft Pull Request"]
+    )
+    svg {}
+}

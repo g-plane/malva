@@ -338,11 +338,24 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                 } else {
                     arg_doc.push(Doc::line_or_nil());
                 }
+                let mut comment_end = None;
+                arg_doc.extend(ctx.end_spaced_comments_without_last_space(
+                    ctx.get_comments_between(arg.l_paren.end, arg_span.start),
+                    &mut comment_end,
+                ));
+                if let Some(comment_end) = comment_end {
+                    if ctx.line_bounds.line_distance(comment_end, arg_span.start) > 0 {
+                        arg_doc.push(Doc::hard_line());
+                    } else {
+                        arg_doc.push(Doc::soft_line());
+                    }
+                }
+            } else {
+                arg_doc.extend(ctx.end_spaced_comments(
+                    ctx.get_comments_between(arg.l_paren.end, arg_span.start),
+                ));
             }
 
-            arg_doc.extend(
-                ctx.end_spaced_comments(ctx.get_comments_between(arg.l_paren.end, arg_span.start)),
-            );
             arg_doc.push(match &arg.kind {
                 PseudoClassSelectorArgKind::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
@@ -429,11 +442,24 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
 
             if ctx.options.linebreak_in_pseudo_parens {
                 arg_doc.push(Doc::line_or_nil());
+                let mut comment_end = None;
+                arg_doc.extend(ctx.end_spaced_comments_without_last_space(
+                    ctx.get_comments_between(arg.l_paren.end, arg_span.start),
+                    &mut comment_end,
+                ));
+                if let Some(comment_end) = comment_end {
+                    if ctx.line_bounds.line_distance(comment_end, arg_span.start) > 0 {
+                        arg_doc.push(Doc::hard_line());
+                    } else {
+                        arg_doc.push(Doc::soft_line());
+                    }
+                }
+            } else {
+                arg_doc.extend(ctx.end_spaced_comments(
+                    ctx.get_comments_between(arg.l_paren.end, arg_span.start),
+                ));
             }
 
-            arg_doc.extend(
-                ctx.end_spaced_comments(ctx.get_comments_between(arg.l_paren.end, arg_span.start)),
-            );
             arg_doc.push(match &arg.kind {
                 PseudoElementSelectorArgKind::CompoundSelector(compound_selector) => {
                     compound_selector.doc(ctx)
