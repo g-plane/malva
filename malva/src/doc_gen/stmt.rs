@@ -63,13 +63,13 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     );
 
                     docs.push(value.doc(ctx));
-                    if let ComponentValue::TokenWithSpan(TokenWithSpan {
-                        token: Token::Comma(..) | Token::Semicolon(..),
-                        ..
-                    }) = value
-                    {
-                        docs.push(Doc::soft_line().nest(ctx.indent_width));
-                    } else if matches!(iter.peek(), Some(next) if value.span().end < next.span().start)
+                    if matches!(
+                        value,
+                        ComponentValue::TokenWithSpan(TokenWithSpan {
+                            token: Token::Comma(..) | Token::Semicolon(..),
+                            ..
+                        })
+                    ) || matches!(iter.peek(), Some(next) if value.span().end < next.span().start)
                     {
                         docs.push(Doc::soft_line().nest(ctx.indent_width));
                     }
