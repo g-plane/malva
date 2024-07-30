@@ -46,8 +46,12 @@ fn fmt_snapshot() {
         };
 
         let output = format_text(&input, syntax, &options).unwrap();
-        assert!(
-            !output.contains(" \n"),
+        similar_asserts::assert_eq!(
+            output,
+            output
+                .lines()
+                .map(|line| format!("{}\n", line.trim_end()))
+                .collect::<String>(),
             "'{}' has trailing whitespace",
             path.display()
         );
