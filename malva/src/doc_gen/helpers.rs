@@ -305,10 +305,10 @@ pub(super) fn ident_to_lowercase<'s>(
     }
 }
 
-pub(super) fn get_smart_linebreak<'s, N>(
+pub(super) fn get_smart_linebreak<N>(
     start: usize,
     elements: &[N],
-    ctx: &Ctx<'_, 's>,
+    ctx: &Ctx<'_, '_>,
 ) -> Doc<'static>
 where
     N: Spanned,
