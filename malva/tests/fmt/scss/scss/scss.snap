@@ -590,10 +590,11 @@ $foundation-dir: "foundation";
   }
 
   50% {
-    transform: translate3d(0, $bounce-height, 0) scale(
-      $loader-bounce-horizontal-expansion,
-      $loader-bounce-vertical-compression
-    );
+    transform: translate3d(0, $bounce-height, 0)
+      scale(
+        $loader-bounce-horizontal-expansion,
+        $loader-bounce-vertical-compression
+      );
   }
 }
 

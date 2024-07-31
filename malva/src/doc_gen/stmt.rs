@@ -26,7 +26,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
         }
 
         docs.push(Doc::text(":"));
-        let can_break_before_value = self.value.iter().any(|value| {
+        let has_comma = self.value.iter().any(|value| {
             matches!(
                 value,
                 ComponentValue::Delimiter(Delimiter {
@@ -35,7 +35,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                 })
             )
         });
-        let space_after_colon = if can_break_before_value {
+        let space_after_colon = if has_comma {
             Doc::line_or_space().nest(ctx.indent_width)
         } else {
             Doc::space()
@@ -109,20 +109,64 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     });
             }
             _ => {
-                docs.push(space_after_colon);
+                let mut iter = self.value.iter().enumerate().peekable();
 
-                let mut iter = self.value.iter().peekable();
-                while let Some(value) = iter.next() {
+                if !matches!(iter.peek(), Some((_, ComponentValue::Function(..)))) {
+                    docs.push(space_after_colon);
+                }
+
+                while let Some((index, value)) = iter.next() {
                     let span = value.span();
-                    docs.push(
-                        Doc::list(
-                            ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start))
-                                .collect(),
-                        )
-                        .nest(ctx.indent_width),
-                    );
 
-                    docs.push(value.doc(ctx));
+                    if let ComponentValue::Function(function) = value {
+                        let mut has_last_line_comment = false;
+                        docs.push(
+                            Doc::list(
+                                ctx.start_spaced_comments_without_last_hard_line(
+                                    ctx.get_comments_between(pos, span.start),
+                                    &mut has_last_line_comment,
+                                )
+                                .collect(),
+                            )
+                            .nest(ctx.indent_width),
+                        );
+                        if has_last_line_comment || has_comma && index == 0 {
+                            docs.push(
+                                Doc::hard_line()
+                                    .append(function.doc(ctx))
+                                    .nest(ctx.indent_width),
+                            );
+                        } else if index == 0 {
+                            docs.push(Doc::space());
+                            docs.push(function.doc(ctx));
+                        } else if matches!(
+                            self.value.get(index - 1),
+                            Some(ComponentValue::Delimiter(Delimiter {
+                                kind: DelimiterKind::Solidus,
+                                ..
+                            }))
+                        ) {
+                            // spaces around solidus have been
+                            // considered when formatting solidus
+                            docs.push(function.doc(ctx));
+                        } else {
+                            docs.push(
+                                Doc::line_or_space()
+                                    .append(function.doc(ctx))
+                                    .group()
+                                    .nest(ctx.indent_width),
+                            );
+                        }
+                    } else {
+                        docs.push(
+                            Doc::list(
+                                ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start))
+                                    .collect(),
+                            )
+                            .nest(ctx.indent_width),
+                        );
+                        docs.push(value.doc(ctx));
+                    }
                     match value {
                         ComponentValue::Delimiter(Delimiter {
                             kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
@@ -137,15 +181,22 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                             }
                         }
                         _ => match iter.peek() {
-                            Some(ComponentValue::Delimiter(Delimiter {
-                                kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
-                                ..
-                            }))
+                            Some((
+                                _,
+                                ComponentValue::Delimiter(Delimiter {
+                                    kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                                    ..
+                                })
+                                | ComponentValue::Function(..),
+                            ))
                             | None => {}
-                            Some(ComponentValue::Delimiter(Delimiter {
-                                kind: DelimiterKind::Solidus,
-                                span: next_span,
-                            })) => {
+                            Some((
+                                _,
+                                ComponentValue::Delimiter(Delimiter {
+                                    kind: DelimiterKind::Solidus,
+                                    span: next_span,
+                                }),
+                            )) => {
                                 if span.end < next_span.start {
                                     docs.push(Doc::soft_line().nest(ctx.indent_width));
                                 }

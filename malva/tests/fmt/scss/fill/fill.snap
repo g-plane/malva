@@ -2,11 +2,8 @@
 source: malva/tests/fmt.rs
 ---
 div {
-  border-left: 1px solid mix(
-    $warningBackgroundColors,
-    $warningBorderColors,
-    50%
-  );
+  border-left: 1px solid
+    mix($warningBackgroundColors, $warningBorderColors, 50%);
   $fontFamily:
     "Lato",
     -apple-system,

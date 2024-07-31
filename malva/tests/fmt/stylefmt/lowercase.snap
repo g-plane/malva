@@ -31,12 +31,9 @@ $myVar7: linear-gradient(to right, RGBA(0, 0, 0, 0.5), RGB(255, 255, 255));
   background-color: INDIGO;
   background: HSLA(120, 100%, 50%, 0.3);
   color: RGBA(0, 0, 0, 0.5);
-  transform: ROTATE(1deg) ROTATEX(1deg) ROTATEY(1deg) ROTATEZ(1deg) ROTATE3D(
-    0,
-    0,
-    1,
-    1deg
-  ) SKEW(1deg) SKEWX(1deg) SKEWY(1deg) SCALE(1, 1) SCALEX(1) SCALEY(1);
+  transform: ROTATE(1deg) ROTATEX(1deg) ROTATEY(1deg) ROTATEZ(1deg)
+    ROTATE3D(0, 0, 1, 1deg) SKEW(1deg) SKEWX(1deg) SKEWY(1deg) SCALE(1, 1)
+    SCALEX(1) SCALEY(1);
   transform: ROTATE(1deg);
   transform: ROTATEX(1deg);
   transform: ROTATEY(1deg);
