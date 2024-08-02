@@ -8,7 +8,7 @@ mod helpers;
 mod line_bounds;
 mod state;
 
-use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen};
+use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen, state::State};
 pub use crate::{error::Error, line_bounds::LineBounds};
 pub use raffia::Syntax;
 use raffia::{ast::Stylesheet, token::Comment, ParserBuilder, ParserOptions};
@@ -60,9 +60,9 @@ pub fn print_stylesheet<'a, 's>(
         comments,
         indent_width: options.layout.indent_width,
         line_bounds,
-        state: Default::default(),
     };
-    let doc = stylesheet.doc(&ctx);
+    let state = State::default();
+    let doc = stylesheet.doc(&ctx, &state);
     tiny_pretty::print(
         &doc,
         &PrintOptions {

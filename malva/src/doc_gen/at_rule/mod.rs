@@ -1,5 +1,5 @@
 use super::{super::DocGen, helpers};
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state::State};
 use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
@@ -19,7 +19,7 @@ mod scope;
 mod supports;
 
 impl<'s> DocGen<'s> for AtRule<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         let mut pos = self.name.span.end;
 
@@ -32,7 +32,7 @@ impl<'s> DocGen<'s> for AtRule<'s> {
             docs.push(Doc::space());
             let span = prelude.span();
             docs.extend(ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start)));
-            docs.push(prelude.doc(ctx));
+            docs.push(prelude.doc(ctx, state));
             pos = span.end;
         }
 
@@ -42,7 +42,7 @@ impl<'s> DocGen<'s> for AtRule<'s> {
                 block.span.start,
                 ctx,
             ));
-            docs.push(block.doc(ctx));
+            docs.push(block.doc(ctx, state));
         }
 
         Doc::list(docs)
@@ -50,53 +50,59 @@ impl<'s> DocGen<'s> for AtRule<'s> {
 }
 
 impl<'s> DocGen<'s> for AtRulePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            AtRulePrelude::Media(media) => media.doc(ctx),
+            AtRulePrelude::Media(media) => media.doc(ctx, state),
             AtRulePrelude::Charset(charset) => Doc::text(charset.raw),
-            AtRulePrelude::ColorProfile(color_profile) => color_profile.doc(ctx),
-            AtRulePrelude::Container(container) => container.doc(ctx),
-            AtRulePrelude::CounterStyle(counter_style) => counter_style.doc(ctx),
-            AtRulePrelude::CustomMedia(custom_media) => custom_media.doc(ctx),
-            AtRulePrelude::CustomSelector(custom_selector) => custom_selector.doc(ctx),
-            AtRulePrelude::Document(document) => document.doc(ctx),
-            AtRulePrelude::FontFeatureValues(font_feature_values) => font_feature_values.doc(ctx),
-            AtRulePrelude::FontPaletteValues(font_palette_values) => font_palette_values.doc(ctx),
-            AtRulePrelude::Import(import) => import.doc(ctx),
-            AtRulePrelude::Keyframes(keyframes) => keyframes.doc(ctx),
-            AtRulePrelude::Layer(layer) => layer.doc(ctx),
-            AtRulePrelude::LessImport(less_import) => less_import.doc(ctx),
-            AtRulePrelude::LessPlugin(less_plugin) => less_plugin.doc(ctx),
-            AtRulePrelude::Namespace(namespace) => namespace.doc(ctx),
-            AtRulePrelude::Nest(nest) => nest.doc(ctx).group().nest(ctx.indent_width),
-            AtRulePrelude::Page(page) => page.doc(ctx),
-            AtRulePrelude::PositionTry(position_try) => position_try.doc(ctx),
-            AtRulePrelude::Property(property) => property.doc(ctx),
-            AtRulePrelude::SassAtRoot(sass_at_root) => sass_at_root.doc(ctx),
-            AtRulePrelude::SassContent(sass_content) => sass_content.doc(ctx),
-            AtRulePrelude::SassEach(sass_each) => sass_each.doc(ctx),
-            AtRulePrelude::SassExpr(sass_expr) => sass_expr.doc(ctx),
-            AtRulePrelude::SassExtend(sass_extend) => sass_extend.doc(ctx),
-            AtRulePrelude::SassFor(sass_for) => sass_for.doc(ctx),
-            AtRulePrelude::SassForward(sass_forward) => sass_forward.doc(ctx),
-            AtRulePrelude::SassFunction(sass_function) => sass_function.doc(ctx),
-            AtRulePrelude::SassImport(sass_import) => sass_import.doc(ctx),
-            AtRulePrelude::SassInclude(sass_include) => sass_include.doc(ctx),
-            AtRulePrelude::SassMixin(sass_mixin) => sass_mixin.doc(ctx),
-            AtRulePrelude::SassUse(sass_use) => sass_use.doc(ctx),
-            AtRulePrelude::Scope(scope) => scope.doc(ctx),
-            AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx),
-            AtRulePrelude::Supports(supports) => supports.doc(ctx),
-            AtRulePrelude::Unknown(unknown) => unknown.doc(ctx),
+            AtRulePrelude::ColorProfile(color_profile) => color_profile.doc(ctx, state),
+            AtRulePrelude::Container(container) => container.doc(ctx, state),
+            AtRulePrelude::CounterStyle(counter_style) => counter_style.doc(ctx, state),
+            AtRulePrelude::CustomMedia(custom_media) => custom_media.doc(ctx, state),
+            AtRulePrelude::CustomSelector(custom_selector) => custom_selector.doc(ctx, state),
+            AtRulePrelude::Document(document) => document.doc(ctx, state),
+            AtRulePrelude::FontFeatureValues(font_feature_values) => {
+                font_feature_values.doc(ctx, state)
+            }
+            AtRulePrelude::FontPaletteValues(font_palette_values) => {
+                font_palette_values.doc(ctx, state)
+            }
+            AtRulePrelude::Import(import) => import.doc(ctx, state),
+            AtRulePrelude::Keyframes(keyframes) => keyframes.doc(ctx, state),
+            AtRulePrelude::Layer(layer) => layer.doc(ctx, state),
+            AtRulePrelude::LessImport(less_import) => less_import.doc(ctx, state),
+            AtRulePrelude::LessPlugin(less_plugin) => less_plugin.doc(ctx, state),
+            AtRulePrelude::Namespace(namespace) => namespace.doc(ctx, state),
+            AtRulePrelude::Nest(nest) => nest.doc(ctx, state).group().nest(ctx.indent_width),
+            AtRulePrelude::Page(page) => page.doc(ctx, state),
+            AtRulePrelude::PositionTry(position_try) => position_try.doc(ctx, state),
+            AtRulePrelude::Property(property) => property.doc(ctx, state),
+            AtRulePrelude::SassAtRoot(sass_at_root) => sass_at_root.doc(ctx, state),
+            AtRulePrelude::SassContent(sass_content) => sass_content.doc(ctx, state),
+            AtRulePrelude::SassEach(sass_each) => sass_each.doc(ctx, state),
+            AtRulePrelude::SassExpr(sass_expr) => sass_expr.doc(ctx, state),
+            AtRulePrelude::SassExtend(sass_extend) => sass_extend.doc(ctx, state),
+            AtRulePrelude::SassFor(sass_for) => sass_for.doc(ctx, state),
+            AtRulePrelude::SassForward(sass_forward) => sass_forward.doc(ctx, state),
+            AtRulePrelude::SassFunction(sass_function) => sass_function.doc(ctx, state),
+            AtRulePrelude::SassImport(sass_import) => sass_import.doc(ctx, state),
+            AtRulePrelude::SassInclude(sass_include) => sass_include.doc(ctx, state),
+            AtRulePrelude::SassMixin(sass_mixin) => sass_mixin.doc(ctx, state),
+            AtRulePrelude::SassUse(sass_use) => sass_use.doc(ctx, state),
+            AtRulePrelude::Scope(scope) => scope.doc(ctx, state),
+            AtRulePrelude::ScrollTimeline(scroll_timeline) => scroll_timeline.doc(ctx, state),
+            AtRulePrelude::Supports(supports) => supports.doc(ctx, state),
+            AtRulePrelude::Unknown(unknown) => unknown.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            UnknownAtRulePrelude::ComponentValue(component_value) => component_value.doc(ctx),
-            UnknownAtRulePrelude::TokenSeq(token_seq) => token_seq.doc(ctx),
+            UnknownAtRulePrelude::ComponentValue(component_value) => {
+                component_value.doc(ctx, state)
+            }
+            UnknownAtRulePrelude::TokenSeq(token_seq) => token_seq.doc(ctx, state),
         }
     }
 }

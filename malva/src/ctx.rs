@@ -1,9 +1,9 @@
-use crate::{config::LanguageOptions, doc_gen::DocGen, state::State, LineBounds};
+use crate::{config::LanguageOptions, doc_gen::format_comment, LineBounds};
 use raffia::{
     token::{Comment, CommentKind},
     Syntax,
 };
-use std::{array, cell::Cell, iter::Peekable, mem};
+use std::{array, iter::Peekable, mem};
 use tiny_pretty::Doc;
 
 pub(crate) struct Ctx<'a, 's: 'a> {
@@ -13,7 +13,6 @@ pub(crate) struct Ctx<'a, 's: 'a> {
     pub comments: &'a [Comment<'s>],
     pub indent_width: usize,
     pub line_bounds: LineBounds,
-    pub state: Cell<State>,
 }
 
 impl<'a, 's> Ctx<'a, 's> {
@@ -41,7 +40,7 @@ impl<'a, 's> Ctx<'a, 's> {
                             CommentKind::Block => Doc::soft_line(),
                             CommentKind::Line => Doc::nil(),
                         },
-                        comment.doc(self),
+                        format_comment(comment, self),
                         match comment.kind {
                             CommentKind::Block => Doc::nil(),
                             CommentKind::Line => Doc::hard_line(),
@@ -73,7 +72,7 @@ impl<'a, 's> Ctx<'a, 's> {
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
         comments.flat_map(|comment| {
             [
-                comment.doc(self),
+                format_comment(comment, self),
                 match comment.kind {
                     CommentKind::Block => Doc::soft_line(),
                     CommentKind::Line => Doc::hard_line(),
@@ -101,20 +100,9 @@ impl<'a, 's> Ctx<'a, 's> {
         comments: impl Iterator<Item = &'a Comment<'s>> + 'a,
     ) -> impl Iterator<Item = Doc<'s>> + 'a {
         comments.filter_map(|comment| match comment.kind {
-            CommentKind::Block => Some(comment.doc(self)),
+            CommentKind::Block => Some(format_comment(comment, self)),
             CommentKind::Line => None,
         })
-    }
-
-    pub(crate) fn with_state(
-        &self,
-        additional_state: State,
-        f: impl FnOnce() -> Doc<'s>,
-    ) -> Doc<'s> {
-        let old_state = self.state.replace(self.state.get().union(additional_state));
-        let doc = f();
-        self.state.set(old_state);
-        doc
     }
 }
 
@@ -148,7 +136,7 @@ where
                     CommentKind::Block => Doc::soft_line(),
                     CommentKind::Line => Doc::nil(),
                 },
-                comment.doc(self.ctx),
+                format_comment(comment, self.ctx),
                 match comment.kind {
                     CommentKind::Line if has_next => Doc::hard_line(),
                     _ => Doc::nil(),
@@ -184,7 +172,7 @@ where
             }
 
             [
-                comment.doc(self.ctx),
+                format_comment(comment, self.ctx),
                 match comment.kind {
                     CommentKind::Block => {
                         if is_last {

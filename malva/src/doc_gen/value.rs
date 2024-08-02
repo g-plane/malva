@@ -3,16 +3,16 @@ use super::{
     str::{format_str, CssStrRawFormatter},
     DocGen,
 };
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state::State};
 use aho_corasick::PatternID;
 use raffia::{ast::*, token::TokenWithSpan, Spanned};
 use std::{borrow::Cow, mem};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for BracketBlock<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = itertools::intersperse(
-            self.value.iter().map(|value| value.doc(ctx)),
+            self.value.iter().map(|value| value.doc(ctx, state)),
             Doc::soft_line(),
         )
         .collect::<Vec<_>>();
@@ -23,7 +23,7 @@ impl<'s> DocGen<'s> for BracketBlock<'s> {
 }
 
 impl<'s> DocGen<'s> for Calc<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let left = if let (
             ComponentValue::Calc(Calc {
                 op:
@@ -38,12 +38,12 @@ impl<'s> DocGen<'s> for Calc<'s> {
         {
             Doc::text("(")
                 .append(Doc::line_or_nil())
-                .append(self.left.doc(ctx))
+                .append(self.left.doc(ctx, state))
                 .nest(ctx.indent_width)
                 .append(Doc::line_or_nil())
                 .append(Doc::text(")"))
         } else {
-            self.left.doc(ctx)
+            self.left.doc(ctx, state)
         };
 
         let right = if let (
@@ -114,19 +114,19 @@ impl<'s> DocGen<'s> for Calc<'s> {
         {
             Doc::text("(")
                 .append(Doc::line_or_nil())
-                .append(self.right.doc(ctx))
+                .append(self.right.doc(ctx, state))
                 .nest(ctx.indent_width)
                 .append(Doc::line_or_nil())
                 .append(Doc::text(")"))
         } else {
-            self.right.doc(ctx)
+            self.right.doc(ctx, state)
         };
 
         left.append(helpers::format_operator_prefix_space(ctx))
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.left.span().end, self.op.span.start),
             ))
-            .append(self.op.doc(ctx))
+            .append(self.op.doc(ctx, state))
             .append(helpers::format_operator_suffix_space(ctx))
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.op.span.end, self.right.span().start),
@@ -137,7 +137,7 @@ impl<'s> DocGen<'s> for Calc<'s> {
 }
 
 impl<'s> DocGen<'s> for CalcOperator {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(match self.kind {
             CalcOperatorKind::Plus => "+",
             CalcOperatorKind::Minus => "-",
@@ -148,76 +148,90 @@ impl<'s> DocGen<'s> for CalcOperator {
 }
 
 impl<'s> DocGen<'s> for ComponentValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            ComponentValue::BracketBlock(bracket_block) => bracket_block.doc(ctx),
-            ComponentValue::Calc(calc) => calc.doc(ctx),
-            ComponentValue::Dimension(dimension) => dimension.doc(ctx),
-            ComponentValue::Delimiter(delimiter) => delimiter.doc(ctx),
-            ComponentValue::Function(function) => function.doc(ctx),
-            ComponentValue::HexColor(hex_color) => hex_color.doc(ctx),
-            ComponentValue::IdSelector(id_selector) => id_selector.doc(ctx),
-            ComponentValue::ImportantAnnotation(important) => important.doc(ctx),
-            ComponentValue::InterpolableIdent(interpolable_ident) => interpolable_ident.doc(ctx),
-            ComponentValue::InterpolableStr(interpolable_str) => interpolable_str.doc(ctx),
-            ComponentValue::LayerName(layer_name) => layer_name.doc(ctx),
+            ComponentValue::BracketBlock(bracket_block) => bracket_block.doc(ctx, state),
+            ComponentValue::Calc(calc) => calc.doc(ctx, state),
+            ComponentValue::Dimension(dimension) => dimension.doc(ctx, state),
+            ComponentValue::Delimiter(delimiter) => delimiter.doc(ctx, state),
+            ComponentValue::Function(function) => function.doc(ctx, state),
+            ComponentValue::HexColor(hex_color) => hex_color.doc(ctx, state),
+            ComponentValue::IdSelector(id_selector) => id_selector.doc(ctx, state),
+            ComponentValue::ImportantAnnotation(important) => important.doc(ctx, state),
+            ComponentValue::InterpolableIdent(interpolable_ident) => {
+                interpolable_ident.doc(ctx, state)
+            }
+            ComponentValue::InterpolableStr(interpolable_str) => interpolable_str.doc(ctx, state),
+            ComponentValue::LayerName(layer_name) => layer_name.doc(ctx, state),
             ComponentValue::LessBinaryOperation(less_binary_operation) => {
-                less_binary_operation.doc(ctx)
+                less_binary_operation.doc(ctx, state)
             }
-            ComponentValue::LessCondition(less_condition) => less_condition.doc(ctx),
+            ComponentValue::LessCondition(less_condition) => less_condition.doc(ctx, state),
             ComponentValue::LessDetachedRuleset(less_detached_ruleset) => {
-                less_detached_ruleset.doc(ctx)
+                less_detached_ruleset.doc(ctx, state)
             }
-            ComponentValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
-            ComponentValue::LessJavaScriptSnippet(less_js_snippet) => less_js_snippet.doc(ctx),
-            ComponentValue::LessList(less_list) => less_list.doc(ctx).nest(ctx.indent_width),
-            ComponentValue::LessMixinCall(less_mixin_call) => less_mixin_call.doc(ctx),
+            ComponentValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx, state),
+            ComponentValue::LessJavaScriptSnippet(less_js_snippet) => {
+                less_js_snippet.doc(ctx, state)
+            }
+            ComponentValue::LessList(less_list) => less_list.doc(ctx, state).nest(ctx.indent_width),
+            ComponentValue::LessMixinCall(less_mixin_call) => less_mixin_call.doc(ctx, state),
             ComponentValue::LessNamespaceValue(less_namespace_value) => {
-                less_namespace_value.doc(ctx)
+                less_namespace_value.doc(ctx, state)
             }
-            ComponentValue::LessNegativeValue(less_negative_value) => less_negative_value.doc(ctx),
+            ComponentValue::LessNegativeValue(less_negative_value) => {
+                less_negative_value.doc(ctx, state)
+            }
             ComponentValue::LessParenthesizedOperation(less_parenthesized_operation) => {
-                less_parenthesized_operation.doc(ctx)
+                less_parenthesized_operation.doc(ctx, state)
             }
             ComponentValue::LessPercentKeyword(less_percent_keyword) => {
-                less_percent_keyword.doc(ctx)
+                less_percent_keyword.doc(ctx, state)
             }
             ComponentValue::LessPropertyVariable(less_property_variable) => {
-                less_property_variable.doc(ctx)
+                less_property_variable.doc(ctx, state)
             }
-            ComponentValue::LessVariable(less_variable) => less_variable.doc(ctx),
+            ComponentValue::LessVariable(less_variable) => less_variable.doc(ctx, state),
             ComponentValue::LessVariableVariable(less_variable_variable) => {
-                less_variable_variable.doc(ctx)
+                less_variable_variable.doc(ctx, state)
             }
-            ComponentValue::Number(number) => number.doc(ctx),
-            ComponentValue::Percentage(percentage) => percentage.doc(ctx),
-            ComponentValue::Ratio(ratio) => ratio.doc(ctx),
+            ComponentValue::Number(number) => number.doc(ctx, state),
+            ComponentValue::Percentage(percentage) => percentage.doc(ctx, state),
+            ComponentValue::Ratio(ratio) => ratio.doc(ctx, state),
             ComponentValue::SassArbitraryArgument(sass_arbitrary_arg) => {
-                sass_arbitrary_arg.doc(ctx)
+                sass_arbitrary_arg.doc(ctx, state)
             }
-            ComponentValue::SassBinaryExpression(sass_binary_expr) => sass_binary_expr.doc(ctx),
-            ComponentValue::SassKeywordArgument(sass_keyword_arg) => sass_keyword_arg.doc(ctx),
-            ComponentValue::SassList(sass_list) => sass_list.doc(ctx),
-            ComponentValue::SassMap(sass_map) => sass_map.doc(ctx),
-            ComponentValue::SassQualifiedName(sass_qualified_name) => sass_qualified_name.doc(ctx),
-            ComponentValue::SassNestingDeclaration(sass_nesting_decl) => sass_nesting_decl.doc(ctx),
+            ComponentValue::SassBinaryExpression(sass_binary_expr) => {
+                sass_binary_expr.doc(ctx, state)
+            }
+            ComponentValue::SassKeywordArgument(sass_keyword_arg) => {
+                sass_keyword_arg.doc(ctx, state)
+            }
+            ComponentValue::SassList(sass_list) => sass_list.doc(ctx, state),
+            ComponentValue::SassMap(sass_map) => sass_map.doc(ctx, state),
+            ComponentValue::SassQualifiedName(sass_qualified_name) => {
+                sass_qualified_name.doc(ctx, state)
+            }
+            ComponentValue::SassNestingDeclaration(sass_nesting_decl) => {
+                sass_nesting_decl.doc(ctx, state)
+            }
             ComponentValue::SassParenthesizedExpression(sass_parenthesized_expr) => {
-                sass_parenthesized_expr.doc(ctx)
+                sass_parenthesized_expr.doc(ctx, state)
             }
             ComponentValue::SassParentSelector(sass_parent_selector) => {
-                sass_parent_selector.doc(ctx)
+                sass_parent_selector.doc(ctx, state)
             }
-            ComponentValue::SassUnaryExpression(sass_unary_expr) => sass_unary_expr.doc(ctx),
-            ComponentValue::SassVariable(sass_variable) => sass_variable.doc(ctx),
-            ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx),
-            ComponentValue::UnicodeRange(unicode_range) => unicode_range.doc(ctx),
-            ComponentValue::Url(url) => url.doc(ctx),
+            ComponentValue::SassUnaryExpression(sass_unary_expr) => sass_unary_expr.doc(ctx, state),
+            ComponentValue::SassVariable(sass_variable) => sass_variable.doc(ctx, state),
+            ComponentValue::TokenWithSpan(token_with_span) => token_with_span.doc(ctx, state),
+            ComponentValue::UnicodeRange(unicode_range) => unicode_range.doc(ctx, state),
+            ComponentValue::Url(url) => url.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for Delimiter {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         match self.kind {
             DelimiterKind::Comma => Doc::text(","),
             DelimiterKind::Solidus => Doc::text("/"),
@@ -227,7 +241,7 @@ impl<'s> DocGen<'s> for Delimiter {
 }
 
 impl<'s> DocGen<'s> for Dimension<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let unit = match self.kind {
             DimensionKind::Length => {
                 if self.unit.name.eq_ignore_ascii_case("Q") {
@@ -249,16 +263,16 @@ impl<'s> DocGen<'s> for Dimension<'s> {
                     Doc::text(self.unit.raw.to_ascii_lowercase())
                 }
             }
-            DimensionKind::Unknown => self.unit.doc(ctx),
+            DimensionKind::Unknown => self.unit.doc(ctx, state),
         };
-        self.value.doc(ctx).append(unit)
+        self.value.doc(ctx, state).append(unit)
     }
 }
 
 impl<'s> DocGen<'s> for Function<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(4);
-        docs.push(self.name.doc(ctx));
+        docs.push(self.name.doc(ctx, state));
         docs.push(Doc::text("("));
 
         let mut pos = self.name.span().end;
@@ -283,6 +297,7 @@ impl<'s> DocGen<'s> for Function<'s> {
             pos: &mut usize,
             separator: Doc<'s>,
             ctx: &Ctx<'_, 's>,
+            state: &State,
         ) -> Doc<'s> {
             Doc::list(
                 itertools::intersperse(
@@ -295,7 +310,7 @@ impl<'s> DocGen<'s> for Function<'s> {
                             ))
                             .collect(),
                         )
-                        .append(arg.doc(ctx))
+                        .append(arg.doc(ctx, state))
                     }),
                     separator,
                 )
@@ -317,14 +332,14 @@ impl<'s> DocGen<'s> for Function<'s> {
                     },
                 )] = group
                 {
-                    format_group(group, &mut pos, separator.clone(), ctx)
+                    format_group(group, &mut pos, separator.clone(), ctx, state)
                         .concat(ctx.start_spaced_comments(ctx.get_comments_between(
                             mem::replace(&mut pos, delimiter_span.end),
                             delimiter_span.start,
                         )))
-                        .append(delimiter.doc(ctx))
+                        .append(delimiter.doc(ctx, state))
                 } else {
-                    format_group(group, &mut pos, separator.clone(), ctx)
+                    format_group(group, &mut pos, separator.clone(), ctx, state)
                 }
             }),
             Doc::line_or_space(),
@@ -353,83 +368,93 @@ impl<'s> DocGen<'s> for Function<'s> {
 }
 
 impl<'s> DocGen<'s> for FunctionName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            FunctionName::Ident(ident) => ident.doc(ctx),
-            FunctionName::LessFormatFunction(less_format_fn) => less_format_fn.doc(ctx),
-            FunctionName::LessListFunction(less_list_fn) => less_list_fn.doc(ctx),
-            FunctionName::SassQualifiedName(sass_qualified_name) => sass_qualified_name.doc(ctx),
+            FunctionName::Ident(ident) => ident.doc(ctx, state),
+            FunctionName::LessFormatFunction(less_format_fn) => less_format_fn.doc(ctx, state),
+            FunctionName::LessListFunction(less_list_fn) => less_list_fn.doc(ctx, state),
+            FunctionName::SassQualifiedName(sass_qualified_name) => {
+                sass_qualified_name.doc(ctx, state)
+            }
         }
     }
 }
 
 impl<'s> DocGen<'s> for Ident<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
 impl<'s> DocGen<'s> for HexColor<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(format_hex_raw(self.raw, ctx))
     }
 }
 
 impl<'s> DocGen<'s> for InterpolableIdent<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            InterpolableIdent::Literal(literal) => literal.doc(ctx),
-            InterpolableIdent::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx),
-            InterpolableIdent::LessInterpolated(less_interpolated) => less_interpolated.doc(ctx),
+            InterpolableIdent::Literal(literal) => literal.doc(ctx, state),
+            InterpolableIdent::SassInterpolated(sass_interpolated) => {
+                sass_interpolated.doc(ctx, state)
+            }
+            InterpolableIdent::LessInterpolated(less_interpolated) => {
+                less_interpolated.doc(ctx, state)
+            }
         }
     }
 }
 
 impl<'s> DocGen<'s> for InterpolableIdentStaticPart<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
 impl<'s> DocGen<'s> for InterpolableStr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            InterpolableStr::Literal(literal) => literal.doc(ctx),
-            InterpolableStr::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx),
-            InterpolableStr::LessInterpolated(less_interpolated) => less_interpolated.doc(ctx),
+            InterpolableStr::Literal(literal) => literal.doc(ctx, state),
+            InterpolableStr::SassInterpolated(sass_interpolated) => {
+                sass_interpolated.doc(ctx, state)
+            }
+            InterpolableStr::LessInterpolated(less_interpolated) => {
+                less_interpolated.doc(ctx, state)
+            }
         }
     }
 }
 
 impl<'s> DocGen<'s> for InterpolableUrlStaticPart<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
 impl<'s> DocGen<'s> for Number<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(format_number_raw(self.raw, ctx))
     }
 }
 
 impl<'s> DocGen<'s> for Percentage<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        self.value.doc(ctx).append(Doc::text("%"))
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+        self.value.doc(ctx, state).append(Doc::text("%"))
     }
 }
 
 impl<'s> DocGen<'s> for Ratio<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         self.numerator
-            .doc(ctx)
+            .doc(ctx, state)
             .append(Doc::text("/"))
-            .append(self.denominator.doc(ctx))
+            .append(self.denominator.doc(ctx, state))
     }
 }
 
 impl<'s> DocGen<'s> for Str<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(format_str(
             self.raw,
             CssStrRawFormatter::new(self.raw),
@@ -440,7 +465,7 @@ impl<'s> DocGen<'s> for Str<'s> {
 }
 
 impl<'s> DocGen<'s> for TokenWithSpan<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         use raffia::token::Token;
 
         match &self.token {
@@ -585,7 +610,7 @@ impl<'s> DocGen<'s> for TokenWithSpan<'s> {
 }
 
 impl<'s> DocGen<'s> for UnicodeRange<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         let mut s = format!("U+{}", self.start_raw);
         if let Some(end_raw) = self.end_raw {
             s.push('-');
@@ -597,7 +622,7 @@ impl<'s> DocGen<'s> for UnicodeRange<'s> {
 }
 
 impl<'s> DocGen<'s> for Url<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         docs.push(Doc::text(format!(
             "{}(",
@@ -606,13 +631,15 @@ impl<'s> DocGen<'s> for Url<'s> {
 
         let mut args = Vec::with_capacity(1);
         if let Some(value) = &self.value {
-            args.push(value.doc(ctx));
+            args.push(value.doc(ctx, state));
 
             if !self.modifiers.is_empty() {
                 args.push(Doc::line_or_space());
                 args.append(
                     &mut itertools::intersperse(
-                        self.modifiers.iter().map(|modifier| modifier.doc(ctx)),
+                        self.modifiers
+                            .iter()
+                            .map(|modifier| modifier.doc(ctx, state)),
                         Doc::soft_line(),
                     )
                     .collect(),
@@ -628,27 +655,27 @@ impl<'s> DocGen<'s> for Url<'s> {
 }
 
 impl<'s> DocGen<'s> for UrlModifier<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            UrlModifier::Ident(ident) => ident.doc(ctx),
-            UrlModifier::Function(function) => function.doc(ctx),
+            UrlModifier::Ident(ident) => ident.doc(ctx, state),
+            UrlModifier::Function(function) => function.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for UrlRaw<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
 impl<'s> DocGen<'s> for UrlValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            UrlValue::Raw(raw) => raw.doc(ctx),
-            UrlValue::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx),
-            UrlValue::Str(str) => str.doc(ctx),
-            UrlValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
+            UrlValue::Raw(raw) => raw.doc(ctx, state),
+            UrlValue::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx, state),
+            UrlValue::Str(str) => str.doc(ctx, state),
+            UrlValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx, state),
         }
     }
 }

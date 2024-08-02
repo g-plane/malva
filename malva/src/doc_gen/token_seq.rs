@@ -1,5 +1,5 @@
 use super::DocGen;
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state::State};
 use raffia::{
     ast::*,
     token::{Token, TokenWithSpan},
@@ -8,7 +8,7 @@ use raffia::{
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for TokenSeq<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut pos = self.span.start;
         let mut docs = Vec::with_capacity(self.tokens.len());
         let mut iter = self.tokens.iter().peekable();
@@ -16,7 +16,7 @@ impl<'s> DocGen<'s> for TokenSeq<'s> {
             let span = token.span();
             docs.extend(ctx.start_spaced_comments(ctx.get_comments_between(pos, span.start)));
 
-            docs.push(token.doc(ctx));
+            docs.push(token.doc(ctx, state));
             if let TokenWithSpan {
                 token: Token::Comma(..) | Token::Semicolon(..),
                 ..

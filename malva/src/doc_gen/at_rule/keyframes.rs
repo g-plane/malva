@@ -1,15 +1,16 @@
 use super::{super::DocGen, helpers};
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state::State};
 use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for KeyframeBlock<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         helpers::format_selectors_before_block(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
             ctx,
+            state,
         )
         .append(helpers::format_space_before_block(
             self.selectors
@@ -19,23 +20,23 @@ impl<'s> DocGen<'s> for KeyframeBlock<'s> {
             self.block.span.start,
             ctx,
         ))
-        .append(self.block.doc(ctx))
+        .append(self.block.doc(ctx, state))
     }
 }
 
 impl<'s> DocGen<'s> for KeyframesName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            KeyframesName::Ident(ident) => ident.doc(ctx),
-            KeyframesName::Str(str) => str.doc(ctx),
-            KeyframesName::LessVariable(less_variable) => less_variable.doc(ctx),
-            KeyframesName::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
+            KeyframesName::Ident(ident) => ident.doc(ctx, state),
+            KeyframesName::Str(str) => str.doc(ctx, state),
+            KeyframesName::LessVariable(less_variable) => less_variable.doc(ctx, state),
+            KeyframesName::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for KeyframeSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::KeyframeSelectorNotation;
 
         match self {
@@ -46,7 +47,7 @@ impl<'s> DocGen<'s> for KeyframeSelector<'s> {
                 ) {
                     (0.0, Some(KeyframeSelectorNotation::Keyword)) => Doc::text("from"),
                     (100.0, Some(KeyframeSelectorNotation::Keyword)) => Doc::text("to"),
-                    _ => percentage.doc(ctx),
+                    _ => percentage.doc(ctx, state),
                 }
             }
             KeyframeSelector::Ident(InterpolableIdent::Literal(Ident { name, .. }))
@@ -71,7 +72,7 @@ impl<'s> DocGen<'s> for KeyframeSelector<'s> {
                     Doc::text("to")
                 }
             }
-            KeyframeSelector::Ident(ident) => ident.doc(ctx),
+            KeyframeSelector::Ident(ident) => ident.doc(ctx, state),
         }
     }
 }

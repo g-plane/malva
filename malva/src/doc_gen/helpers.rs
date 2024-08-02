@@ -1,5 +1,5 @@
 use super::DocGen;
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state::State};
 use itertools::{EitherOrBoth, Itertools};
 use raffia::{ast::*, Span, Spanned, Syntax};
 use std::{iter, mem};
@@ -10,6 +10,7 @@ pub(super) fn format_selectors_before_block<'s, N>(
     comma_spans: &[Span],
     start: usize,
     ctx: &Ctx<'_, 's>,
+    state: &State,
 ) -> Doc<'s>
 where
     N: DocGen<'s> + Spanned,
@@ -24,7 +25,7 @@ where
             BlockSelectorLineBreak::Wrap => Doc::soft_line(),
         },
     )
-    .format(selectors, comma_spans, start, ctx)
+    .format(selectors, comma_spans, start, ctx, state)
     .group()
 }
 
@@ -56,6 +57,7 @@ impl SeparatedListFormatter {
         separator_spans: &[Span],
         start: usize,
         ctx: &Ctx<'_, 's>,
+        state: &State,
     ) -> Doc<'s>
     where
         N: DocGen<'s> + Spanned,
@@ -81,7 +83,7 @@ impl SeparatedListFormatter {
                             docs.push(Doc::soft_line());
                         }
                     }
-                    docs.push(list_item.doc(ctx));
+                    docs.push(list_item.doc(ctx, state));
                     docs.extend(ctx.start_spaced_comments(
                         ctx.get_comments_between(list_item_span.end, separator_span.start),
                     ));
@@ -131,7 +133,7 @@ impl SeparatedListFormatter {
                             docs.push(Doc::soft_line());
                         }
                     }
-                    docs.push(list_item.doc(ctx));
+                    docs.push(list_item.doc(ctx, state));
                 }
                 EitherOrBoth::Right(..) => unreachable!(),
             }
@@ -150,6 +152,7 @@ pub(super) fn format_values_list<'s>(
     comma_spans: Option<&[Span]>,
     list_span: &Span,
     ctx: &Ctx<'_, 's>,
+    state: &State,
 ) -> Doc<'s> {
     if let Some(comma_spans) = comma_spans {
         Doc::list(
@@ -166,7 +169,7 @@ pub(super) fn format_values_list<'s>(
                                     value_span.start,
                                 ))
                                 .collect::<Vec<_>>();
-                            docs.push(value.doc(ctx));
+                            docs.push(value.doc(ctx, state));
                             docs.extend(ctx.start_spaced_comments(
                                 ctx.get_comments_between(value_span.end, comma_span.start),
                             ));
@@ -178,7 +181,7 @@ pub(super) fn format_values_list<'s>(
                                     ctx.get_comments_between(*pos, value.span().start),
                                 )
                                 .collect::<Vec<_>>();
-                            docs.push(value.doc(ctx));
+                            docs.push(value.doc(ctx, state));
                             Some(docs.into_iter())
                         }
                         EitherOrBoth::Right(..) => unreachable!(),
@@ -206,7 +209,7 @@ pub(super) fn format_values_list<'s>(
                             mem::replace(pos, value_span.end),
                             value_span.start,
                         ))
-                        .chain(iter::once(value.doc(ctx)))
+                        .chain(iter::once(value.doc(ctx, state)))
                         .collect::<Vec<_>>()
                         .into_iter(),
                     )
@@ -296,12 +299,13 @@ pub(super) fn format_space_before_block<'s>(
 pub(super) fn ident_to_lowercase<'s>(
     interpolable_ident: &InterpolableIdent<'s>,
     ctx: &Ctx<'_, 's>,
+    state: &State,
 ) -> Doc<'s> {
     match &interpolable_ident {
         InterpolableIdent::Literal(ident) if !ident.name.starts_with("--") => {
             Doc::text(ident.raw.to_ascii_lowercase())
         }
-        name => name.doc(ctx),
+        name => name.doc(ctx, state),
     }
 }
 

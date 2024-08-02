@@ -1,11 +1,11 @@
 use super::{helpers, DocGen};
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state::State};
 use raffia::{ast::*, Spanned};
 use std::mem;
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for AnPlusB {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         let a = match self.a {
             0 => Doc::nil(),
             1 => Doc::text("n"),
@@ -22,7 +22,7 @@ impl<'s> DocGen<'s> for AnPlusB {
 }
 
 impl<'s> DocGen<'s> for AttributeSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         docs.push(Doc::text("["));
         docs.extend(
@@ -30,7 +30,7 @@ impl<'s> DocGen<'s> for AttributeSelector<'s> {
                 ctx.get_comments_between(self.span.start, self.name.span.start),
             ),
         );
-        docs.push(self.name.doc(ctx));
+        docs.push(self.name.doc(ctx, state));
 
         let mut pos = self.name.span.end;
         if let Some((matcher, value)) = self.matcher.as_ref().zip(self.value.as_ref()) {
@@ -38,13 +38,13 @@ impl<'s> DocGen<'s> for AttributeSelector<'s> {
                 mem::replace(&mut pos, matcher.span.end),
                 matcher.span.start,
             )));
-            docs.push(matcher.doc(ctx));
+            docs.push(matcher.doc(ctx, state));
 
             let value_span = value.span();
             docs.extend(ctx.end_spaced_comments(
                 ctx.get_comments_between(mem::replace(&mut pos, value_span.end), value_span.start),
             ));
-            docs.push(value.doc(ctx));
+            docs.push(value.doc(ctx, state));
             if let Some(modifier) = &self.modifier {
                 docs.reserve(2);
                 docs.push(Doc::space());
@@ -52,7 +52,7 @@ impl<'s> DocGen<'s> for AttributeSelector<'s> {
                     mem::replace(&mut pos, modifier.span.end),
                     modifier.span.start,
                 )));
-                docs.push(modifier.doc(ctx));
+                docs.push(modifier.doc(ctx, state));
             }
         }
 
@@ -63,7 +63,7 @@ impl<'s> DocGen<'s> for AttributeSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for AttributeSelectorMatcher {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(match self.kind {
             AttributeSelectorMatcherKind::Exact => "=",
             AttributeSelectorMatcherKind::MatchWord => "~=",
@@ -76,47 +76,49 @@ impl<'s> DocGen<'s> for AttributeSelectorMatcher {
 }
 
 impl<'s> DocGen<'s> for AttributeSelectorModifier<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match &self.ident {
             InterpolableIdent::Literal(ident) if matches!(&*ident.name, "I" | "S") => {
                 Doc::text(ident.name.to_ascii_lowercase())
             }
-            _ => self.ident.doc(ctx),
+            _ => self.ident.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for AttributeSelectorValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::{AttrValueQuotes, Quotes};
 
         match self {
             AttributeSelectorValue::Ident(ident) => match ctx.options.attr_value_quotes {
                 AttrValueQuotes::Always => match ctx.options.quotes {
                     Quotes::AlwaysDouble | Quotes::PreferDouble => Doc::text("\"")
-                        .append(ident.doc(ctx))
+                        .append(ident.doc(ctx, state))
                         .append(Doc::text("\"")),
-                    Quotes::AlwaysSingle | Quotes::PreferSingle => {
-                        Doc::text("'").append(ident.doc(ctx)).append(Doc::text("'"))
-                    }
+                    Quotes::AlwaysSingle | Quotes::PreferSingle => Doc::text("'")
+                        .append(ident.doc(ctx, state))
+                        .append(Doc::text("'")),
                 },
-                AttrValueQuotes::Ignore => ident.doc(ctx),
+                AttrValueQuotes::Ignore => ident.doc(ctx, state),
             },
-            AttributeSelectorValue::Str(str) => str.doc(ctx),
-            AttributeSelectorValue::Percentage(percentage) => percentage.doc(ctx),
-            AttributeSelectorValue::LessEscapedStr(less_escaped_str) => less_escaped_str.doc(ctx),
+            AttributeSelectorValue::Str(str) => str.doc(ctx, state),
+            AttributeSelectorValue::Percentage(percentage) => percentage.doc(ctx, state),
+            AttributeSelectorValue::LessEscapedStr(less_escaped_str) => {
+                less_escaped_str.doc(ctx, state)
+            }
         }
     }
 }
 
 impl<'s> DocGen<'s> for ClassSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text(".").append(self.name.doc(ctx))
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+        Doc::text(".").append(self.name.doc(ctx, state))
     }
 }
 
 impl<'s> DocGen<'s> for Combinator {
-    fn doc(&self, _: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
         Doc::text(match self.kind {
             CombinatorKind::Descendant => " ",
             CombinatorKind::Child => ">",
@@ -128,16 +130,18 @@ impl<'s> DocGen<'s> for Combinator {
 }
 
 impl<'s> DocGen<'s> for ComplexSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.children.len() * 2);
         let mut pos = self.span.start;
 
         let mut children = self.children.iter();
         if let Some(first) = children.next() {
             match first {
-                ComplexSelectorChild::CompoundSelector(selector) => docs.push(selector.doc(ctx)),
+                ComplexSelectorChild::CompoundSelector(selector) => {
+                    docs.push(selector.doc(ctx, state))
+                }
                 ComplexSelectorChild::Combinator(combinator) => {
-                    docs.push(combinator.doc(ctx));
+                    docs.push(combinator.doc(ctx, state));
                     docs.push(Doc::space());
                 }
             }
@@ -151,7 +155,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                         docs.extend(ctx.end_spaced_comments(
                             ctx.get_comments_between(pos, selector.span.start),
                         ));
-                        docs.push(selector.doc(ctx).nest(ctx.indent_width));
+                        docs.push(selector.doc(ctx, state).nest(ctx.indent_width));
                         (docs, selector.span.end)
                     }
                     ComplexSelectorChild::Combinator(Combinator {
@@ -184,7 +188,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                         docs.extend(ctx.end_spaced_comments(
                             ctx.get_comments_between(pos, combinator.span.start),
                         ));
-                        docs.push(combinator.doc(ctx));
+                        docs.push(combinator.doc(ctx, state));
                         docs.push(Doc::space());
                         (docs, combinator.span.end)
                     }
@@ -196,7 +200,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for CompoundSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             self.children
                 .iter()
@@ -210,7 +214,7 @@ impl<'s> DocGen<'s> for CompoundSelector<'s> {
                             ))
                             .collect(),
                         )
-                        .append(selector.doc(ctx)),
+                        .append(selector.doc(ctx, state)),
                     )
                 })
                 .collect(),
@@ -219,36 +223,37 @@ impl<'s> DocGen<'s> for CompoundSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for CompoundSelectorList<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         helpers::SeparatedListFormatter::new(",", Doc::space()).format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
             ctx,
+            state,
         )
     }
 }
 
 impl<'s> DocGen<'s> for IdSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        Doc::text("#").append(self.name.doc(ctx))
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+        Doc::text("#").append(self.name.doc(ctx, state))
     }
 }
 
 impl<'s> DocGen<'s> for LanguageRange<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            LanguageRange::Ident(ident) => ident.doc(ctx),
-            LanguageRange::Str(str) => str.doc(ctx),
+            LanguageRange::Ident(ident) => ident.doc(ctx, state),
+            LanguageRange::Str(str) => str.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for LanguageRangeList<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             itertools::intersperse(
-                self.ranges.iter().map(|selector| selector.doc(ctx)),
+                self.ranges.iter().map(|selector| selector.doc(ctx, state)),
                 Doc::text(", "),
             )
             .collect(),
@@ -257,10 +262,10 @@ impl<'s> DocGen<'s> for LanguageRangeList<'s> {
 }
 
 impl<'s> DocGen<'s> for NestingSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let ampersand = Doc::text("&");
         if let Some(suffix) = &self.suffix {
-            ampersand.append(suffix.doc(ctx))
+            ampersand.append(suffix.doc(ctx, state))
         } else {
             ampersand
         }
@@ -268,10 +273,10 @@ impl<'s> DocGen<'s> for NestingSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for NsPrefix<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let bar = Doc::text("|");
         if let Some(kind) = &self.kind {
-            kind.doc(ctx)
+            kind.doc(ctx, state)
                 .concat(
                     ctx.unspaced_comments(ctx.get_comments_between(kind.span().end, self.span.end)),
                 )
@@ -283,19 +288,19 @@ impl<'s> DocGen<'s> for NsPrefix<'s> {
 }
 
 impl<'s> DocGen<'s> for NsPrefixKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            NsPrefixKind::Ident(ident) => ident.doc(ctx),
+            NsPrefixKind::Ident(ident) => ident.doc(ctx, state),
             NsPrefixKind::Universal(..) => Doc::text("*"),
         }
     }
 }
 
 impl<'s> DocGen<'s> for Nth<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let index = self.index.doc(ctx);
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+        let index = self.index.doc(ctx, state);
         if let Some(matcher) = &self.matcher {
-            index.append(Doc::space()).append(matcher.doc(ctx))
+            index.append(Doc::space()).append(matcher.doc(ctx, state))
         } else {
             index
         }
@@ -303,9 +308,9 @@ impl<'s> DocGen<'s> for Nth<'s> {
 }
 
 impl<'s> DocGen<'s> for NthIndex<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            Self::AnPlusB(an_plus_b) => an_plus_b.doc(ctx),
+            Self::AnPlusB(an_plus_b) => an_plus_b.doc(ctx, state),
             Self::Odd(..) => Doc::text("odd"),
             Self::Even(..) => Doc::text("even"),
             Self::Integer(integer) => Doc::text((integer.value as i32).to_string()),
@@ -314,10 +319,12 @@ impl<'s> DocGen<'s> for NthIndex<'s> {
 }
 
 impl<'s> DocGen<'s> for NthMatcher<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let matcher = Doc::text("of");
         if let Some(selector) = &self.selector {
-            matcher.append(Doc::space()).append(selector.doc(ctx))
+            matcher
+                .append(Doc::space())
+                .append(selector.doc(ctx, state))
         } else {
             matcher
         }
@@ -325,14 +332,14 @@ impl<'s> DocGen<'s> for NthMatcher<'s> {
 }
 
 impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = vec![Doc::text(":")];
         docs.extend(
             ctx.unspaced_comments(
                 ctx.get_comments_between(self.span.start, self.name.span().start),
             ),
         );
-        docs.push(helpers::ident_to_lowercase(&self.name, ctx));
+        docs.push(helpers::ident_to_lowercase(&self.name, ctx, state));
 
         if let Some(arg) = &self.arg {
             docs.push(Doc::text("("));
@@ -370,23 +377,23 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
 
             arg_doc.push(match &arg.kind {
                 PseudoClassSelectorArgKind::CompoundSelector(compound_selector) => {
-                    compound_selector.doc(ctx)
+                    compound_selector.doc(ctx, state)
                 }
                 PseudoClassSelectorArgKind::CompoundSelectorList(compound_selector_list) => {
-                    compound_selector_list.doc(ctx)
+                    compound_selector_list.doc(ctx, state)
                 }
-                PseudoClassSelectorArgKind::Ident(ident) => ident.doc(ctx),
+                PseudoClassSelectorArgKind::Ident(ident) => ident.doc(ctx, state),
                 PseudoClassSelectorArgKind::LanguageRangeList(language_range_list) => {
-                    language_range_list.doc(ctx)
+                    language_range_list.doc(ctx, state)
                 }
-                PseudoClassSelectorArgKind::Nth(nth) => nth.doc(ctx),
-                PseudoClassSelectorArgKind::Number(number) => number.doc(ctx),
+                PseudoClassSelectorArgKind::Nth(nth) => nth.doc(ctx, state),
+                PseudoClassSelectorArgKind::Number(number) => number.doc(ctx, state),
                 PseudoClassSelectorArgKind::RelativeSelectorList(relative_selector_list) => {
-                    relative_selector_list.doc(ctx)
+                    relative_selector_list.doc(ctx, state)
                 }
                 PseudoClassSelectorArgKind::SelectorList(selector_list) => {
                     if ctx.options.linebreak_in_pseudo_parens {
-                        let doc = selector_list.doc(ctx);
+                        let doc = selector_list.doc(ctx, state);
                         if force_break {
                             doc
                         } else {
@@ -398,16 +405,18 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                             &selector_list.comma_spans,
                             selector_list.span.start,
                             ctx,
+                            state,
                         )
                     }
                 }
                 PseudoClassSelectorArgKind::LessExtendList(less_extend_list) => {
-                    less_extend_list.doc(ctx)
+                    less_extend_list.doc(ctx, state)
                 }
                 PseudoClassSelectorArgKind::TokenSeq(token_seq) => {
                     format_pseudo_selector_arg_tokens(
                         token_seq,
                         ctx,
+                        state,
                         token_seq.span.start,
                         token_seq.span.end,
                     )
@@ -437,14 +446,14 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = vec![Doc::text("::")];
         docs.extend(
             ctx.unspaced_comments(
                 ctx.get_comments_between(self.span.start, self.name.span().start),
             ),
         );
-        docs.push(helpers::ident_to_lowercase(&self.name, ctx));
+        docs.push(helpers::ident_to_lowercase(&self.name, ctx, state));
 
         if let Some(arg) = &self.arg {
             docs.push(Doc::text("("));
@@ -474,13 +483,14 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
 
             arg_doc.push(match &arg.kind {
                 PseudoElementSelectorArgKind::CompoundSelector(compound_selector) => {
-                    compound_selector.doc(ctx)
+                    compound_selector.doc(ctx, state)
                 }
-                PseudoElementSelectorArgKind::Ident(ident) => ident.doc(ctx),
+                PseudoElementSelectorArgKind::Ident(ident) => ident.doc(ctx, state),
                 PseudoElementSelectorArgKind::TokenSeq(token_seq) => {
                     format_pseudo_selector_arg_tokens(
                         token_seq,
                         ctx,
+                        state,
                         token_seq.span.start,
                         token_seq.span.end,
                     )
@@ -510,65 +520,67 @@ impl<'s> DocGen<'s> for PseudoElementSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for RelativeSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         if let Some(combinator) = &self.combinator {
             combinator
-                .doc(ctx)
+                .doc(ctx, state)
                 .append(Doc::space())
-                .append(self.complex_selector.doc(ctx))
+                .append(self.complex_selector.doc(ctx, state))
         } else {
-            self.complex_selector.doc(ctx)
+            self.complex_selector.doc(ctx, state)
         }
     }
 }
 
 impl<'s> DocGen<'s> for RelativeSelectorList<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         helpers::SeparatedListFormatter::new(",", Doc::space()).format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
             ctx,
+            state,
         )
     }
 }
 
 impl<'s> DocGen<'s> for SimpleSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            SimpleSelector::Class(selector) => selector.doc(ctx),
-            SimpleSelector::Id(selector) => selector.doc(ctx),
-            SimpleSelector::Type(selector) => selector.doc(ctx),
-            SimpleSelector::Attribute(selector) => selector.doc(ctx),
-            SimpleSelector::PseudoClass(selector) => selector.doc(ctx),
-            SimpleSelector::PseudoElement(selector) => selector.doc(ctx),
-            SimpleSelector::Nesting(selector) => selector.doc(ctx),
-            SimpleSelector::SassPlaceholder(selector) => selector.doc(ctx),
+            SimpleSelector::Class(selector) => selector.doc(ctx, state),
+            SimpleSelector::Id(selector) => selector.doc(ctx, state),
+            SimpleSelector::Type(selector) => selector.doc(ctx, state),
+            SimpleSelector::Attribute(selector) => selector.doc(ctx, state),
+            SimpleSelector::PseudoClass(selector) => selector.doc(ctx, state),
+            SimpleSelector::PseudoElement(selector) => selector.doc(ctx, state),
+            SimpleSelector::Nesting(selector) => selector.doc(ctx, state),
+            SimpleSelector::SassPlaceholder(selector) => selector.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for SelectorList<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         helpers::SeparatedListFormatter::new(",", Doc::line_or_space()).format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
             ctx,
+            state,
         )
     }
 }
 
 impl<'s> DocGen<'s> for TagNameSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let name = if let InterpolableIdent::Literal(ident) = &self.name.name {
             Doc::text(ident.raw.to_ascii_lowercase())
         } else {
-            self.name.doc(ctx)
+            self.name.doc(ctx, state)
         };
         if let Some(prefix) = &self.name.prefix {
             prefix
-                .doc(ctx)
+                .doc(ctx, state)
                 .concat(ctx.unspaced_comments(
                     ctx.get_comments_between(prefix.span.end, self.name.name.span().start),
                 ))
@@ -580,20 +592,20 @@ impl<'s> DocGen<'s> for TagNameSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for TypeSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            TypeSelector::TagName(selector) => selector.doc(ctx),
-            TypeSelector::Universal(selector) => selector.doc(ctx),
+            TypeSelector::TagName(selector) => selector.doc(ctx, state),
+            TypeSelector::Universal(selector) => selector.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for UniversalSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let asterisk = Doc::text("*");
         if let Some(prefix) = &self.prefix {
             prefix
-                .doc(ctx)
+                .doc(ctx, state)
                 .concat(
                     ctx.unspaced_comments(ctx.get_comments_between(prefix.span.end, self.span.end)),
                 )
@@ -605,11 +617,11 @@ impl<'s> DocGen<'s> for UniversalSelector<'s> {
 }
 
 impl<'s> DocGen<'s> for WqName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
-        let name = self.name.doc(ctx);
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+        let name = self.name.doc(ctx, state);
         if let Some(prefix) = &self.prefix {
             prefix
-                .doc(ctx)
+                .doc(ctx, state)
                 .concat(ctx.unspaced_comments(
                     ctx.get_comments_between(prefix.span.end, self.name.span().start),
                 ))
@@ -623,6 +635,7 @@ impl<'s> DocGen<'s> for WqName<'s> {
 fn format_pseudo_selector_arg_tokens<'a, 's: 'a>(
     token_seq: &TokenSeq<'s>,
     ctx: &Ctx<'a, 's>,
+    state: &State,
     from: usize,
     to: usize,
 ) -> Doc<'s> {
@@ -634,7 +647,7 @@ fn format_pseudo_selector_arg_tokens<'a, 's: 'a>(
     while let Some(token) = iter.next() {
         docs.extend(ctx.end_spaced_comments(ctx.get_comments_between(pos, token.span.start)));
 
-        docs.push(token.doc(ctx));
+        docs.push(token.doc(ctx, state));
         if let TokenWithSpan {
             token: Token::Comma(..) | Token::Semicolon(..),
             ..

@@ -1,10 +1,10 @@
 use super::super::DocGen;
-use crate::ctx::Ctx;
+use crate::{ctx::Ctx, state::State};
 use raffia::{ast::*, Spanned};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for ContainerCondition<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             self.conditions
                 .iter()
@@ -15,7 +15,7 @@ impl<'s> DocGen<'s> for ContainerCondition<'s> {
                         docs.extend(
                             ctx.start_spaced_comments(ctx.get_comments_between(pos, span.start)),
                         );
-                        docs.push(condition.doc(ctx));
+                        docs.push(condition.doc(ctx, state));
                         (docs, span.end)
                     },
                 )
@@ -25,7 +25,7 @@ impl<'s> DocGen<'s> for ContainerCondition<'s> {
 }
 
 impl<'s> DocGen<'s> for ContainerConditionAnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -35,25 +35,27 @@ impl<'s> DocGen<'s> for ContainerConditionAnd<'s> {
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.keyword.span.end, self.query_in_parens.span.start),
         ));
-        docs.push(self.query_in_parens.doc(ctx));
+        docs.push(self.query_in_parens.doc(ctx, state));
 
         Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
 impl<'s> DocGen<'s> for ContainerConditionKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            ContainerConditionKind::QueryInParens(query_in_parens) => query_in_parens.doc(ctx),
-            ContainerConditionKind::And(and) => and.doc(ctx),
-            ContainerConditionKind::Not(not) => not.doc(ctx),
-            ContainerConditionKind::Or(or) => or.doc(ctx),
+            ContainerConditionKind::QueryInParens(query_in_parens) => {
+                query_in_parens.doc(ctx, state)
+            }
+            ContainerConditionKind::And(and) => and.doc(ctx, state),
+            ContainerConditionKind::Not(not) => not.doc(ctx, state),
+            ContainerConditionKind::Or(or) => or.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for ContainerConditionNot<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -63,14 +65,14 @@ impl<'s> DocGen<'s> for ContainerConditionNot<'s> {
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.keyword.span.end, self.query_in_parens.span.start),
         ));
-        docs.push(self.query_in_parens.doc(ctx));
+        docs.push(self.query_in_parens.doc(ctx, state));
 
         Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
 impl<'s> DocGen<'s> for ContainerConditionOr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -80,35 +82,35 @@ impl<'s> DocGen<'s> for ContainerConditionOr<'s> {
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.keyword.span.end, self.query_in_parens.span.start),
         ));
-        docs.push(self.query_in_parens.doc(ctx));
+        docs.push(self.query_in_parens.doc(ctx, state));
 
         Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
 impl<'s> DocGen<'s> for ContainerPrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         if let Some(name) = &self.name {
-            docs.push(name.doc(ctx));
+            docs.push(name.doc(ctx, state));
             docs.push(Doc::space());
             docs.extend(ctx.end_spaced_comments(
                 ctx.get_comments_between(name.span().start, self.condition.span.start),
             ));
         }
-        docs.push(self.condition.doc(ctx));
+        docs.push(self.condition.doc(ctx, state));
         Doc::list(docs)
     }
 }
 
 impl<'s> DocGen<'s> for QueryInParens<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match &self.kind {
             QueryInParensKind::ContainerCondition(condition) => Doc::text("(")
                 .concat(ctx.end_spaced_comments(
                     ctx.get_comments_between(self.span.start, condition.span.start),
                 ))
-                .append(condition.doc(ctx))
+                .append(condition.doc(ctx, state))
                 .concat(ctx.start_spaced_comments(
                     ctx.get_comments_between(condition.span.end, self.span.end),
                 ))
@@ -121,7 +123,7 @@ impl<'s> DocGen<'s> for QueryInParens<'s> {
                             ctx.get_comments_between(self.span.start, span.start),
                         ),
                     )
-                    .append(size_feature.doc(ctx))
+                    .append(size_feature.doc(ctx, state))
                     .concat(
                         ctx.start_spaced_comments(
                             ctx.get_comments_between(span.end, self.span.end),
@@ -137,7 +139,7 @@ impl<'s> DocGen<'s> for QueryInParens<'s> {
                             ctx.get_comments_between(self.span.start, span.start),
                         ),
                     )
-                    .append(style_query.doc(ctx))
+                    .append(style_query.doc(ctx, state))
                     .concat(
                         ctx.start_spaced_comments(
                             ctx.get_comments_between(span.end, self.span.end),
@@ -150,7 +152,7 @@ impl<'s> DocGen<'s> for QueryInParens<'s> {
 }
 
 impl<'s> DocGen<'s> for StyleCondition<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             self.conditions
                 .iter()
@@ -161,7 +163,7 @@ impl<'s> DocGen<'s> for StyleCondition<'s> {
                         docs.extend(
                             ctx.start_spaced_comments(ctx.get_comments_between(pos, span.start)),
                         );
-                        docs.push(condition.doc(ctx));
+                        docs.push(condition.doc(ctx, state));
                         (docs, span.end)
                     },
                 )
@@ -171,7 +173,7 @@ impl<'s> DocGen<'s> for StyleCondition<'s> {
 }
 
 impl<'s> DocGen<'s> for StyleConditionAnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -181,25 +183,25 @@ impl<'s> DocGen<'s> for StyleConditionAnd<'s> {
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.keyword.span.end, self.style_in_parens.span.start),
         ));
-        docs.push(self.style_in_parens.doc(ctx));
+        docs.push(self.style_in_parens.doc(ctx, state));
 
         Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
 impl<'s> DocGen<'s> for StyleConditionKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            StyleConditionKind::StyleInParens(style_in_parens) => style_in_parens.doc(ctx),
-            StyleConditionKind::And(and) => and.doc(ctx),
-            StyleConditionKind::Not(not) => not.doc(ctx),
-            StyleConditionKind::Or(or) => or.doc(ctx),
+            StyleConditionKind::StyleInParens(style_in_parens) => style_in_parens.doc(ctx, state),
+            StyleConditionKind::And(and) => and.doc(ctx, state),
+            StyleConditionKind::Not(not) => not.doc(ctx, state),
+            StyleConditionKind::Or(or) => or.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for StyleConditionNot<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -209,14 +211,14 @@ impl<'s> DocGen<'s> for StyleConditionNot<'s> {
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.keyword.span.end, self.style_in_parens.span.start),
         ));
-        docs.push(self.style_in_parens.doc(ctx));
+        docs.push(self.style_in_parens.doc(ctx, state));
 
         Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
 impl<'s> DocGen<'s> for StyleConditionOr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -226,20 +228,20 @@ impl<'s> DocGen<'s> for StyleConditionOr<'s> {
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.keyword.span.end, self.style_in_parens.span.start),
         ));
-        docs.push(self.style_in_parens.doc(ctx));
+        docs.push(self.style_in_parens.doc(ctx, state));
 
         Doc::list(docs).group().nest(ctx.indent_width)
     }
 }
 
 impl<'s> DocGen<'s> for StyleInParens<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let kind_span = self.kind.span();
         Doc::text("(")
             .concat(
                 ctx.end_spaced_comments(ctx.get_comments_between(self.span.start, kind_span.start)),
             )
-            .append(self.kind.doc(ctx))
+            .append(self.kind.doc(ctx, state))
             .concat(
                 ctx.start_spaced_comments(ctx.get_comments_between(kind_span.end, self.span.end)),
             )
@@ -248,19 +250,19 @@ impl<'s> DocGen<'s> for StyleInParens<'s> {
 }
 
 impl<'s> DocGen<'s> for StyleInParensKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            StyleInParensKind::Condition(condition) => condition.doc(ctx),
-            StyleInParensKind::Feature(feature) => feature.doc(ctx),
+            StyleInParensKind::Condition(condition) => condition.doc(ctx, state),
+            StyleInParensKind::Feature(feature) => feature.doc(ctx, state),
         }
     }
 }
 
 impl<'s> DocGen<'s> for StyleQuery<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         match self {
-            StyleQuery::Condition(condition) => condition.doc(ctx),
-            StyleQuery::Feature(feature) => feature.doc(ctx),
+            StyleQuery::Condition(condition) => condition.doc(ctx, state),
+            StyleQuery::Feature(feature) => feature.doc(ctx, state),
         }
     }
 }
