@@ -61,7 +61,9 @@ pub fn print_stylesheet<'a, 's>(
         indent_width: options.layout.indent_width,
         line_bounds,
     };
-    let state = State::default();
+    let state = State {
+        in_less_detached_ruleset: false,
+    };
     let doc = stylesheet.doc(&ctx, &state);
     tiny_pretty::print(
         &doc,
