@@ -226,7 +226,7 @@ impl<'s> DocGen<'s> for LessImportPrelude<'s> {
         docs.push(self.options.doc(ctx, state));
         let mut pos = self.options.span.end;
 
-        docs.push(Doc::line_or_space());
+        docs.push(Doc::soft_line().nest(ctx.indent_width));
         let href_span = self.href.span();
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(mem::replace(&mut pos, href_span.end), href_span.start),
@@ -234,12 +234,12 @@ impl<'s> DocGen<'s> for LessImportPrelude<'s> {
         docs.push(self.href.doc(ctx, state));
 
         if let Some(media) = &self.media {
-            docs.push(Doc::line_or_space());
+            docs.push(Doc::soft_line().nest(ctx.indent_width));
             docs.extend(ctx.end_spaced_comments(ctx.get_comments_between(pos, media.span.start)));
             docs.push(media.doc(ctx, state));
         }
 
-        Doc::list(docs).group().nest(ctx.indent_width)
+        Doc::list(docs).group()
     }
 }
 
