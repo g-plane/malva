@@ -1,0 +1,11 @@
+/*cfg blockSelectorLinebreak = "always"*/
+
+/* malva-selector-override consistent */
+div,span {
+  div,span{} /* this shouldn't be overriden */
+}
+
+/* malva-selector-override: consistent */
+div,span {
+  div,span{} /* this shouldn't be overriden */
+}

@@ -135,6 +135,13 @@ pub struct LanguageOptions {
     /// See [`attrValueQuotes`](https://github.com/g-plane/malva/blob/main/docs/config.md#attrvaluequotes) on GitHub
     pub attr_value_quotes: AttrValueQuotes,
 
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(alias = "selectorOverrideCommentDirective")
+    )]
+    /// See [`selectorOverrideCommentDirective`](https://github.com/g-plane/malva/blob/main/docs/config.md#selectoroverridecommentdirective) on GitHub
+    pub selector_override_comment_directive: String,
+
     #[cfg_attr(feature = "config_serde", serde(alias = "ignoreCommentDirective"))]
     /// See [`ignoreCommentDirective`](https://github.com/g-plane/malva/blob/main/docs/config.md#ignorecommentdirective) on GitHub
     pub ignore_comment_directive: String,
@@ -156,6 +163,7 @@ impl Default for LanguageOptions {
             single_line_block_threshold: None,
             keyframe_selector_notation: None,
             attr_value_quotes: AttrValueQuotes::default(),
+            selector_override_comment_directive: "malva-selector-override".into(),
             ignore_comment_directive: "malva-ignore".into(),
         }
     }

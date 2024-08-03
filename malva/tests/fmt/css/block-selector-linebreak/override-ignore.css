@@ -1,0 +1,13 @@
+/* malva-selector-override ignore */
+h1, h2,
+h3, h4,
+h5, h6 {
+  div,span{} /* this shouldn't be overriden */
+}
+
+/* malva-selector-override: ignore */
+h1, h2,
+h3, h4,
+h5, h6 {
+  div,span{} /* this shouldn't be overriden */
+}

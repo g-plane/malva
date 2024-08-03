@@ -118,11 +118,12 @@ impl<'s> DocGen<'s> for LessConditions<'s> {
 }
 
 impl<'s> DocGen<'s> for LessDetachedRuleset<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         self.block.doc(
             ctx,
             &State {
                 in_less_detached_ruleset: true,
+                ..state.clone()
             },
         )
     }

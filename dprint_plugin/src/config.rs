@@ -207,6 +207,12 @@ pub(crate) fn resolve_config(
                     Default::default()
                 }
             },
+            selector_override_comment_directive: get_value(
+                &mut config,
+                "selectorOverrideCommentDirective",
+                "malva-selector-override".into(),
+                &mut diagnostics,
+            ),
             ignore_comment_directive: get_value(
                 &mut config,
                 "ignoreCommentDirective",

@@ -206,6 +206,11 @@
       ],
       "default": "always"
     },
+    "selectorOverrideCommentDirective": {
+      "description": "Text directive for overriding selector formatting.",
+      "type": "string",
+      "default": "malva-selector-override"
+    },
     "ignoreCommentDirective": {
       "description": "Text directive for ignoring formatting specific statement.",
       "type": "string",

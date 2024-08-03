@@ -1,0 +1,9 @@
+/* malva-selector-override always */
+div,span {
+  div,span{} /* this shouldn't be overriden */
+}
+
+/* malva-selector-override: always */
+div,span {
+  div,span{} /* this shouldn't be overriden */
+}

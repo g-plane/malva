@@ -485,9 +485,13 @@ struct SingleStmtFormatter<'a, 's> {
 }
 impl<'a, 's> SingleStmtFormatter<'a, 's> {
     fn format(self, ctx: &Ctx<'_, 's>, state: &State) -> Vec<Doc<'s>> {
+        use crate::state::SelectorOverride;
+
         let mut docs = Vec::with_capacity(3);
 
         let span = self.stmt.span();
+        let is_qualified_rule = self.stmt.is_qualified_rule();
+        let mut selector_override = SelectorOverride::Unset;
 
         let comments = ctx.get_comments_between(*self.pos, span.start);
         let has_comments =
@@ -505,6 +509,20 @@ impl<'a, 's> SingleStmtFormatter<'a, 's> {
                         }
                     }
                     docs.push(format_comment(comment, ctx));
+                    if is_qualified_rule {
+                        selector_override = comment
+                            .content
+                            .trim()
+                            .strip_prefix(&ctx.options.selector_override_comment_directive)
+                            .map(|s| match s.strip_prefix(':').unwrap_or(s).trim() {
+                                "ignore" => SelectorOverride::Ignore,
+                                "always" => SelectorOverride::Always,
+                                "consistent" => SelectorOverride::Consistent,
+                                "wrap" => SelectorOverride::Wrap,
+                                _ => SelectorOverride::Unset,
+                            })
+                            .unwrap_or(SelectorOverride::Unset);
+                    }
                     *self.pos = comment.span.end;
                     true
                 });
@@ -517,6 +535,14 @@ impl<'a, 's> SingleStmtFormatter<'a, 's> {
                 docs.push(Doc::hard_line());
             }
         }
+        let state = if is_qualified_rule {
+            &State {
+                selector_override,
+                ..state.clone()
+            }
+        } else {
+            state
+        };
         if comments
             .last()
             .and_then(|comment| {

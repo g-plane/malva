@@ -1,0 +1,18 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg blockSelectorLinebreak = "always"*/
+
+/* malva-selector-override wrap */
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
+pre, abbr {
+  div,
+  span {} /* this shouldn't be overriden */
+}
+
+/* malva-selector-override: wrap */
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
+pre, abbr {
+  div,
+  span {} /* this shouldn't be overriden */
+}

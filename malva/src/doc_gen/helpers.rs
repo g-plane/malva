@@ -15,11 +15,34 @@ pub(super) fn format_selectors_before_block<'s, N>(
 where
     N: DocGen<'s> + Spanned,
 {
-    use crate::config::BlockSelectorLineBreak;
+    use crate::{config::BlockSelectorLineBreak, state::SelectorOverride};
+
+    let linebreak = match state.selector_override {
+        SelectorOverride::Unset => ctx.options.block_selector_linebreak.clone(),
+        SelectorOverride::Ignore => {
+            if let Some(source) = ctx.source {
+                let first = selectors[0].span();
+                let raw = &source[first.start
+                    ..selectors
+                        .last()
+                        .map(|last| last.span())
+                        .unwrap_or(first)
+                        .end];
+                return Doc::list(
+                    itertools::intersperse(raw.lines().map(Doc::text), Doc::empty_line()).collect(),
+                );
+            } else {
+                ctx.options.block_selector_linebreak.clone()
+            }
+        }
+        SelectorOverride::Always => BlockSelectorLineBreak::Always,
+        SelectorOverride::Consistent => BlockSelectorLineBreak::Consistent,
+        SelectorOverride::Wrap => BlockSelectorLineBreak::Wrap,
+    };
 
     SeparatedListFormatter::new(
         ",",
-        match ctx.options.block_selector_linebreak {
+        match linebreak {
             BlockSelectorLineBreak::Always => Doc::hard_line(),
             BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
             BlockSelectorLineBreak::Wrap => Doc::soft_line(),

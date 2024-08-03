@@ -63,6 +63,7 @@ pub fn print_stylesheet<'a, 's>(
     };
     let state = State {
         in_less_detached_ruleset: false,
+        selector_override: crate::state::SelectorOverride::Unset,
     };
     let doc = stylesheet.doc(&ctx, &state);
     tiny_pretty::print(
