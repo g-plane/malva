@@ -133,7 +133,7 @@
       "type": "boolean",
       "default": false
     },
-    "padComments": {
+    "formatComments": {
       "description": "Control whether whitespace should be inserted at the beginning and end of comments.",
       "type": "boolean",
       "default": false

@@ -6,7 +6,7 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
     match comment.kind {
         CommentKind::Block => {
             let mut docs = vec![Doc::text("/*")];
-            if ctx.options.pad_comments
+            if ctx.options.format_comments
                 && !comment
                     .content
                     .as_bytes()
@@ -42,7 +42,7 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
                 ));
             }
 
-            if ctx.options.pad_comments
+            if ctx.options.format_comments
                 && !comment
                     .content
                     .as_bytes()
@@ -62,7 +62,7 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
         }
         CommentKind::Line => {
             let content = comment.content.trim_end();
-            if ctx.options.pad_comments
+            if ctx.options.format_comments
                 && !content
                     .as_bytes()
                     .first()

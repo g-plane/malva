@@ -389,7 +389,7 @@ $config: (
 );
 ```
 
-## `padComments`
+## `formatComments`
 
 Control whether whitespace should be inserted at the beginning and end of comments.
 

@@ -108,9 +108,16 @@ pub struct LanguageOptions {
     /// See [`trailingComma`](https://github.com/g-plane/malva/blob/main/docs/config.md#trailingcomma) on GitHub
     pub trailing_comma: bool,
 
-    #[cfg_attr(feature = "config_serde", serde(alias = "padComments"))]
-    /// See [`padComments`](https://github.com/g-plane/malva/blob/main/docs/config.md#padcomments) on GitHub
-    pub pad_comments: bool,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            alias = "formatComments",
+            alias = "pad_comments", // for backward compatibility
+            alias = "padComments" // for backward compatibility
+        )
+    )]
+    /// See [`formatComments`](https://github.com/g-plane/malva/blob/main/docs/config.md#formatcomments) on GitHub
+    pub format_comments: bool,
 
     #[cfg_attr(
         feature = "config_serde",
@@ -251,7 +258,7 @@ impl Default for LanguageOptions {
             block_selector_linebreak: BlockSelectorLineBreak::default(),
             omit_number_leading_zero: false,
             trailing_comma: false,
-            pad_comments: false,
+            format_comments: false,
             linebreak_in_pseudo_parens: false,
             declaration_order: None,
             single_line_block_threshold: None,

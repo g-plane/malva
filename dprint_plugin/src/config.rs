@@ -144,7 +144,8 @@ pub(crate) fn resolve_config(
                 &mut diagnostics,
             ),
             trailing_comma: get_value(&mut config, "trailingComma", false, &mut diagnostics),
-            pad_comments: get_value(&mut config, "padComments", false, &mut diagnostics),
+            format_comments: get_nullable_value(&mut config, "formatComments", &mut diagnostics)
+                .unwrap_or_else(|| get_value(&mut config, "padComments", false, &mut diagnostics)),
             linebreak_in_pseudo_parens: get_value(
                 &mut config,
                 "linebreakInPseudoParens",
