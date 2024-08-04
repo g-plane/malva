@@ -49,7 +49,12 @@ source: malva/tests/fmt.rs
 @mixin button-variant($hover-background: darken($background, 7.5%)) {}
 @mixin button-variant($hover-background: darken($background, 7.5%)) {}
 @mixin button-variant($hover-background: darken($background, 7.5%)) {}
-@mixin button-variant($hover-background: darken($background, 7.5%)) {}
+@mixin button-variant(
+  $hover-background: darken(
+    $background,
+    7.5%
+  )
+) {}
 @mixin button-variant($foo: "...") {}
 @mixin button-variant($foo: " ... ") {}
 @mixin button-variant($foo: "  ...  ") {}

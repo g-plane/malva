@@ -1,0 +1,36 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg "sassModuleConfig.preferSingleLine" = true*/
+
+@use "library" with ($var1: 1, $var2: 2, $var3: 3);
+
+$var: namespace.fn(
+  1,
+  2,
+  3
+);
+
+@include mixin(
+  1,
+  2,
+  3
+) {
+  @content (
+    1,
+    2,
+    3
+  );
+}
+
+$map: (
+  k1: v1,
+  k2: v2,
+  k3: v3
+);
+
+@function fn(
+  $arg1,
+  $arg2,
+  $arg3
+) {}

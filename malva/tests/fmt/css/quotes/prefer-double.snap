@@ -8,7 +8,9 @@ source: malva/tests/fmt.rs
 @charset 'UTF-8'; /* Single quotes are invalid here. Keep them since we don't know what the user is doing. */
 
 @supports (content: one "two" three "four") {
-  a[href="foo" y], abbr[title^="It\'s a trap!"], img[src=""] {
+  a[href="foo" y],
+  abbr[title^="It\'s a trap!"],
+  img[src=""] {
     /* Simple strings. */
     content: "abc";
     content: "abc";

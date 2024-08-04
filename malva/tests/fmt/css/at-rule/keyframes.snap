@@ -9,7 +9,8 @@ source: malva/tests/fmt.rs
   30% {
     top: 50px;
   }
-  68%, 72% {
+  68%,
+  72% {
     left: 50px;
   }
   100% {
@@ -73,7 +74,8 @@ source: malva/tests/fmt.rs
   30% {
     top: 50px;
   }
-  68%, 72% {
+  68%,
+  72% {
     left: 50px;
   }
   100% {
@@ -93,7 +95,8 @@ source: malva/tests/fmt.rs
     top: 50px;
   }
 
-  68%, 72% {
+  68%,
+  72% {
     left: 50px;
   }
 

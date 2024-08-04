@@ -1,0 +1,18 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg "lessImportOptions.preferSingleLine" = true*/
+
+@import (inline, css, multiple) url("import/invalid-css.less");
+
+.mixin(
+  @a,
+  @b,
+  @c
+) {}
+
+.mixin(
+  @a,
+  @b,
+  @c
+);

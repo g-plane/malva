@@ -33,7 +33,12 @@ impl<'s> DocGen<'s> for CustomSelectorArgs<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
-                helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &self.args,
+                    ctx.options.selectors_prefer_single_line,
+                    ctx,
+                ),
             )
             .format(&self.args, &self.comma_spans, self.span.start, ctx, state),
             self.args

@@ -206,6 +206,61 @@
       ],
       "default": "always"
     },
+    "preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": "boolean",
+      "default": false
+    },
+    "selectors.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "functionArgs.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "sassContentAtRule.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "sassIncludeAtRule.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "sassMap.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "sassModuleConfig.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "sassParams.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "lessImportOptions.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "lessMixinArgs.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "lessMixinParams.preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
     "selectorOverrideCommentDirective": {
       "description": "Text directive for overriding selector formatting.",
       "type": "string",

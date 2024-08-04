@@ -44,7 +44,25 @@ where
         ",",
         match linebreak {
             BlockSelectorLineBreak::Always => Doc::hard_line(),
-            BlockSelectorLineBreak::Consistent => Doc::line_or_space(),
+            BlockSelectorLineBreak::Consistent => {
+                if ctx
+                    .options
+                    .selectors_prefer_single_line
+                    .unwrap_or(ctx.options.prefer_single_line)
+                    || selectors
+                        .first()
+                        .zip(selectors.get(1))
+                        .is_some_and(|(first, second)| {
+                            ctx.line_bounds
+                                .line_distance(first.span().end, second.span().start)
+                                == 0
+                        })
+                {
+                    Doc::line_or_space()
+                } else {
+                    Doc::hard_line()
+                }
+            }
             BlockSelectorLineBreak::Wrap => Doc::soft_line(),
         },
     )
@@ -335,13 +353,18 @@ pub(super) fn ident_to_lowercase<'s>(
 pub(super) fn get_smart_linebreak<N>(
     start: usize,
     elements: &[N],
+    prefer_single_line: Option<bool>,
     ctx: &Ctx<'_, '_>,
 ) -> Doc<'static>
 where
     N: Spanned,
 {
+    let prefer_single_line = prefer_single_line.unwrap_or(ctx.options.prefer_single_line);
     match elements.first() {
-        Some(element) if ctx.line_bounds.line_distance(start, element.span().start) > 0 => {
+        Some(element)
+            if !prefer_single_line
+                && ctx.line_bounds.line_distance(start, element.span().start) > 0 =>
+        {
             Doc::hard_line()
         }
         _ => Doc::line_or_space(),

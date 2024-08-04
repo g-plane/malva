@@ -7,8 +7,36 @@ a {
   prop3: func(1px, 1px, 1px, func(1px, 1px, 1px, func(1px, 1px, 1px)));
   prop4: func(1px, 1px, 1px, func(1px, 1px, 1px, func(1px, 1px, 1px)));
   prop5: func(1px, 1px, 1px, func(1px, 1px, 1px, func(1px, 1px, 1px)));
-  prop6: func(1px, 1px, 1px, func(1px, 1px, 1px, func(1px, 1px, 1px)));
-  prop7: func(1px, 1px, 1px, func(1px, 1px, 1px, func(1px, 1px, 1px)));
+  prop6: func(
+    1px,
+    1px,
+    1px,
+    func(
+      1px,
+      1px,
+      1px,
+      func(
+        1px,
+        1px,
+        1px
+      )
+    )
+  );
+  prop7: func(
+    1px,
+    1px,
+    1px,
+    func(
+      1px,
+      1px,
+      1px,
+      func(
+        1px,
+        1px,
+        1px
+      )
+    )
+  );
   prop8: very-very-very-very-very-very-vey-very-very-long-func(
     1px,
     1px,
@@ -39,7 +67,11 @@ a {
       1px,
       1px,
       1px,
-      very-very-very-very-very-very-vey-very-very-long-func(1px, 1px, 1px)
+      very-very-very-very-very-very-vey-very-very-long-func(
+        1px,
+        1px,
+        1px
+      )
     )
   );
   prop11: very-very-very-very-very-very-vey-very-very-long-func(
@@ -50,7 +82,11 @@ a {
       1px,
       1px,
       1px,
-      very-very-very-very-very-very-vey-very-very-long-func(1px, 1px, 1px)
+      very-very-very-very-very-very-vey-very-very-long-func(
+        1px,
+        1px,
+        1px
+      )
     )
   );
 }
@@ -80,9 +116,18 @@ a {
   prop20: attr(data-size em, 20);
   prop21: attr(data-size em, 20);
   prop22: attr(data-size em, 20);
-  prop23: attr(data-size em, 20);
-  prop24: attr(data-size em, 20);
-  prop25: attr(data-size em, 20);
+  prop23: attr(
+    data-size em,
+    20
+  );
+  prop24: attr(
+    data-size em,
+    20
+  );
+  prop25: attr(
+    data-size em,
+    20
+  );
 }
 
 .bar {

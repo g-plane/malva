@@ -3,7 +3,8 @@ source: malva/tests/fmt.rs
 ---
 // mixin for clearfix
 @mixin clearfix() {
-  &:before, &:after {
+  &:before,
+  &:after {
     content: " ";
     display: table;
   }

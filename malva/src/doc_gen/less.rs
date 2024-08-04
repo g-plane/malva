@@ -206,7 +206,12 @@ impl<'s> DocGen<'s> for LessImportOptions<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
-                helpers::get_smart_linebreak(self.span.start, &self.names, ctx),
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &self.names,
+                    ctx.options.less_import_options_prefer_single_line,
+                    ctx,
+                ),
             )
             .with_trailing()
             .format(&self.names, &self.comma_spans, self.span.start, ctx, state),
@@ -425,7 +430,12 @@ impl<'s> DocGen<'s> for LessMixinArguments<'s> {
             .append(
                 helpers::SeparatedListFormatter::new(
                     if self.is_comma_separated { "," } else { ";" },
-                    helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+                    helpers::get_smart_linebreak(
+                        self.span.start,
+                        &self.args,
+                        ctx.options.less_mixin_args_prefer_single_line,
+                        ctx,
+                    ),
                 )
                 .with_trailing()
                 .format(
@@ -617,7 +627,12 @@ impl<'s> DocGen<'s> for LessMixinParameters<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 if self.is_comma_separated { "," } else { ";" },
-                helpers::get_smart_linebreak(self.span.start, &self.params, ctx),
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &self.params,
+                    ctx.options.less_mixin_params_prefer_single_line,
+                    ctx,
+                ),
             )
             .with_trailing()
             .format(

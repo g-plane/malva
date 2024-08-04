@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg "functionArgs.preferSingleLine" = true*/
+a,
+b {
+  color: rgb(0, 0, 0);
+}

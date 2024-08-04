@@ -32,7 +32,8 @@ source: malva/tests/fmt.rs
 .parent, .another-parent {}
 .parent, .another-parent {}
 .parent, .another-parent {}
-.parent, .another-parent {}
+.parent,
+.another-parent {}
 
 .parent.child {}
 .parent .child {}

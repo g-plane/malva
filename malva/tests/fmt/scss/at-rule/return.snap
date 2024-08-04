@@ -44,5 +44,8 @@ source: malva/tests/fmt.rs
   @return map-merge($obj, $ext-obj);
 }
 @function extend($obj, $ext-obj) {
-  @return map-merge($obj, $ext-obj);
+  @return map-merge(
+    $obj,
+    $ext-obj
+  );
 }

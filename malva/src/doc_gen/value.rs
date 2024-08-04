@@ -342,7 +342,12 @@ impl<'s> DocGen<'s> for Function<'s> {
                     format_group(group, &mut pos, separator.clone(), ctx, state)
                 }
             }),
-            Doc::line_or_space(),
+            helpers::get_smart_linebreak(
+                self.span.start,
+                &self.args,
+                ctx.options.function_args_prefer_single_line,
+                ctx,
+            ),
         ));
 
         let mut has_last_line_comment = false;

@@ -561,7 +561,24 @@ impl<'s> DocGen<'s> for SimpleSelector<'s> {
 
 impl<'s> DocGen<'s> for SelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
-        helpers::SeparatedListFormatter::new(",", Doc::line_or_space()).format(
+        let space_after_separator = if ctx
+            .options
+            .selectors_prefer_single_line
+            .unwrap_or(ctx.options.prefer_single_line)
+            || self
+                .selectors
+                .first()
+                .zip(self.selectors.get(1))
+                .is_some_and(|(first, second)| {
+                    ctx.line_bounds
+                        .line_distance(first.span.end, second.span.start)
+                        == 0
+                }) {
+            Doc::line_or_space()
+        } else {
+            Doc::hard_line()
+        };
+        helpers::SeparatedListFormatter::new(",", space_after_separator).format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,

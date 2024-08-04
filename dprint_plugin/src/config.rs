@@ -207,6 +207,57 @@ pub(crate) fn resolve_config(
                     Default::default()
                 }
             },
+            prefer_single_line: get_value(&mut config, "preferSingleLine", false, &mut diagnostics),
+            selectors_prefer_single_line: get_nullable_value(
+                &mut config,
+                "selectorsPreferSingleLine",
+                &mut diagnostics,
+            ),
+            function_args_prefer_single_line: get_nullable_value(
+                &mut config,
+                "functionArgsPreferSingleLine",
+                &mut diagnostics,
+            ),
+            sass_content_at_rule_prefer_single_line: get_nullable_value(
+                &mut config,
+                "sassContentAtRulePreferSingleLine",
+                &mut diagnostics,
+            ),
+            sass_include_at_rule_prefer_single_line: get_nullable_value(
+                &mut config,
+                "sassIncludeAtRulePreferSingleLine",
+                &mut diagnostics,
+            ),
+            sass_map_prefer_single_line: get_nullable_value(
+                &mut config,
+                "sassMapPreferSingleLine",
+                &mut diagnostics,
+            ),
+            sass_module_config_prefer_single_line: get_nullable_value(
+                &mut config,
+                "sassModuleConfigPreferSingleLine",
+                &mut diagnostics,
+            ),
+            sass_params_prefer_single_line: get_nullable_value(
+                &mut config,
+                "sassParamsPreferSingleLine",
+                &mut diagnostics,
+            ),
+            less_import_options_prefer_single_line: get_nullable_value(
+                &mut config,
+                "lessImportOptionsPreferSingleLine",
+                &mut diagnostics,
+            ),
+            less_mixin_args_prefer_single_line: get_nullable_value(
+                &mut config,
+                "lessMixinArgsPreferSingleLine",
+                &mut diagnostics,
+            ),
+            less_mixin_params_prefer_single_line: get_nullable_value(
+                &mut config,
+                "lessMixinParamsPreferSingleLine",
+                &mut diagnostics,
+            ),
             selector_override_comment_directive: get_value(
                 &mut config,
                 "selectorOverrideCommentDirective",

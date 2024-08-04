@@ -186,7 +186,8 @@ style comment! */
 @import "library"; // library.less
 @import "typo.css";
 
-a, .link {
+a,
+.link {
   color: #428bca;
 }
 .widget {
@@ -199,7 +200,8 @@ a, .link {
 @link-color-hover: darken(@link-color, 10%);
 
 // Usage
-a, .link {
+a,
+.link {
   color: @link-color;
 }
 a:hover {
@@ -320,7 +322,8 @@ nav ul {
 nav ul {
   background: blue;
 }
-.inline, nav ul {
+.inline,
+nav ul {
   color: red;
 }
 
@@ -344,15 +347,19 @@ nav ul {
 // the above an the below do the same thing
 .e:extend(.f, .g) {}
 
-.big-division, .big-bag:extend(.bag), .big-bucket:extend(.bucket) {
+.big-division,
+.big-bag:extend(.bag),
+.big-bucket:extend(.bucket) {
   // body
 }
 
-pre:hover, .some-class {
+pre:hover,
+.some-class {
   &:extend(div pre);
 }
 
-pre:hover:extend(div pre), .some-class:extend(div pre) {}
+pre:hover:extend(div pre),
+.some-class:extend(div pre) {}
 
 .bucket {
   tr {
@@ -362,7 +369,8 @@ pre:hover:extend(div pre), .some-class:extend(div pre) {}
 }
 .some-class:extend(.bucket tr) {} // nested ruleset is recognized
 
-.bucket tr, .some-class {
+.bucket tr,
+.some-class {
   color: blue;
 }
 
@@ -374,11 +382,14 @@ pre:hover:extend(div pre), .some-class:extend(div pre) {}
 }
 .some-class:extend(tr .bucket) {} // nested ruleset is recognized
 
-tr .bucket, .some-class {
+tr .bucket,
+.some-class {
   color: blue;
 }
 
-.a.class, .class.a, .class > .a {
+.a.class,
+.class.a,
+.class > .a {
   color: blue;
 }
 .test:extend(.class) {} // this will NOT match the any selectors above
@@ -424,19 +435,29 @@ link:hover:visited {
 .singleQuote:extend([title="identifier"]) {}
 .doubleQuote:extend([title="identifier"]) {}
 
-[title="identifier"], .noQuote, .singleQuote, .doubleQuote {
+[title="identifier"],
+.noQuote,
+.singleQuote,
+.doubleQuote {
   color: blue;
 }
 
-[title="identifier"], .noQuote, .singleQuote, .doubleQuote {
+[title="identifier"],
+.noQuote,
+.singleQuote,
+.doubleQuote {
   color: blue;
 }
 
-[title="identifier"], .noQuote, .singleQuote, .doubleQuote {
+[title="identifier"],
+.noQuote,
+.singleQuote,
+.doubleQuote {
   color: blue;
 }
 
-.a.b.test, .test.c {
+.a.b.test,
+.test.c {
   color: orange;
 }
 .test {
@@ -447,10 +468,14 @@ link:hover:visited {
 
 .replacement:extend(.test all) {}
 
-.a.b.test, .test.c, .a.b.replacement, .replacement.c {
+.a.b.test,
+.test.c,
+.a.b.replacement,
+.replacement.c {
   color: orange;
 }
-.test:hover, .replacement:hover {
+.test:hover,
+.replacement:hover {
   color: green;
 }
 
@@ -500,7 +525,8 @@ link:hover:visited {
 }
 
 @media print {
-  .selector, .screenClass {
+  .selector,
+  .screenClass {
     /*  ruleset inside the same media was extended */
     color: black;
   }
@@ -549,25 +575,31 @@ link:hover:visited {
 .topLevel:extend(.selector) {} /* top level extend matches everything */
 
 @media screen {
-  .selector, .topLevel {
+  .selector,
+  .topLevel {
     /* ruleset inside media was extended */
     color: blue;
   }
 }
 @media screen and (min-width: 1023px) {
-  .selector, .topLevel {
+  .selector,
+  .topLevel {
     /* ruleset inside nested media was extended */
     color: blue;
   }
 }
 
-.alert-info, .widget {
+.alert-info,
+.widget {
   /* declarations */
 }
 
 .alert:extend(.alert-info, .widget) {}
 
-.alert-info, .widget, .alert, .alert {
+.alert-info,
+.widget,
+.alert,
+.alert {
   /* declarations */
 }
 
@@ -624,7 +656,9 @@ link:hover:visited {
   &:extend(.my-inline-block);
 }
 
-.my-inline-block, .thing1, .thing2 {
+.my-inline-block,
+.thing1,
+.thing2 {
   display: inline-block;
   font-size: 0;
 }
@@ -1438,7 +1472,8 @@ a:hover {
 .grand .parent.grand .parent {
   color: blue;
 }
-.grand .parent, .grand .parentish {
+.grand .parent,
+.grand .parentish {
   color: cyan;
 }
 
@@ -1465,7 +1500,10 @@ p, a, ul, li {
   }
 }
 
-p, a, ul, li {
+p,
+a,
+ul,
+li {
   border-top: 2px dotted #366;
 }
 p + p,

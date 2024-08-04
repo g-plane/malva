@@ -115,9 +115,18 @@ $map: (
 $map: map-merge($map, ($key: $value));
 $map: map-merge($map, ($key: $value));
 $map: map-merge($map, ($key: $value));
-$map: map-merge($map, ($key: $value));
-$map: map-merge($map, ($key: $value));
-$map: map-merge($map, ($key: $value));
+$map: map-merge(
+  $map,
+  ($key: $value)
+);
+$map: map-merge(
+  $map,
+  ($key: $value)
+);
+$map: map-merge(
+  $map,
+  ($key: $value)
+);
 
 $longVariable: (
   (mobile $mobile) (tablet $tablet) (desktop $desktop) (wide $wide)

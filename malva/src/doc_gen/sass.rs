@@ -150,7 +150,12 @@ impl<'s> DocGen<'s> for SassContent<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
-                helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &self.args,
+                    ctx.options.sass_content_at_rule_prefer_single_line,
+                    ctx,
+                ),
             )
             .with_trailing()
             .format(&self.args, &self.comma_spans, self.span.start, ctx, state),
@@ -462,7 +467,12 @@ impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
-                helpers::get_smart_linebreak(self.span.start, &self.args, ctx),
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &self.args,
+                    ctx.options.sass_include_at_rule_prefer_single_line,
+                    ctx,
+                ),
             )
             .with_trailing()
             .format(&self.args, &self.comma_spans, self.span.start, ctx, state),
@@ -656,7 +666,12 @@ impl<'s> DocGen<'s> for SassMap<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
-                helpers::get_smart_linebreak(self.span.start, &self.items, ctx),
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &self.items,
+                    ctx.options.sass_map_prefer_single_line,
+                    ctx,
+                ),
             )
             .with_trailing()
             .format(&self.items, &self.comma_spans, self.span.start, ctx, state),
@@ -705,7 +720,12 @@ impl<'s> DocGen<'s> for SassModuleConfig<'s> {
             .append(helpers::format_parenthesized(
                 helpers::SeparatedListFormatter::new(
                     ",",
-                    helpers::get_smart_linebreak(self.span.start, &self.items, ctx),
+                    helpers::get_smart_linebreak(
+                        self.span.start,
+                        &self.items,
+                        ctx.options.sass_module_config_prefer_single_line,
+                        ctx,
+                    ),
                 )
                 .with_trailing()
                 .format(
@@ -833,7 +853,12 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
-                helpers::get_smart_linebreak(self.span.start, &params, ctx),
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &params,
+                    ctx.options.sass_params_prefer_single_line,
+                    ctx,
+                ),
             )
             .with_trailing()
             .format(&params, &self.comma_spans, self.span.start, ctx, state),

@@ -135,6 +135,100 @@ pub struct LanguageOptions {
     /// See [`attrValueQuotes`](https://github.com/g-plane/malva/blob/main/docs/config.md#attrvaluequotes) on GitHub
     pub attr_value_quotes: AttrValueQuotes,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "preferSingleLine"))]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub prefer_single_line: bool,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "selectors.prefer_single_line",
+            alias = "selectors.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub selectors_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "function_args.prefer_single_line",
+            alias = "functionArgs.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub function_args_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "sass_content_at_rule.prefer_single_line",
+            alias = "sassContentAtRule.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub sass_content_at_rule_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "sass_include_at_rule.prefer_single_line",
+            alias = "sassIncludeAtRule.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub sass_include_at_rule_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "sass_map.prefer_single_line",
+            alias = "sassMap.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub sass_map_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "sass_module_config.prefer_single_line",
+            alias = "sassModuleConfig.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub sass_module_config_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "sass_params.prefer_single_line",
+            alias = "sassParams.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub sass_params_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "less_import_options.prefer_single_line",
+            alias = "lessImportOptions.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub less_import_options_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "less_mixin_args.prefer_single_line",
+            alias = "lessMixinArgs.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub less_mixin_args_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "less_mixin_params.prefer_single_line",
+            alias = "lessMixinParams.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    pub less_mixin_params_prefer_single_line: Option<bool>,
+
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "selectorOverrideCommentDirective")
@@ -163,6 +257,17 @@ impl Default for LanguageOptions {
             single_line_block_threshold: None,
             keyframe_selector_notation: None,
             attr_value_quotes: AttrValueQuotes::default(),
+            prefer_single_line: false,
+            selectors_prefer_single_line: None,
+            function_args_prefer_single_line: None,
+            sass_content_at_rule_prefer_single_line: None,
+            sass_include_at_rule_prefer_single_line: None,
+            sass_map_prefer_single_line: None,
+            sass_module_config_prefer_single_line: None,
+            sass_params_prefer_single_line: None,
+            less_import_options_prefer_single_line: None,
+            less_mixin_args_prefer_single_line: None,
+            less_mixin_params_prefer_single_line: None,
             selector_override_comment_directive: "malva-selector-override".into(),
             ignore_comment_directive: "malva-ignore".into(),
         }

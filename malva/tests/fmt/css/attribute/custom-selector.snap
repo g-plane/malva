@@ -3,4 +3,6 @@ source: malva/tests/fmt.rs
 ---
 @custom-selector :--icon i[class^="icon-"], i[class*=" icon-"];
 @custom-selector :--icon i[class^="icon-"], i[class*=" icon-"];
-@custom-selector :--icon i[class^="icon-"], i[class*=" icon-"];
+@custom-selector :--icon
+  i[class^="icon-"],
+i[class*=" icon-"];
