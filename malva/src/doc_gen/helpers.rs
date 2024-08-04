@@ -196,50 +196,21 @@ pub(super) fn format_values_list<'s>(
     state: &State,
 ) -> Doc<'s> {
     if let Some(comma_spans) = comma_spans {
-        Doc::list(
-            itertools::intersperse(
-                values
-                    .iter()
-                    .zip_longest(comma_spans.iter())
-                    .scan(list_span.start, |pos, item| match item {
-                        EitherOrBoth::Both(value, comma_span) => {
-                            let value_span = value.span();
-                            let mut docs = ctx
-                                .end_spaced_comments(ctx.get_comments_between(
-                                    mem::replace(pos, comma_span.end),
-                                    value_span.start,
-                                ))
-                                .collect::<Vec<_>>();
-                            docs.push(value.doc(ctx, state));
-                            docs.extend(ctx.start_spaced_comments(
-                                ctx.get_comments_between(value_span.end, comma_span.start),
-                            ));
-                            Some(docs.into_iter())
-                        }
-                        EitherOrBoth::Left(value) => {
-                            let mut docs = ctx
-                                .end_spaced_comments(
-                                    ctx.get_comments_between(*pos, value.span().start),
-                                )
-                                .collect::<Vec<_>>();
-                            docs.push(value.doc(ctx, state));
-                            Some(docs.into_iter())
-                        }
-                        EitherOrBoth::Right(..) => unreachable!(),
-                    }),
-                vec![Doc::text(","), Doc::line_or_space()].into_iter(),
-            )
-            .flatten()
-            .collect(),
-        )
-        .append(if values.len() == 1 {
-            Doc::text(",")
-        } else if ctx.options.trailing_comma {
-            Doc::flat_or_break(Doc::nil(), Doc::text(","))
+        let doc = SeparatedListFormatter::new(",", Doc::line_or_space())
+            .with_trailing()
+            .format(values, comma_spans, list_span.start, ctx, state)
+            .group();
+        if values.len() == 1 {
+            if ctx.options.trailing_comma {
+                // trailing comma was added by `SeparatedListFormatter` when there're multiple lines
+                doc.append(Doc::flat_or_break(Doc::text(","), Doc::nil()))
+                    .group()
+            } else {
+                doc.append(Doc::text(","))
+            }
         } else {
-            Doc::nil()
-        })
-        .group()
+            doc
+        }
     } else {
         let mut docs =
             itertools::intersperse(
