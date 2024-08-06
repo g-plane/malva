@@ -586,7 +586,7 @@ impl<'s> DocGen<'s> for TokenWithSpan<'s> {
             Token::Linebreak(..) => unreachable!(),
             Token::LParen(..) => Doc::text("("),
             Token::Minus(..) => Doc::text("-"),
-            Token::Number(number) => Doc::text(format_number_raw(number.raw, ctx)),
+            Token::Number(number) => Doc::text(number.raw),
             Token::NumberSign(..) => Doc::text("#"),
             Token::Percent(..) => Doc::text("%"),
             Token::Percentage(percentage) => {
