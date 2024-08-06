@@ -102,7 +102,9 @@ impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
             UnknownAtRulePrelude::ComponentValue(component_value) => {
                 component_value.doc(ctx, state)
             }
-            UnknownAtRulePrelude::TokenSeq(token_seq) => token_seq.doc(ctx, state),
+            UnknownAtRulePrelude::TokenSeq(token_seq) => {
+                token_seq.doc(ctx, state).nest(ctx.indent_width)
+            }
         }
     }
 }
