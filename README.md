@@ -83,7 +83,7 @@ You can also read [dprint CLI documentation](https://dprint.dev/cli/) for using 
 
 ## Configuration
 
-Please refer to [Configuration](./docs/config.md).
+Please refer to [Configuration](https://malva.netlify.app/config/index.html).
 
 ## FAQ
 

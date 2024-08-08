@@ -1,3 +1,4 @@
 /target
 bench_samples
 wasm/pkg
+docs/book

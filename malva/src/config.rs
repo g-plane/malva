@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "config_serde", serde(default))]
 /// The whole configuration of Malva.
 ///
-/// For detail, please refer to [Configuration](https://github.com/g-plane/malva/blob/main/docs/config.md) on GitHub.
+/// For detail, please refer to [Configuration](https://github.com/g-plane/malva/blob/main/docs/config.md).
 pub struct FormatOptions {
     #[cfg_attr(feature = "config_serde", serde(flatten))]
     pub layout: LayoutOptions,
@@ -22,22 +22,22 @@ pub struct FormatOptions {
 /// Configuration related to layout, such as indentation or print width.
 pub struct LayoutOptions {
     #[cfg_attr(feature = "config_serde", serde(alias = "printWidth"))]
-    /// See [`printWidth`](https://github.com/g-plane/malva/blob/main/docs/config.md#printwidth) on GitHub
+    /// See [`printWidth`](https://malva.netlify.app/config/print-width.html)
     pub print_width: usize,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "useTabs"))]
-    /// See [`useTabs`](https://github.com/g-plane/malva/blob/main/docs/config.md#usetabs) on GitHub
+    /// See [`useTabs`](https://malva.netlify.app/config/use-tabs.html)
     pub use_tabs: bool,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "indentWidth"))]
-    /// See [`indentWidth`](https://github.com/g-plane/malva/blob/main/docs/config.md#indentwidth) on GitHub
+    /// See [`indentWidth`](https://malva.netlify.app/config/indent-width.html)
     pub indent_width: usize,
 
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "lineBreak", alias = "linebreak")
     )]
-    /// See [`lineBreak`](https://github.com/g-plane/malva/blob/main/docs/config.md#linebreak) on GitHub
+    /// See [`lineBreak`](https://malva.netlify.app/config/line-break.html)
     pub line_break: LineBreak,
 }
 
@@ -76,36 +76,36 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
 /// Configuration related to syntax.
 pub struct LanguageOptions {
     #[cfg_attr(feature = "config_serde", serde(alias = "hexCase"))]
-    /// See [`hexCase`](https://github.com/g-plane/malva/blob/main/docs/config.md#hexcase) on GitHub
+    /// See [`hexCase`](https://malva.netlify.app/config/hex-case.html)
     pub hex_case: HexCase,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "hexColorLength"))]
-    /// See [`hexColorLength`](https://github.com/g-plane/malva/blob/main/docs/config.md#hexcolorlength) on GitHub
+    /// See [`hexColorLength`](https://malva.netlify.app/config/hex-color-length.html)
     pub hex_color_length: Option<HexColorLength>,
 
-    /// See [`quotes`](https://github.com/g-plane/malva/blob/main/docs/config.md#quotes) on GitHub
+    /// See [`quotes`](https://malva.netlify.app/config/quotes.html)
     pub quotes: Quotes,
 
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "operatorLinebreak", alias = "operatorLineBreak")
     )]
-    /// See [`operatorLinebreak`](https://github.com/g-plane/malva/blob/main/docs/config.md#operatorlinebreak) on GitHub
+    /// See [`operatorLinebreak`](https://malva.netlify.app/config/operator-linebreak.html)
     pub operator_linebreak: OperatorLineBreak,
 
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "blockSelectorLinebreak", alias = "blockSelectorLineBreak")
     )]
-    /// See [`blockSelectorLinebreak`](https://github.com/g-plane/malva/blob/main/docs/config.md#blockselectorlinebreak) on GitHub
+    /// See [`blockSelectorLinebreak`](https://malva.netlify.app/config/block-selector-linebreak.html)
     pub block_selector_linebreak: BlockSelectorLineBreak,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "omitNumberLeadingZero"))]
-    /// See [`omitNumberLeadingZero`](https://github.com/g-plane/malva/blob/main/docs/config.md#omitnumberleadingzero) on GitHub
+    /// See [`omitNumberLeadingZero`](https://malva.netlify.app/config/omit-number-leading-zero.html)
     pub omit_number_leading_zero: bool,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "trailingComma"))]
-    /// See [`trailingComma`](https://github.com/g-plane/malva/blob/main/docs/config.md#trailingcomma) on GitHub
+    /// See [`trailingComma`](https://malva.netlify.app/config/trailing-comma.html)
     pub trailing_comma: bool,
 
     #[cfg_attr(
@@ -116,34 +116,34 @@ pub struct LanguageOptions {
             alias = "padComments" // for backward compatibility
         )
     )]
-    /// See [`formatComments`](https://github.com/g-plane/malva/blob/main/docs/config.md#formatcomments) on GitHub
+    /// See [`formatComments`](https://malva.netlify.app/config/format-comments.html)
     pub format_comments: bool,
 
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "linebreakInPseudoParens", alias = "lineBreakInPseudoParens")
     )]
-    /// See [`linebreakInPseudoParens`](https://github.com/g-plane/malva/blob/main/docs/config.md#linebreakinpseudoparens) on GitHub
+    /// See [`linebreakInPseudoParens`](https://malva.netlify.app/config/linebreak-in-pseudo-parens.html)
     pub linebreak_in_pseudo_parens: bool,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "declarationOrder"))]
-    /// See [`declarationOrder`](https://github.com/g-plane/malva/blob/main/docs/config.md#declarationorder) on GitHub
+    /// See [`declarationOrder`](https://malva.netlify.app/config/declaration-order.html)
     pub declaration_order: Option<DeclarationOrder>,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "singleLineBlockThreshold"))]
-    /// See [`singleLineBlockThreshold`](https://github.com/g-plane/malva/blob/main/docs/config.md#singlelineblockthreshold) on GitHub
+    /// See [`singleLineBlockThreshold`](https://malva.netlify.app/config/single-line-block-threshold.html)
     pub single_line_block_threshold: Option<usize>,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "keyframeSelectorNotation"))]
-    /// See [`keyframeSelectorNotation`](https://github.com/g-plane/malva/blob/main/docs/config.md#keyframeselectornotation) on GitHub
+    /// See [`keyframeSelectorNotation`](https://malva.netlify.app/config/keyframe-selector-notation.html)
     pub keyframe_selector_notation: Option<KeyframeSelectorNotation>,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "attrValueQuotes"))]
-    /// See [`attrValueQuotes`](https://github.com/g-plane/malva/blob/main/docs/config.md#attrvaluequotes) on GitHub
+    /// See [`attrValueQuotes`](https://malva.netlify.app/config/attr-value-quotes.html)
     pub attr_value_quotes: AttrValueQuotes,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "preferSingleLine"))]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub prefer_single_line: bool,
     #[cfg_attr(
         feature = "config_serde",
@@ -152,7 +152,7 @@ pub struct LanguageOptions {
             alias = "selectors.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub selectors_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -161,7 +161,7 @@ pub struct LanguageOptions {
             alias = "functionArgs.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub function_args_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -170,7 +170,7 @@ pub struct LanguageOptions {
             alias = "sassContentAtRule.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub sass_content_at_rule_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -179,7 +179,7 @@ pub struct LanguageOptions {
             alias = "sassIncludeAtRule.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub sass_include_at_rule_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -188,7 +188,7 @@ pub struct LanguageOptions {
             alias = "sassMap.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub sass_map_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -197,7 +197,7 @@ pub struct LanguageOptions {
             alias = "sassModuleConfig.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub sass_module_config_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -206,7 +206,7 @@ pub struct LanguageOptions {
             alias = "sassParams.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub sass_params_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -215,7 +215,7 @@ pub struct LanguageOptions {
             alias = "lessImportOptions.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub less_import_options_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -224,7 +224,7 @@ pub struct LanguageOptions {
             alias = "lessMixinArgs.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub less_mixin_args_prefer_single_line: Option<bool>,
     #[cfg_attr(
         feature = "config_serde",
@@ -233,18 +233,18 @@ pub struct LanguageOptions {
             alias = "lessMixinParams.preferSingleLine"
         )
     )]
-    /// See [`preferSingleLine`](https://github.com/g-plane/malva/blob/main/docs/config.md#prefersingleline) on GitHub
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub less_mixin_params_prefer_single_line: Option<bool>,
 
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "selectorOverrideCommentDirective")
     )]
-    /// See [`selectorOverrideCommentDirective`](https://github.com/g-plane/malva/blob/main/docs/config.md#selectoroverridecommentdirective) on GitHub
+    /// See [`selectorOverrideCommentDirective`](https://malva.netlify.app/config/selector-override-comment-directive.html)
     pub selector_override_comment_directive: String,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "ignoreCommentDirective"))]
-    /// See [`ignoreCommentDirective`](https://github.com/g-plane/malva/blob/main/docs/config.md#ignorecommentdirective) on GitHub
+    /// See [`ignoreCommentDirective`](https://malva.netlify.app/config/ignore-comment-directive.html)
     pub ignore_comment_directive: String,
 }
 

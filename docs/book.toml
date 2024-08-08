@@ -1,0 +1,8 @@
+[book]
+title = "Malva Documentation"
+authors = ["Pig Fang"]
+language = "en"
+
+[output.html]
+git-repository-url = "https://github.com/g-plane/malva"
+edit-url-template = "https://github.com/g-plane/malva/edit/main/docs/{path}"
