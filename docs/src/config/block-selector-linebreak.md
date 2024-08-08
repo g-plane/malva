@@ -72,4 +72,4 @@ Or, to override with different options:
 
 This selector will be formatted as `"always"` disregarding the configuration.
 
-To customize the comment directive text, see the [`"selectorOverrideCommentDirective"`](./selector-override-comment-directive.md) option.
+To customize the comment directive text, see the [`selectorOverrideCommentDirective`](./selector-override-comment-directive.md) option.

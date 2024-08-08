@@ -7,7 +7,7 @@ Or, it can be used to format a specific selector in a different way.
 For example, you're resetting CSS with many tag name selectors,
 then you can use "wrap" style to format this selector only without affecting other selectors.
 
-Suppose [`"blockSelectorLineBreak"`](./block-selector-linebreak.md) is [`"always"`](./block-selector-linebreak.md#example-for-always) in configuration, with the following CSS:
+Suppose [`blockSelectorLineBreak`](./block-selector-linebreak.md) is [`"always"`](./block-selector-linebreak.md#example-for-always) in configuration, with the following CSS:
 
 ```css
 /* malva-selector-override wrap */
