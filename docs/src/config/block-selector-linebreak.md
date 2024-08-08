@@ -48,3 +48,28 @@ legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas,
 details, figcaption, figure, footer, header, hgroup, menu, nav, section,
 summary, time, mark, audio, video {}
 ```
+
+## Overriding or ignoring
+
+Selector of specific block can be overridden or ignored by adding a comment directive above the selector.
+
+For example, to ignore it:
+
+```css
+/* malva-selector-override ignore */
+h1, h2,
+h3, h4,
+h5, h6 {}
+```
+
+Or, to override with different options:
+
+```css
+/* malva-selector-override always */
+.container,
+.btn {}
+```
+
+This selector will be formatted as `"always"` disregarding the configuration.
+
+To customize the comment directive text, see the [`"selectorOverrideCommentDirective"`](./selector-override-comment-directive.md) option.
