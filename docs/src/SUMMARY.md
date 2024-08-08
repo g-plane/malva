@@ -1,7 +1,5 @@
 # Summary
 
-# Configuration
-
 - [Configuration](./config/README.md)
   - [printWidth](./config/print-width.md)
   - [useTabs](./config/use-tabs.md)
