@@ -235,6 +235,15 @@ pub struct LanguageOptions {
     )]
     /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
     pub less_mixin_params_prefer_single_line: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "top_level_declarations.prefer_single_line",
+            alias = "topLevelDeclarations.preferSingleLine"
+        )
+    )]
+    /// See [`preferSingleLine`](https://malva.netlify.app/config/prefer-single-line.html)
+    pub top_level_declarations_prefer_single_line: Option<bool>,
 
     #[cfg_attr(
         feature = "config_serde",
@@ -275,6 +284,7 @@ impl Default for LanguageOptions {
             less_import_options_prefer_single_line: None,
             less_mixin_args_prefer_single_line: None,
             less_mixin_params_prefer_single_line: None,
+            top_level_declarations_prefer_single_line: None,
             selector_override_comment_directive: "malva-selector-override".into(),
             ignore_comment_directive: "malva-ignore".into(),
         }

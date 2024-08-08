@@ -341,14 +341,34 @@ impl<'s> DocGen<'s> for Statement<'s> {
 impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut stmt_docs = vec![];
-        format_statements(
-            &mut stmt_docs,
-            &self.statements,
-            &self.span,
-            Doc::hard_line(),
-            ctx,
-            state,
-        );
+        if ctx.syntax == Syntax::Css
+            && matches!(
+                ctx.options.top_level_declarations_prefer_single_line,
+                Some(true)
+            )
+            && self.statements.iter().all(|stmt| stmt.is_declaration())
+        {
+            // Declarations can't be at the top level in CSS,
+            // but parser allows them and treat them as recoverable errors.
+            // This situation can happen when formatting declarations
+            // inside `style` attribute in HTML.
+            // All comments are ignored.
+            stmt_docs = itertools::intersperse(
+                self.statements.iter().map(|stmt| stmt.doc(ctx, state)),
+                Doc::text("; "),
+            )
+            .collect();
+        } else {
+            format_statements(
+                &mut stmt_docs,
+                &self.statements,
+                &self.span,
+                Doc::hard_line(),
+                ctx,
+                state,
+            );
+        }
+
         if ctx.syntax != Syntax::Sass {
             stmt_docs.push(Doc::empty_line());
         }
