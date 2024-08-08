@@ -231,6 +231,7 @@ impl<'s> DocGen<'s> for MediaQuery<'s> {
         match self {
             MediaQuery::ConditionOnly(media_condition) => media_condition.doc(ctx, state),
             MediaQuery::WithType(media_query_with_type) => media_query_with_type.doc(ctx, state),
+            MediaQuery::Function(function) => function.doc(ctx, state),
             MediaQuery::LessVariable(less_variable) => less_variable.doc(ctx, state),
             MediaQuery::LessNamespaceValue(less_namespace_value) => {
                 less_namespace_value.doc(ctx, state)

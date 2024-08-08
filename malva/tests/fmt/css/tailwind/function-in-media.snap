@@ -1,0 +1,5 @@
+---
+source: malva/tests/fmt.rs
+---
+/* non-standard syntax, but for Tailwind CSS */
+@media screen(md) {}
