@@ -28,7 +28,10 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
         .build();
     let stylesheet = match parser.parse::<Stylesheet>() {
         Ok(stylesheet) => stylesheet,
-        Err(error) => return Err(error.into()),
+        Err(error) => {
+            let (line, col) = line_bounds.get_line_col(error.span.start);
+            return Err(Error::Parser(error, line, col));
+        }
     };
 
     Ok(print_stylesheet(

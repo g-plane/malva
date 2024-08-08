@@ -19,23 +19,23 @@ impl LineBounds {
             end >= start,
             "end {end} must be greater than or equal start {start}"
         );
+        self.get_line_at(end) - self.get_line_at(start)
+    }
 
-        let (ControlFlow::Break(start) | ControlFlow::Continue(start)) =
+    pub(crate) fn get_line_col(&self, pos: usize) -> (usize, usize) {
+        let line = self.get_line_at(pos);
+        (line, pos - self.0[line - 1])
+    }
+
+    fn get_line_at(&self, pos: usize) -> usize {
+        let (ControlFlow::Break(line) | ControlFlow::Continue(line)) =
             self.0
                 .iter()
-                .try_fold(0, |i, offset| match start.cmp(offset) {
+                .try_fold(0, |i, offset| match pos.cmp(offset) {
                     Ordering::Less => ControlFlow::Break(i),
                     Ordering::Equal => ControlFlow::Continue(i),
                     Ordering::Greater => ControlFlow::Continue(i + 1),
                 });
-        let (ControlFlow::Break(end) | ControlFlow::Continue(end)) =
-            self.0
-                .iter()
-                .try_fold(0, |i, offset| match end.cmp(offset) {
-                    Ordering::Less => ControlFlow::Break(i),
-                    Ordering::Equal => ControlFlow::Continue(i),
-                    Ordering::Greater => ControlFlow::Continue(i + 1),
-                });
-        end - start
+        line
     }
 }
