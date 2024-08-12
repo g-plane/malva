@@ -19,5 +19,6 @@
   - [keyframeSelectorNotation](./config/keyframe-selector-notation.md)
   - [attrValueQuotes](./config/attr-value-quotes.md)
   - [preferSingleLine](./config/prefer-single-line.md)
+  - [singleLineTopLevelDeclarations](./config/single-line-top-level-declarations.md)
   - [selectorOverrideCommentDirective](./config/selector-override-comment-directive.md)
   - [ignoreCommentDirective](./config/ignore-comment-directive.md)

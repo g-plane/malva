@@ -259,9 +259,10 @@ pub(crate) fn resolve_config(
                 "lessMixinParamsPreferSingleLine",
                 &mut diagnostics,
             ),
-            top_level_declarations_prefer_single_line: get_nullable_value(
+            single_line_top_level_declarations: get_value(
                 &mut config,
-                "topLevelDeclarationsPreferSingleLine",
+                "singleLineTopLevelDeclarations",
+                false,
                 &mut diagnostics,
             ),
             selector_override_comment_directive: get_value(

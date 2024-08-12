@@ -261,10 +261,10 @@
       "type": ["boolean", "null"],
       "default": null
     },
-    "topLevelDeclarations.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+    "singleLineTopLevelDeclarations": {
+      "description": "Control whether to force to format all top-level declarations on a single line.",
+      "type": "boolean",
+      "default": false
     },
     "selectorOverrideCommentDirective": {
       "description": "Text directive for overriding selector formatting.",

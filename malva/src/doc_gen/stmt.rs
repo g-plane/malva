@@ -342,10 +342,7 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut stmt_docs = vec![];
         if ctx.syntax == Syntax::Css
-            && matches!(
-                ctx.options.top_level_declarations_prefer_single_line,
-                Some(true)
-            )
+            && ctx.options.single_line_top_level_declarations
             && self.statements.iter().all(|stmt| stmt.is_declaration())
         {
             // Declarations can't be at the top level in CSS,
