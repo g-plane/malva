@@ -16,7 +16,6 @@ This global option can be overridden by different syntax nodes:
 - `lessImportOptions.preferSingleLine`
 - `lessMixinArgs.preferSingleLine`
 - `lessMixinParams.preferSingleLine`
-- `topLevelDeclarations.preferSingleLine` (Only for CSS)
 
 Given the following example CSS:
 
