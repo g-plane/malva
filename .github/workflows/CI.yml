@@ -53,7 +53,7 @@ jobs:
       - run: mdbook build docs
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - run: wasm-pack build --out-dir docs/book --target web --no-typescript standalone_wasm
+      - run: wasm-pack build --out-dir ../docs/book --target web --no-typescript standalone_wasm
       - name: Deploy Production
         run: |
           cp dprint_plugin/deployment/schema.json docs/book
