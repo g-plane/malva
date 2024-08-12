@@ -20,7 +20,7 @@ jobs:
           cargo build --release -p dprint_plugin_malva --target wasm32-unknown-unknown
           cp target/wasm32-unknown-unknown/release/dprint_plugin_malva.wasm dprint_plugin/deployment/plugin.wasm
       - name: Publish dprint plugin
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             dprint_plugin/deployment/plugin.wasm
@@ -41,14 +41,9 @@ jobs:
           $packageJson = Get-Content standalone_wasm/pkg/package.json | ConvertFrom-Json
           $packageJson.name = "malva"
           $packageJson | ConvertTo-Json | Set-Content standalone_wasm/pkg/package.json
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           registry-url: "https://registry.npmjs.org"
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.0.0
-        with:
-          version: latest
-          run_install: true
       - name: Publish npm package
         run: |
           cp target/wasm32-unknown-unknown/release/dprint_plugin_malva.wasm dprint_plugin/deployment/npm/plugin.wasm
