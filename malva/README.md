@@ -1,4 +1,4 @@
-Malva is a configurable, smart and fast CSS/SCSS/Sass/Less formatter.
+Malva is a configurable, smart and fast CSS, SCSS, Sass and Less formatter.
 
 ## Basic Usage
 
