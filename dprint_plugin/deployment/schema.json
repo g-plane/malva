@@ -4,6 +4,13 @@
   "title": "Config",
   "description": "Configuration for dprint-plugin-malva.",
   "type": "object",
+  "definitions": {
+    "preferSingleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
+      "type": "boolean",
+      "default": false
+    }
+  },
   "properties": {
     "printWidth": {
       "description": "The line width limitation that Malva should *(but not must)* avoid exceeding. Malva will try its best to keep line width less than this value, but it may exceed for some cases, for example, a very very long single word.",
@@ -212,59 +219,37 @@
       "default": "always"
     },
     "preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": "boolean",
-      "default": false
+      "$ref": "#/definitions/preferSingleLine"
     },
     "selectors.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "functionArgs.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "sassContentAtRule.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "sassIncludeAtRule.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "sassMap.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "sassModuleConfig.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "sassParams.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "lessImportOptions.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "lessMixinArgs.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "lessMixinParams.preferSingleLine": {
-      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/preferSingleLine"
     },
     "singleLineTopLevelDeclarations": {
       "description": "Control whether to force to format all top-level declarations on a single line.",
