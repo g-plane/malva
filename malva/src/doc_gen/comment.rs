@@ -80,11 +80,25 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
 }
 
 pub(super) fn reflow<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Vec<Doc<'s>> {
-    let col = ctx
-        .line_bounds
-        .get_line_col(comment.span.start)
-        .1
-        .saturating_sub(1);
+    let col = comment
+        .content
+        .lines()
+        .skip(1)
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            line.as_bytes()
+                .iter()
+                .take_while(|byte| byte.is_ascii_whitespace())
+                .count()
+        })
+        .min()
+        .unwrap_or_default()
+        .min(
+            ctx.line_bounds
+                .get_line_col(comment.span.start)
+                .1
+                .saturating_sub(1),
+        );
     let mut docs = Vec::with_capacity(2);
     let mut lines = comment.content.split('\n').enumerate().peekable();
     while let Some((i, line)) = lines.next() {
