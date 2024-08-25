@@ -35,6 +35,8 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
                 docs.extend(
                     lines.map(|line| Doc::hard_line().append(Doc::text(line.trim_start()))),
                 );
+            } else if ctx.options.align_comments {
+                docs.append(&mut reflow(comment, ctx));
             } else {
                 docs.extend(itertools::intersperse(
                     lines.map(Doc::text),
@@ -75,4 +77,31 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
             }
         }
     }
+}
+
+pub(super) fn reflow<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Vec<Doc<'s>> {
+    let col = ctx
+        .line_bounds
+        .get_line_col(comment.span.start)
+        .1
+        .saturating_sub(1);
+    let mut docs = Vec::with_capacity(2);
+    let mut lines = comment.content.split('\n').enumerate().peekable();
+    while let Some((i, line)) = lines.next() {
+        let s = line.strip_suffix('\r').unwrap_or(line);
+        let s = if s.starts_with([' ', '\t']) && i > 0 {
+            s.get(col..).unwrap_or(s)
+        } else {
+            s
+        };
+        if i > 0 {
+            if s.trim().is_empty() && lines.peek().is_some() {
+                docs.push(Doc::empty_line());
+            } else {
+                docs.push(Doc::hard_line());
+            }
+        }
+        docs.push(Doc::text(s));
+    }
+    docs
 }

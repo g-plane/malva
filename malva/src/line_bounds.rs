@@ -24,7 +24,7 @@ impl LineBounds {
 
     pub(crate) fn get_line_col(&self, pos: usize) -> (usize, usize) {
         let line = self.get_line_at(pos);
-        (line, pos - self.0[line - 1])
+        (line, pos - self.0[line.saturating_sub(1)])
     }
 
     fn get_line_at(&self, pos: usize) -> usize {

@@ -119,6 +119,9 @@ pub struct LanguageOptions {
     /// See [`formatComments`](https://malva.netlify.app/config/format-comments.html)
     pub format_comments: bool,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "alignComments"))]
+    pub align_comments: bool,
+
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "linebreakInPseudoParens", alias = "lineBreakInPseudoParens")
@@ -266,6 +269,7 @@ impl Default for LanguageOptions {
             omit_number_leading_zero: false,
             trailing_comma: false,
             format_comments: false,
+            align_comments: true,
             linebreak_in_pseudo_parens: false,
             declaration_order: None,
             single_line_block_threshold: None,

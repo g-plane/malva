@@ -138,6 +138,11 @@
       "type": "boolean",
       "default": false
     },
+    "alignComments": {
+      "description": "Control whether to tweak multi-line comments indentation.",
+      "type": "boolean",
+      "default": true
+    },
     "linebreakInPseudoParens": {
       "description": "Control whether line break should be inserted in pseudo class/element parens or not if current line is too long.",
       "type": "boolean",

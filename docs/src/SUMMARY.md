@@ -13,6 +13,7 @@
   - [omitNumberLeadingZero](./config/omit-number-leading-zero.md)
   - [trailingComma](./config/trailing-comma.md)
   - [formatComments](./config/format-comments.md)
+  - [alignComments](./config/align-comments.md)
   - [linebreakInPseudoParens](./config/linebreak-in-pseudo-parens.md)
   - [declarationOrder](./config/declaration-order.md)
   - [singleLineBlockThreshold](./config/single-line-block-threshold.md)
