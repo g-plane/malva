@@ -1,0 +1,6 @@
+---
+source: malva/tests/fmt.rs
+---
+:root {
+  --color-accent-fg: theme(colors.slate.100);
+}

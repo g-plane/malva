@@ -61,7 +61,7 @@ a {
   prop31: (#{$width} / 2px) (8px / #{$width}) (#{$width} / 2px) (
     8px / #{$width}
   );
-  prop32: func(8px / 2);
+  prop32: func(8px/2);
   prop33: 5px + 8px/2px;
   prop34: func(+20px, +20px);
   prop35: 1 + 1 + 1 + 1;
@@ -96,8 +96,8 @@ a {
   prop72: 1 - "test" 1 - "test" 1 - "test" 1 - "test";
   prop73: calc(100% * 2px) calc(100% * 2px) calc(100% * 2px) calc(100% * 2px);
   prop74: calc(100% / 2px) calc(100% / 2px) calc(100% / 2px) calc(100% / 2px);
-  prop75: calc(100% +2px) calc(100% +2px) calc(100% + 2px) calc(100% + 2px);
-  prop76: calc(100% -2px) calc(100% -2px) calc(100% - 2px) calc(100% - 2px);
+  prop75: calc(100%+2px) calc(100% +2px) calc(100% + 2px) calc(100% + 2px);
+  prop76: calc(100%-2px) calc(100% -2px) calc(100% - 2px) calc(100% - 2px);
   prop77: calc(-5px);
   prop78: calc(+5px);
   prop79: calc(-100px + 100px);

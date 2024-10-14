@@ -13,7 +13,7 @@ https://github.com/postcss/postcss/releases/tag/8.0.0
   --javascript: function(rule) { console.log(rule) };
 }
 
-@supports (--element(".minwidth", { "minWidth" : 300 })) {
+@supports (--element(".minwidth", { "minWidth": 300 })) {
   [--self] {
     background: greenyellow;
   }

@@ -299,23 +299,31 @@ impl<'s> DocGen<'s> for Function<'s> {
             ctx: &Ctx<'_, 's>,
             state: &State,
         ) -> Doc<'s> {
-            Doc::list(
-                itertools::intersperse(
-                    group.iter().map(|arg| {
-                        let arg_span = arg.span();
-                        Doc::list(
-                            ctx.end_spaced_comments(ctx.get_comments_between(
-                                mem::replace(pos, arg_span.end),
-                                arg_span.start,
-                            ))
-                            .collect(),
-                        )
-                        .append(arg.doc(ctx, state))
-                    }),
-                    separator,
-                )
-                .collect(),
-            )
+            Doc::list(group.iter().enumerate().fold(
+                Vec::with_capacity(group.len()),
+                |mut docs, (i, arg)| {
+                    let arg_span = arg.span();
+                    if i > 0 && *pos < arg_span.start {
+                        docs.push(separator.clone());
+                    }
+                    docs.extend(ctx.end_spaced_comments(
+                        ctx.get_comments_between(mem::replace(pos, arg_span.end), arg_span.start),
+                    ));
+                    match arg {
+                        ComponentValue::Number(number)
+                            if i > 0
+                                && matches!(
+                                    group.get(i - 1),
+                                    Some(ComponentValue::InterpolableIdent(..))
+                                ) =>
+                        {
+                            docs.push(Doc::text(number.raw));
+                        }
+                        _ => docs.push(arg.doc(ctx, state)),
+                    }
+                    docs
+                },
+            ))
         }
 
         let separator = if args_groups.len() == 1 {
