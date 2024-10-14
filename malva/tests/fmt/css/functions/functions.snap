@@ -1,0 +1,15 @@
+---
+source: malva/tests/fmt.rs
+---
+@font-face {
+  src:
+    url("./libertinus-7.050/LibertinusSerif-Regular.woff2") format("woff2"),
+    local(Libertinus Serif),
+    local(Libertinus Serif Regular),
+    local(Libertinus);
+  src:
+    local(Libertinus Serif),
+    local(Libertinus Serif Regular),
+    local(Libertinus),
+    url("./libertinus-7.050/LibertinusSerif-Regular.woff2") format("woff2");
+}

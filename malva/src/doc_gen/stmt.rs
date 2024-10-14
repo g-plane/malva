@@ -140,7 +140,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                         } else if matches!(
                             self.value.get(index - 1),
                             Some(ComponentValue::Delimiter(Delimiter {
-                                kind: DelimiterKind::Solidus,
+                                kind: DelimiterKind::Solidus | DelimiterKind::Comma,
                                 ..
                             }))
                         ) {
