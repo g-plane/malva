@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://plugins.dprint.dev/g-plane/malva/v0.10.1/schema.json",
+  "$id": "https://plugins.dprint.dev/g-plane/malva/v0.11.0/schema.json",
   "title": "Config",
   "description": "Configuration for dprint-plugin-malva.",
   "type": "object",
