@@ -1,0 +1,6 @@
+---
+source: malva/tests/fmt.rs
+---
+/* malva-ignore-file */
+a,b{}
+a,b{}

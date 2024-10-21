@@ -34,14 +34,27 @@ pub fn format_text(input: &str, syntax: Syntax, options: &FormatOptions) -> Resu
         }
     };
 
-    Ok(print_stylesheet(
-        &stylesheet,
-        &comments,
-        Some(input),
-        line_bounds,
-        syntax,
-        options,
-    ))
+    if comments.first().is_some_and(|comment| {
+        comment.span.start == 0
+            && comment
+                .content
+                .trim_start()
+                .strip_prefix(&options.language.ignore_file_comment_directive)
+                .is_some_and(|rest| {
+                    rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_whitespace())
+                })
+    }) {
+        Ok(input.to_owned())
+    } else {
+        Ok(print_stylesheet(
+            &stylesheet,
+            &comments,
+            Some(input),
+            line_bounds,
+            syntax,
+            options,
+        ))
+    }
 }
 
 /// Print the given stylesheet AST.

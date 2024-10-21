@@ -256,6 +256,10 @@ pub struct LanguageOptions {
     #[cfg_attr(feature = "config_serde", serde(alias = "ignoreCommentDirective"))]
     /// See [`ignoreCommentDirective`](https://malva.netlify.app/config/ignore-comment-directive.html)
     pub ignore_comment_directive: String,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "ignoreFileCommentDirective"))]
+    /// See [`ignoreFileCommentDirective`](https://malva.netlify.app/config/ignore-file-comment-directive.html)
+    pub ignore_file_comment_directive: String,
 }
 
 impl Default for LanguageOptions {
@@ -289,6 +293,7 @@ impl Default for LanguageOptions {
             single_line_top_level_declarations: false,
             selector_override_comment_directive: "malva-selector-override".into(),
             ignore_comment_directive: "malva-ignore".into(),
+            ignore_file_comment_directive: "malva-ignore-file".into(),
         }
     }
 }

@@ -278,6 +278,12 @@ pub(crate) fn resolve_config(
                 "malva-ignore".into(),
                 &mut diagnostics,
             ),
+            ignore_file_comment_directive: get_value(
+                &mut config,
+                "ignoreFileCommentDirective",
+                "dprint-ignore-file".into(),
+                &mut diagnostics,
+            ),
         },
     };
 

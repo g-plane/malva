@@ -265,6 +265,11 @@
       "description": "Text directive for ignoring formatting specific statement.",
       "type": "string",
       "default": "malva-ignore"
+    },
+    "ignoreFileCommentDirective": {
+      "description": "Text directive for ignoring formatting a whole file.",
+      "type": "string",
+      "default": "dprint-ignore-file"
     }
   }
 }
