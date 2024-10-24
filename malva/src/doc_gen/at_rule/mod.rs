@@ -45,10 +45,13 @@ impl<'s> DocGen<'s> for AtRule<'s> {
                 block.span.start,
                 ctx,
             ));
-            docs.push(block.doc(ctx, &State {
-                in_unknown_at_rule,
-                ..state.clone()
-            }));
+            docs.push(block.doc(
+                ctx,
+                &State {
+                    in_unknown_at_rule,
+                    ..state.clone()
+                },
+            ));
         }
 
         Doc::list(docs)
