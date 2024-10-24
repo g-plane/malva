@@ -314,7 +314,7 @@ pub(super) fn ident_to_lowercase<'s>(
     state: &State,
 ) -> Doc<'s> {
     match &interpolable_ident {
-        InterpolableIdent::Literal(ident) if !ident.name.starts_with("--") => {
+        InterpolableIdent::Literal(ident) if !ident.name.starts_with("--") && !state.in_unknown_at_rule => {
             Doc::text(ident.raw.to_ascii_lowercase())
         }
         name => name.doc(ctx, state),

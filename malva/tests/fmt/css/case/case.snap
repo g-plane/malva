@@ -63,3 +63,8 @@ x-panel {
 :host(:hover) {
   transform: scale(1.1);
 }
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  prefersDark: true;
+}
