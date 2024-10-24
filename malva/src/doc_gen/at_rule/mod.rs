@@ -22,21 +22,20 @@ impl<'s> DocGen<'s> for AtRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         let mut pos = self.name.span.end;
+        let mut in_unknown_at_rule = false;
 
         docs.push(Doc::text(format!(
             "@{}",
             self.name.raw.to_ascii_lowercase()
         )));
 
-        let mut in_unknown_at_rule = false;
-
         if let Some(prelude) = &self.prelude {
-            in_unknown_at_rule = matches!(prelude, AtRulePrelude::Unknown(_));
             docs.push(Doc::space());
             let span = prelude.span();
             docs.extend(ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start)));
             docs.push(prelude.doc(ctx, state));
             pos = span.end;
+            in_unknown_at_rule = matches!(prelude, AtRulePrelude::Unknown(_));
         }
 
         if let Some(block) = &self.block {
