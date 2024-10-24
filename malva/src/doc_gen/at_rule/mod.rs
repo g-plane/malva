@@ -31,9 +31,9 @@ impl<'s> DocGen<'s> for AtRule<'s> {
         let mut in_unknown_at_rule = false;
 
         if let Some(prelude) = &self.prelude {
+            in_unknown_at_rule = matches!(prelude, AtRulePrelude::Unknown(_));
             docs.push(Doc::space());
             let span = prelude.span();
-            in_unknown_at_rule = matches!(prelude, AtRulePrelude::Unknown(_));
             docs.extend(ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start)));
             docs.push(prelude.doc(ctx, state));
             pos = span.end;
