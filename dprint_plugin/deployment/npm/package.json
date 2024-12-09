@@ -14,7 +14,7 @@
     "*.wasm"
   ],
   "exports": {
-    ".": "./plugin.wasm",
+    "./plugin.wasm": "./plugin.wasm",
     "./package.json": "./package.json"
   }
 }
