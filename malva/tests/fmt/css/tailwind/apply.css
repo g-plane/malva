@@ -6,3 +6,7 @@
   @apply text-jsr-cyan-700 hover:text-jsr-cyan-900 underline decoration-jsr-cyan-700/50 underline-offset-2
     outline-none focus-visible:ring-2 ring-jsr-cyan-700 ring-offset-2 rounded-sm;
 }
+
+.ease-custom {
+  @apply ease-[cubic-bezier(0.4,0,0.1,1)];
+}
