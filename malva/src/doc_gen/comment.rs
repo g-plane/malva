@@ -1,5 +1,8 @@
 use crate::ctx::Ctx;
-use raffia::token::{Comment, CommentKind};
+use raffia::{
+    token::{Comment, CommentKind},
+    Syntax,
+};
 use tiny_pretty::Doc;
 
 pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Doc<'s> {
@@ -64,14 +67,21 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
         }
         CommentKind::Line => {
             let content = comment.content.trim_end();
-            if ctx.options.format_comments
-                && !content
+            if ctx.options.format_comments {
+                let (is_doc_comment, content) = match (ctx.syntax, content.strip_prefix('/')) {
+                    (Syntax::Scss | Syntax::Sass, Some(content)) => (true, content),
+                    _ => (false, content),
+                };
+                let prefix = if is_doc_comment { "///" } else { "//" };
+                if content
                     .as_bytes()
                     .first()
-                    .map(|b| b.is_ascii_whitespace())
-                    .unwrap_or(true)
-            {
-                Doc::text(format!("// {content}"))
+                    .map_or(true, |b| b.is_ascii_whitespace())
+                {
+                    Doc::text(format!("{prefix}{content}"))
+                } else {
+                    Doc::text(format!("{prefix} {content}",))
+                }
             } else {
                 Doc::text(format!("//{content}"))
             }

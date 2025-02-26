@@ -3,3 +3,5 @@ source: malva/tests/fmt.rs
 ---
 /* cfg formatComments = true */
 // comments
+/// doc comments
+/// doc comments
