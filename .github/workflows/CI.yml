@@ -56,6 +56,7 @@ jobs:
       - run: wasm-pack build --out-dir ../docs/book --target web --no-typescript standalone_wasm
       - name: Deploy Production
         run: |
+          npm i --location=global netlify-cli
           cp dprint_plugin/deployment/schema.json docs/book
           netlify deploy --dir=docs/book --site=malva --prod
         env:
