@@ -1,6 +1,6 @@
 [package]
 name = "malva"
-version = "0.11.1"
+version = "0.11.2"
 edition = "2021"
 authors = ["Pig Fang <g-plane@hotmail.com>"]
 description = "Configurable, smart and fast CSS, SCSS, Sass and Less formatter."
