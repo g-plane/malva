@@ -1,0 +1,4 @@
+---
+source: malva/tests/fmt.rs
+---
+--accent: var(--<!-- TEMPLATE-SLOT-ACCENT-COLOR -->);
