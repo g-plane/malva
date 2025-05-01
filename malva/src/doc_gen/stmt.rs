@@ -113,6 +113,14 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     docs.push(space_after_colon);
                 }
 
+                let space_after_comma = match &self.name {
+                    InterpolableIdent::Literal(Ident { name, .. })
+                        if name.eq_ignore_ascii_case("font-family") =>
+                    {
+                        Doc::soft_line()
+                    }
+                    _ => Doc::line_or_space(),
+                };
                 while let Some((index, value)) = iter.next() {
                     let span = value.span();
 
@@ -167,7 +175,11 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     }
                     match value {
                         ComponentValue::Delimiter(Delimiter {
-                            kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                            kind: DelimiterKind::Comma,
+                            ..
+                        }) => docs.push(space_after_comma.clone().nest(ctx.indent_width)),
+                        ComponentValue::Delimiter(Delimiter {
+                            kind: DelimiterKind::Semicolon,
                             ..
                         }) => docs.push(Doc::line_or_space().nest(ctx.indent_width)),
                         ComponentValue::Delimiter(Delimiter {
