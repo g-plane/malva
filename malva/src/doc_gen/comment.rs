@@ -76,7 +76,7 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
                 if content
                     .as_bytes()
                     .first()
-                    .map_or(true, |b| b.is_ascii_whitespace())
+                    .is_none_or(|b| b.is_ascii_whitespace())
                 {
                     Doc::text(format!("{prefix}{content}"))
                 } else {

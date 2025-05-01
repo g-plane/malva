@@ -512,7 +512,7 @@ struct SingleStmtFormatter<'a, 's> {
     ignore_leading_whitespace: bool,
     line_break_doc: Doc<'s>,
 }
-impl<'a, 's> SingleStmtFormatter<'a, 's> {
+impl<'s> SingleStmtFormatter<'_, 's> {
     fn format(self, ctx: &Ctx<'_, 's>, state: &State) -> Vec<Doc<'s>> {
         use crate::state::SelectorOverride;
 
