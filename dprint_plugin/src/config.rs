@@ -171,6 +171,22 @@ pub(crate) fn resolve_config(
                     None
                 }
             }),
+            declaration_order_group_by: match &*get_value(
+                &mut config,
+                "declarationOrderGroupBy",
+                "nonDeclaration".to_string(),
+                &mut diagnostics,
+            ) {
+                "nonDeclaration" => DeclarationOrderGroupBy::NonDeclaration,
+                "nonDeclarationAndEmptyLine" => DeclarationOrderGroupBy::NonDeclarationAndEmptyLine,
+                _ => {
+                    diagnostics.push(ConfigurationDiagnostic {
+                        property_name: "declarationOrderGroupBy".into(),
+                        message: "invalid value for config `declarationOrderGroupBy`".into(),
+                    });
+                    Default::default()
+                }
+            },
             single_line_block_threshold: get_nullable_value(
                 &mut config,
                 "singleLineBlockThreshold",

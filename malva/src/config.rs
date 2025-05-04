@@ -133,6 +133,10 @@ pub struct LanguageOptions {
     /// See [`declarationOrder`](https://malva.netlify.app/config/declaration-order.html)
     pub declaration_order: Option<DeclarationOrder>,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "declarationOrderGroupBy"))]
+    /// See [`declarationOrderGroupBy`](https://malva.netlify.app/config/declaration-order-group-by.html)
+    pub declaration_order_group_by: DeclarationOrderGroupBy,
+
     #[cfg_attr(feature = "config_serde", serde(alias = "singleLineBlockThreshold"))]
     /// See [`singleLineBlockThreshold`](https://malva.netlify.app/config/single-line-block-threshold.html)
     pub single_line_block_threshold: Option<usize>,
@@ -276,6 +280,7 @@ impl Default for LanguageOptions {
             align_comments: true,
             linebreak_in_pseudo_parens: false,
             declaration_order: None,
+            declaration_order_group_by: DeclarationOrderGroupBy::default(),
             single_line_block_threshold: None,
             keyframe_selector_notation: None,
             attr_value_quotes: AttrValueQuotes::default(),
@@ -374,6 +379,17 @@ pub enum DeclarationOrder {
     Smacss,
     /// Order properties applying outside the box model, moving inward to intrinsic changes.
     Concentric,
+}
+
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+pub enum DeclarationOrderGroupBy {
+    #[default]
+    #[cfg_attr(feature = "config_serde", serde(alias = "nonDeclaration"))]
+    NonDeclaration,
+    #[cfg_attr(feature = "config_serde", serde(alias = "nonDeclarationAndEmptyLine"))]
+    NonDeclarationAndEmptyLine,
 }
 
 #[derive(Clone, Debug)]

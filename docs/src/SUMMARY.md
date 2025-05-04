@@ -16,6 +16,7 @@
   - [alignComments](./config/align-comments.md)
   - [linebreakInPseudoParens](./config/linebreak-in-pseudo-parens.md)
   - [declarationOrder](./config/declaration-order.md)
+  - [declarationOrderGroupBy](./config/declaration-order-group-by.md)
   - [singleLineBlockThreshold](./config/single-line-block-threshold.md)
   - [keyframeSelectorNotation](./config/keyframe-selector-notation.md)
   - [attrValueQuotes](./config/attr-value-quotes.md)

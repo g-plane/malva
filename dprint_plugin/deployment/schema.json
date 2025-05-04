@@ -178,6 +178,21 @@
       ],
       "default": null
     },
+    "declarationOrderGroupBy": {
+      "description": "Control how declarations are considered as a group when sorting.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "nonDeclaration",
+          "description": "Non-declaration statements are considered as the boundaries of declaration group."
+        },
+        {
+          "const": "nonDeclarationAndEmptyLine",
+          "description": "Non-declaration statements and empty lines (without comments) are considered as the boundaries of declaration group."
+        }
+      ],
+      "default": "nonDeclaration"
+    },
     "singleLineBlockThreshold": {
       "description": "Control the threshold value for putting block on a single line. If the number of statements in a block is less than or equal to this value, the block will be put on a single line as possible, but when the code can't fit on single line, it will still break into multiple lines.",
       "type": ["integer", "null"],

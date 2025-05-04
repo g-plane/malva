@@ -1,0 +1,13 @@
+/*cfg declarationOrder = "alphabetical"
+      declarationOrderGroupBy = "nonDeclaration"*/
+div {
+  z: 0;
+  y: 0;
+  x: 0;
+  & {}
+  d: 0;
+  c: 0;
+
+  b: 0;
+  a: 0;
+}

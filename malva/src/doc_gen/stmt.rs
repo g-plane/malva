@@ -393,6 +393,8 @@ fn format_statements<'s>(
     ctx: &Ctx<'_, 's>,
     state: &State,
 ) {
+    use crate::config::DeclarationOrderGroupBy;
+
     docs.reserve(statements.len() * 2);
 
     let mut pos = outer_span.start;
@@ -421,6 +423,17 @@ fn format_statements<'s>(
                     }
                     .format(ctx, state),
                 ));
+                let is_grouped_by_empty_line = matches!(
+                    ctx.options.declaration_order_group_by,
+                    DeclarationOrderGroupBy::NonDeclarationAndEmptyLine
+                ) && match next_stmt {
+                    Some(Statement::Declaration(declaration)) => {
+                        let next_start = declaration.span.start;
+                        ctx.line_bounds.line_distance(pos, next_start) > 1
+                            && ctx.get_comments_between(pos, next_start).count() == 0
+                    }
+                    _ => false,
+                };
                 // the end boundary of sortable declarations group
                 if !matches!(
                     next_stmt,
@@ -428,7 +441,8 @@ fn format_statements<'s>(
                         name: InterpolableIdent::Literal(..),
                         ..
                     }))
-                ) {
+                ) || is_grouped_by_empty_line
+                {
                     use crate::{config::DeclarationOrder, helpers::sort_decl};
                     match declaration_order {
                         DeclarationOrder::Alphabetical => {
@@ -455,6 +469,9 @@ fn format_statements<'s>(
                         )
                         .flatten(),
                     );
+                    if is_grouped_by_empty_line {
+                        docs.push(Doc::empty_line());
+                    }
                 }
             } else {
                 docs.append(
