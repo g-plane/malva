@@ -10,6 +10,8 @@ Here're the available strategies:
 
 For more detail, please read [https://github.com/Siilwyn/css-declaration-sorter](https://github.com/Siilwyn/css-declaration-sorter).
 
+Note that sorting declarations never guarantees how empty lines are preserved, because once declarations are moved, trivias information are lost.
+
 Default value is `null`.
 
 ## Notes
