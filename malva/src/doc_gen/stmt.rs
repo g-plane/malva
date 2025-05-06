@@ -458,9 +458,10 @@ fn format_statements<'s>(
                                 .sort_by(|(a, _), (b, _)| sort_decl::compare_in_concentric(a, b));
                         }
                     }
-                    if !is_first_stmt_or_decls_group {
-                        docs.push(Doc::hard_line());
+                    if is_first_stmt_or_decls_group {
                         is_first_stmt_or_decls_group = false;
+                    } else {
+                        docs.push(Doc::hard_line());
                     }
                     docs.extend(
                         itertools::intersperse(

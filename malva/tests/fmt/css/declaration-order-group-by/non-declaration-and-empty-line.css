@@ -16,3 +16,13 @@ div {
 
   & {}
 }
+
+div {
+  font-family-primary: 'Arial';
+
+  color-primary: #00ff00;
+  color-primary-rgb: 0, 255, 0;
+
+  color-secondary: #0000ff;
+  color-secondary-rgb: 0, 0, 255;
+}
