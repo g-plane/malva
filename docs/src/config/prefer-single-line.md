@@ -2,7 +2,7 @@
 
 Control whether items should be placed on single line as possible, even they're originally on multiple lines.
 
-Default option is `false`.
+Default value is `false`.
 
 This global option can be overridden by different syntax nodes:
 

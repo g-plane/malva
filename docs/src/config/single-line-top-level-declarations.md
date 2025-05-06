@@ -7,7 +7,7 @@ When this option is `true`, trailing semicolons are removed.
 Most of the time, you don't need to set this option, because declarations at top level are invalid,
 but if you're formatting HTML's `style` attribute, you may want to set this to `true`.
 
-Default option is `false`.
+Default value is `false`.
 
 ## Example for `false`
 

@@ -15,7 +15,7 @@ This is especially useful for increasing readability when writing atomic CSS. Fo
 .border-5 { border-width: 5px; }
 ```
 
-Default option value is `null` which means always break into multiple lines. The option value can be an integer which is greater than or equal to 0.
+Default value value is `null` which means always break into multiple lines. The option value can be an integer which is greater than or equal to 0.
 
 ## Example for `null`
 

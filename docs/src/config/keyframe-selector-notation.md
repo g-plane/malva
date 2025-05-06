@@ -2,13 +2,13 @@
 
 Control whether to use percentage or keyword (`from` and `to`) notation as keyframe selectors.
 
-Possible options:
+Possible values:
 
 - `null`: Keyframe selector notation will be kept as-is.
 - `"keyword"`: Use keyword notation. This only affects `0%` and `100%`. For other percentage values, they will be kept as-is.
 - `"percentage"`: Use percentage notation.
 
-Default option is `null`.
+Default value is `null`.
 
 ## Example for `null`
 

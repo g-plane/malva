@@ -2,7 +2,7 @@
 
 Control whether omit leading zero before dot of numbers or not.
 
-Default option is `false`.
+Default value is `false`.
 
 ## Example for `false`
 

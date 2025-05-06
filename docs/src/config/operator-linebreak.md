@@ -2,12 +2,12 @@
 
 Control whether line break should come before or after operators.
 
-Possible options:
+Possible values:
 
 - `"before"`: Line break will come before operators.
 - `"after"`: Line break will come after operators.
 
-Default option is `"after"`.
+Default value is `"after"`.
 
 ## Example for `"before"`
 

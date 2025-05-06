@@ -2,7 +2,7 @@
 
 Control whether to tweak multi-line comments indentation.
 
-Default option value is `true`.
+Default value is `true`.
 
 ## Example for `false`
 

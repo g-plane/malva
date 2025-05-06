@@ -2,14 +2,14 @@
 
 Control the quotes of strings.
 
-Possible options:
+Possible values:
 
 - `"alwaysDouble"`: Always use double quotes. Double quotes in strings will be escaped.
 - `"alwaysSingle"`: Always use single quotes. Single quotes in strings will be escaped.
 - `"preferDouble"`: Use double quotes as possible. However if there're double quotes in strings, quotes will be kept as-is.
 - `"preferSingle"`: Use single quotes as possible. However if there're single quotes in strings, quotes will be kept as-is.
 
-Default option is `"alwaysDouble"`.
+Default value is `"alwaysDouble"`.
 
 ## Example for `"alwaysDouble"`
 

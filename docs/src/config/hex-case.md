@@ -2,13 +2,13 @@
 
 Control the case of hex color values.
 
-Possible options:
+Possible values:
 
 - `"lower"`: Hex color values will be converted to lower case.
 - `"upper"`: Hex color values will be converted to upper case.
 - `"ignore"`: Hex color values will be kept as-is.
 
-Default option is `"lower"`.
+Default value is `"lower"`.
 
 ## Example for `"lower"`
 

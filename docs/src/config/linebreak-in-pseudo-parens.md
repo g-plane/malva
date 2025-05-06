@@ -3,7 +3,7 @@
 Control whether line break should be inserted in pseudo class/element parens
 or not if current line is too long.
 
-Default option is `false`.
+Default value is `false`.
 
 ## Example for `false`
 

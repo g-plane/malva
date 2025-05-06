@@ -2,12 +2,12 @@
 
 Control whether should add quotes to attribute value in selector or not if it's not quoted.
 
-Possible options:
+Possible values:
 
 - `"always"`: Always add quotes.
 - `"ignore"`: Don't add quotes to those that're not quoted. For quoted value, quotes won't be removed.
 
-Default option is `"always"`.
+Default value is `"always"`.
 
 ## Example for `"always"`
 

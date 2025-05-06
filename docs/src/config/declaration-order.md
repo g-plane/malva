@@ -10,7 +10,7 @@ Here're the available strategies:
 
 For more detail, please read [https://github.com/Siilwyn/css-declaration-sorter](https://github.com/Siilwyn/css-declaration-sorter).
 
-Default option value is `null`.
+Default value is `null`.
 
 ## Notes
 

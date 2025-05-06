@@ -6,7 +6,7 @@ This only affects Sass list, Sass map, Sass parameters/arguments list,
 Less list and Less parameters/arguments list.
 CSS functions won't respect this option.
 
-Default option is `false`.
+Default value is `false`.
 
 ## Example for `false`
 

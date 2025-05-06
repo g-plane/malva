@@ -2,7 +2,7 @@
 
 Specify use space or tab for indentation.
 
-Default option is `false`.
+Default value is `false`.
 
 ## Example for `false`
 

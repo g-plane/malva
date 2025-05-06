@@ -2,13 +2,13 @@
 
 Control the hex color values in short-hand form or long-hand form.
 
-Possible options:
+Possible values:
 
 - `null`: Hex color values will be kept as-is.
 - `"short"`: Hex color values will be converted to short-hand form.
 - `"long"`: Hex color values will be converted to long-hand form.
 
-Default option is `null`.
+Default value is `null`.
 
 ## Example for `null`
 

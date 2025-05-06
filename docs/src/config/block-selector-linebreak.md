@@ -2,13 +2,13 @@
 
 Control line break behavior after selector commas.
 
-Possible options:
+Possible values:
 
 - `"always"`: Always insert line break after comma.
 - `"consistent"`: If the whole selector can be put on a single line, there won't be line breaks; otherwise, there will be line breaks after each comma.
 - `"wrap"`: Selector will be put on one line as possible. Once it exceeds [`printWidth`](./print-width.md), line break will be inserted where the code exceeds [`printWidth`](./print-width.md).
 
-Default option is `"consistent"`.
+Default value is `"consistent"`.
 
 ## Example for `"always"`
 
