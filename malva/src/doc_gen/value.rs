@@ -1,10 +1,9 @@
 use super::{
     helpers,
-    str::{format_str, CssStrRawFormatter},
+    str::{format_str, is_preferred_quote_allowed, CssStrRawFormatter},
     DocGen,
 };
 use crate::{ctx::Ctx, state::State};
-use aho_corasick::PatternID;
 use raffia::{ast::*, token::TokenWithSpan, Spanned};
 use std::{borrow::Cow, mem};
 use tiny_pretty::Doc;
@@ -471,8 +470,8 @@ impl<'s> DocGen<'s> for Str<'s> {
         Doc::text(format_str(
             self.raw,
             CssStrRawFormatter::new(self.raw),
-            is_preferred_quote_allowed(self.raw, ctx),
-            ctx,
+            is_preferred_quote_allowed(self.raw, ctx.options.quotes),
+            ctx.options.quotes,
         ))
     }
 }
@@ -612,8 +611,8 @@ impl<'s> DocGen<'s> for TokenWithSpan<'s> {
             Token::Str(str) => Doc::text(format_str(
                 str.raw,
                 CssStrRawFormatter::new(str.raw),
-                is_preferred_quote_allowed(str.raw, ctx),
-                ctx,
+                is_preferred_quote_allowed(str.raw, ctx.options.quotes),
+                ctx.options.quotes,
             )),
             Token::StrTemplate(..) => unreachable!(),
             Token::Tilde(..) => Doc::text("~"),
@@ -773,26 +772,5 @@ fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
         .into()
     } else {
         number
-    }
-}
-
-fn is_preferred_quote_allowed(raw: &str, ctx: &Ctx) -> bool {
-    use super::str::{AC_DOUBLE_QUOTES, AC_SINGLE_QUOTES};
-    use crate::config::Quotes;
-
-    match ctx.options.quotes {
-        Quotes::AlwaysDouble | Quotes::AlwaysSingle => false,
-        Quotes::PreferDouble => {
-            let pattern_id = PatternID::must(2);
-            AC_DOUBLE_QUOTES
-                .find_iter(raw)
-                .any(|mat| mat.pattern() == pattern_id)
-        }
-        Quotes::PreferSingle => {
-            let pattern_id = PatternID::must(2);
-            AC_SINGLE_QUOTES
-                .find_iter(raw)
-                .any(|mat| mat.pattern() == pattern_id)
-        }
     }
 }

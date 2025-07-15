@@ -11,6 +11,10 @@ Possible values:
 
 Default value is `"alwaysDouble"`.
 
+This global option can be overridden by different syntax nodes:
+
+- `attrSelector.quotes`
+
 ## Example for `"alwaysDouble"`
 
 [Playground](https://malva-play.vercel.app/?code=H4sIAAAAAAAAA7OySkpNyy9KVajmUlBIzs8rSc0rsVJQV7dG4SoB%2BbUAorGD2SsAAAA%3D&config=H4sIAAAAAAAAA6vmUlBQKizNL0ktVrJSUErMKU%2BsLHbJL03KSVXiqgUAT525jh4AAAA%3D&syntax=css)

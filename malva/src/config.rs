@@ -85,6 +85,12 @@ pub struct LanguageOptions {
 
     /// See [`quotes`](https://malva.netlify.app/config/quotes.html)
     pub quotes: Quotes,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "attr_selector.quotes", alias = "attrSelector.quotes")
+    )]
+    /// See [`quotes`](https://malva.netlify.app/config/quotes.html)
+    pub attr_selector_quotes: Option<Quotes>,
 
     #[cfg_attr(
         feature = "config_serde",
@@ -272,6 +278,7 @@ impl Default for LanguageOptions {
             hex_case: HexCase::default(),
             hex_color_length: None,
             quotes: Quotes::default(),
+            attr_selector_quotes: None,
             operator_linebreak: OperatorLineBreak::default(),
             block_selector_linebreak: BlockSelectorLineBreak::default(),
             omit_number_leading_zero: false,
@@ -322,7 +329,7 @@ pub enum HexColorLength {
     Long,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
 pub enum Quotes {

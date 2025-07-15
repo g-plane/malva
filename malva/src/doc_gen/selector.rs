@@ -1,4 +1,8 @@
-use super::{helpers, DocGen};
+use super::{
+    helpers,
+    str::{format_str, is_preferred_quote_allowed, CssStrRawFormatter},
+    DocGen,
+};
 use crate::{ctx::Ctx, state::State};
 use raffia::{ast::*, Spanned};
 use std::mem;
@@ -90,9 +94,14 @@ impl<'s> DocGen<'s> for AttributeSelectorValue<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         use crate::config::{AttrValueQuotes, Quotes};
 
+        let quotes = ctx
+            .options
+            .attr_selector_quotes
+            .unwrap_or(ctx.options.quotes);
+
         match self {
             AttributeSelectorValue::Ident(ident) => match ctx.options.attr_value_quotes {
-                AttrValueQuotes::Always => match ctx.options.quotes {
+                AttrValueQuotes::Always => match quotes {
                     Quotes::AlwaysDouble | Quotes::PreferDouble => Doc::text("\"")
                         .append(ident.doc(ctx, state))
                         .append(Doc::text("\"")),
@@ -102,6 +111,12 @@ impl<'s> DocGen<'s> for AttributeSelectorValue<'s> {
                 },
                 AttrValueQuotes::Ignore => ident.doc(ctx, state),
             },
+            AttributeSelectorValue::Str(InterpolableStr::Literal(str)) => Doc::text(format_str(
+                str.raw,
+                CssStrRawFormatter::new(str.raw),
+                is_preferred_quote_allowed(str.raw, quotes),
+                quotes,
+            )),
             AttributeSelectorValue::Str(str) => str.doc(ctx, state),
             AttributeSelectorValue::Percentage(percentage) => percentage.doc(ctx, state),
             AttributeSelectorValue::LessEscapedStr(less_escaped_str) => {

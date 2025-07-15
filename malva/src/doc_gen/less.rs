@@ -275,14 +275,14 @@ impl<'s> DocGen<'s> for LessInterpolatedStr<'s> {
                 first.raw,
                 InterpolatedFirstStrRawFormatter::new(first.raw),
                 allow_prefer,
-                ctx,
+                ctx.options.quotes,
             )));
             docs.extend(mid.iter().map(|element| match element {
                 LessInterpolatedStrElement::Static(s) => Doc::text(format_str(
                     s.raw,
                     InterpolatedMidStrRawFormatter::new(s.raw),
                     allow_prefer,
-                    ctx,
+                    ctx.options.quotes,
                 )),
                 LessInterpolatedStrElement::Variable(variable) => variable.doc(ctx, state),
                 LessInterpolatedStrElement::Property(property) => property.doc(ctx, state),
@@ -291,7 +291,7 @@ impl<'s> DocGen<'s> for LessInterpolatedStr<'s> {
                 last.raw,
                 InterpolatedLastStrRawFormatter::new(last.raw),
                 allow_prefer,
-                ctx,
+                ctx.options.quotes,
             )));
             Doc::list(docs)
         } else {

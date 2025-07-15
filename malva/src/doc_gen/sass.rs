@@ -548,7 +548,7 @@ impl<'s> DocGen<'s> for SassInterpolatedStr<'s> {
                 first.raw,
                 InterpolatedFirstStrRawFormatter::new(first.raw),
                 allow_prefer,
-                ctx,
+                ctx.options.quotes,
             )));
             let mut iter = mid.iter().peekable();
             let mut pos = first.span.end;
@@ -560,7 +560,7 @@ impl<'s> DocGen<'s> for SassInterpolatedStr<'s> {
                             s.raw,
                             InterpolatedMidStrRawFormatter::new(s.raw),
                             allow_prefer,
-                            ctx,
+                            ctx.options.quotes,
                         )));
                     }
                     SassInterpolatedStrElement::Expression(expr) => {
@@ -588,7 +588,7 @@ impl<'s> DocGen<'s> for SassInterpolatedStr<'s> {
                 last.raw,
                 InterpolatedLastStrRawFormatter::new(last.raw),
                 allow_prefer,
-                ctx,
+                ctx.options.quotes,
             )));
             Doc::list(docs)
         } else {

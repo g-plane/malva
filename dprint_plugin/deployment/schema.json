@@ -5,6 +5,29 @@
   "description": "Configuration for dprint-plugin-malva.",
   "type": "object",
   "definitions": {
+    "quotes": {
+      "description": "Control the quotes of strings.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "alwaysDouble",
+          "description": "Always use double quotes. Double quotes in strings will be escaped."
+        },
+        {
+          "const": "alwaysSingle",
+          "description": "Always use single quotes. Single quotes in strings will be escaped."
+        },
+        {
+          "const": "preferDouble",
+          "description": "Use double quotes as possible. However if there're double quotes in strings, quotes will be kept as-is."
+        },
+        {
+          "const": "preferSingle",
+          "description": "Use single quotes as possible. However if there're single quotes in strings, quotes will be kept as-is."
+        }
+      ],
+      "default": "alwaysDouble"
+    },
     "preferSingleLine": {
       "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines.",
       "type": "boolean",
@@ -74,27 +97,10 @@
       "default": null
     },
     "quotes": {
-      "description": "Control the quotes of strings.",
-      "type": "string",
-      "oneOf": [
-        {
-          "const": "alwaysDouble",
-          "description": "Always use double quotes. Double quotes in strings will be escaped."
-        },
-        {
-          "const": "alwaysSingle",
-          "description": "Always use single quotes. Single quotes in strings will be escaped."
-        },
-        {
-          "const": "preferDouble",
-          "description": "Use double quotes as possible. However if there're double quotes in strings, quotes will be kept as-is."
-        },
-        {
-          "const": "preferSingle",
-          "description": "Use single quotes as possible. However if there're single quotes in strings, quotes will be kept as-is."
-        }
-      ],
-      "default": "alwaysDouble"
+      "$ref": "#/definitions/quotes"
+    },
+    "attrSelector.quotes": {
+      "$ref": "#/definitions/quotes"
     },
     "operatorLinebreak": {
       "description": "Control whether line break should come before or after operators.",

@@ -1,0 +1,8 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg quotes = "alwaysSingle"
+"attrSelector.quotes" = "alwaysDouble"*/
+[key="value"], [key="value"], [key="value"] {
+  content: '';
+}

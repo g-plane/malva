@@ -1,14 +1,14 @@
-use crate::ctx::Ctx;
+use crate::config::Quotes;
 use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind, PatternID};
 use std::{borrow::Cow, sync::LazyLock};
 
-pub(super) static AC_DOUBLE_QUOTES: LazyLock<AhoCorasick> = LazyLock::new(|| {
+static AC_DOUBLE_QUOTES: LazyLock<AhoCorasick> = LazyLock::new(|| {
     AhoCorasickBuilder::new()
         .match_kind(MatchKind::LeftmostFirst)
         .build(["\\\\", "\\\"", "\""])
         .unwrap()
 });
-pub(super) static AC_SINGLE_QUOTES: LazyLock<AhoCorasick> = LazyLock::new(|| {
+static AC_SINGLE_QUOTES: LazyLock<AhoCorasick> = LazyLock::new(|| {
     AhoCorasickBuilder::new()
         .match_kind(MatchKind::LeftmostFirst)
         .build(["\\\\", "\\'", "'"])
@@ -19,12 +19,12 @@ pub(super) fn format_str<'s>(
     raw: &'s str,
     formatter: impl StrRawFormatter<'s>,
     allow_prefer: bool,
-    ctx: &Ctx<'_, 's>,
+    quotes: Quotes,
 ) -> Cow<'s, str> {
     use crate::config::Quotes;
 
     let content = formatter.content();
-    match ctx.options.quotes {
+    match quotes {
         Quotes::AlwaysDouble => {
             if formatter.bound_check("\"") {
                 raw.into()
@@ -174,5 +174,23 @@ impl<'s> StrRawFormatter<'s> for InterpolatedMidStrRawFormatter<'s> {
 
     fn content(&self) -> &'s str {
         self.content
+    }
+}
+
+pub(super) fn is_preferred_quote_allowed(raw: &str, quotes: Quotes) -> bool {
+    match quotes {
+        Quotes::AlwaysDouble | Quotes::AlwaysSingle => false,
+        Quotes::PreferDouble => {
+            let pattern_id = PatternID::must(2);
+            AC_DOUBLE_QUOTES
+                .find_iter(raw)
+                .any(|mat| mat.pattern() == pattern_id)
+        }
+        Quotes::PreferSingle => {
+            let pattern_id = PatternID::must(2);
+            AC_SINGLE_QUOTES
+                .find_iter(raw)
+                .any(|mat| mat.pattern() == pattern_id)
+        }
     }
 }

@@ -104,6 +104,25 @@ pub(crate) fn resolve_config(
                     Default::default()
                 }
             },
+            attr_selector_quotes: get_nullable_value::<String>(
+                &mut config,
+                "attrSelector.quotes",
+                &mut diagnostics,
+            )
+            .as_deref()
+            .and_then(|value| match value {
+                "alwaysDouble" => Some(Quotes::AlwaysDouble),
+                "alwaysSingle" => Some(Quotes::AlwaysSingle),
+                "preferDouble" => Some(Quotes::PreferDouble),
+                "preferSingle" => Some(Quotes::PreferSingle),
+                _ => {
+                    diagnostics.push(ConfigurationDiagnostic {
+                        property_name: "attrSelector.quotes".into(),
+                        message: "invalid value for config `attrSelector.quotes`".into(),
+                    });
+                    None
+                }
+            }),
             operator_linebreak: match &*get_value(
                 &mut config,
                 "operatorLinebreak",

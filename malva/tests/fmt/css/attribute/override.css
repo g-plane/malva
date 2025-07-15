@@ -1,0 +1,5 @@
+/*cfg quotes = "alwaysSingle"
+"attrSelector.quotes" = "alwaysDouble"*/
+[key=value], [key='value'], [key="value"] {
+  content: '';
+}
