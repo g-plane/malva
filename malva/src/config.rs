@@ -114,14 +114,7 @@ pub struct LanguageOptions {
     /// See [`trailingComma`](https://malva.netlify.app/config/trailing-comma.html)
     pub trailing_comma: bool,
 
-    #[cfg_attr(
-        feature = "config_serde",
-        serde(
-            alias = "formatComments",
-            alias = "pad_comments", // for backward compatibility
-            alias = "padComments" // for backward compatibility
-        )
-    )]
+    #[cfg_attr(feature = "config_serde", serde(alias = "formatComments"))]
     /// See [`formatComments`](https://malva.netlify.app/config/format-comments.html)
     pub format_comments: bool,
 
