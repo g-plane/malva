@@ -147,6 +147,22 @@ impl<'s> DocGen<'s> for QueryInParens<'s> {
                     )
                     .append(Doc::text(")"))
             }
+            QueryInParensKind::ScrollState(scroll_state) => {
+                let span = scroll_state.span();
+                Doc::text("scroll-state(")
+                    .concat(
+                        ctx.end_spaced_comments(
+                            ctx.get_comments_between(self.span.start, span.start),
+                        ),
+                    )
+                    .append(scroll_state.doc(ctx, state))
+                    .concat(
+                        ctx.start_spaced_comments(
+                            ctx.get_comments_between(span.end, self.span.end),
+                        ),
+                    )
+                    .append(Doc::text(")"))
+            }
         }
     }
 }

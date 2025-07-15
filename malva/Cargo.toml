@@ -12,7 +12,7 @@ exclude = ["/tests"]
 aho-corasick = "1.1"
 itertools = "0.14"
 memchr = "2.7"
-raffia = "0.9"
+raffia = "0.10"
 serde = { version = "1.0", optional = true }
 tiny_pretty = "0.2"
 

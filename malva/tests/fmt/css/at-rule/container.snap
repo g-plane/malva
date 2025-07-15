@@ -1,0 +1,4 @@
+---
+source: malva/tests/fmt.rs
+---
+@container my-container scroll-state(scrollable: top) {}
