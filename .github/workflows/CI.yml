@@ -58,6 +58,6 @@ jobs:
         run: |
           npm i --location=global netlify-cli
           cp dprint_plugin/deployment/schema.json docs/book
-          netlify deploy --dir=docs/book --site=malva --prod
+          netlify deploy --dir=docs/book --site=1cf233ec-6ea2-42e1-b7bc-aa27f3b7a960 --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
