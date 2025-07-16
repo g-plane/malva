@@ -355,7 +355,10 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
         let mut stmt_docs = vec![];
         if ctx.syntax == Syntax::Css
             && ctx.options.single_line_top_level_declarations
-            && self.statements.iter().all(|stmt| stmt.is_declaration())
+            && self
+                .statements
+                .iter()
+                .all(|stmt| matches!(stmt, Statement::Declaration(..)))
         {
             // Declarations can't be at the top level in CSS,
             // but parser allows them and treat them as recoverable errors.
@@ -537,7 +540,7 @@ impl<'s> SingleStmtFormatter<'_, 's> {
         let mut docs = Vec::with_capacity(3);
 
         let span = self.stmt.span();
-        let is_qualified_rule = self.stmt.is_qualified_rule();
+        let is_qualified_rule = matches!(self.stmt, Statement::QualifiedRule(..));
         let mut selector_override = SelectorOverride::Unset;
 
         let comments = ctx.get_comments_between(*self.pos, span.start);

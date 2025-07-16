@@ -12,14 +12,14 @@ exclude = ["/tests"]
 aho-corasick = "1.1"
 itertools = "0.14"
 memchr = "2.7"
-raffia = "0.10"
+raffia = "0.11"
 serde = { version = "1.0", optional = true }
 tiny_pretty = "0.2"
 
 [dev-dependencies]
-insta = { version = "1.42", features = ["glob"] }
+insta = { version = "1.43", features = ["glob"] }
 similar-asserts = "1.7"
-toml = "0.8"
+toml = "0.9"
 
 [features]
 config_serde = ["raffia/config_serde", "serde"]
