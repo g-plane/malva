@@ -71,7 +71,7 @@ After adding the dprint plugin, update your `dprint.json` and add configuration:
 {
   // ...
   "plugins": [
-    "https://plugins.dprint.dev/g-plane/malva-v0.12.1.wasm"
+    "https://plugins.dprint.dev/g-plane/malva-v0.13.0.wasm"
   ],
   "malva": {
     // Malva config comes here
