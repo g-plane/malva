@@ -13,7 +13,7 @@ crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 anyhow = "1.0"
-dprint-core = { version = "0.66", default-features = false, features = [
+dprint-core = { version = "0.67", default-features = false, features = [
     "wasm",
 ] }
 malva = { path = "../malva", features = ["config_serde"] }

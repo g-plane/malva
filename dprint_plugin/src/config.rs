@@ -1,13 +1,16 @@
-use dprint_core::configuration::{
-    get_nullable_value, get_unknown_property_diagnostics, get_value, ConfigKeyMap,
-    ConfigurationDiagnostic, GlobalConfiguration, NewLineKind, ResolveConfigurationResult,
+use dprint_core::{
+    configuration::{
+        get_nullable_value, get_unknown_property_diagnostics, get_value, ConfigKeyMap,
+        ConfigurationDiagnostic, GlobalConfiguration, NewLineKind,
+    },
+    plugins::{FileMatchingInfo, PluginResolveConfigurationResult},
 };
 use malva::config::*;
 
 pub(crate) fn resolve_config(
     mut config: ConfigKeyMap,
     global_config: &GlobalConfiguration,
-) -> ResolveConfigurationResult<FormatOptions> {
+) -> PluginResolveConfigurationResult<FormatOptions> {
     let mut diagnostics = Vec::new();
     let malva_config = FormatOptions {
         layout: LayoutOptions {
@@ -323,8 +326,12 @@ pub(crate) fn resolve_config(
 
     diagnostics.extend(get_unknown_property_diagnostics(config));
 
-    ResolveConfigurationResult {
+    PluginResolveConfigurationResult {
         config: malva_config,
         diagnostics,
+        file_matching: FileMatchingInfo {
+            file_extensions: vec!["css".into(), "scss".into(), "sass".into(), "less".into()],
+            file_names: vec![],
+        },
     }
 }
