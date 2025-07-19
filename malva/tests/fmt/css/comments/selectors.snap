@@ -153,8 +153,7 @@ h3 /* comment 134 */ {}
 } /* comment 166 */
 
 /* comment 167 */
-article /* comment 168 */
-  :--heading
+article /* comment 168 */ :--heading
   /* comment 169 */ + /* comment 170 */ p /* comment 171 */ {}
 
 /* comment 172 */

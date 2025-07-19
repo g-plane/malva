@@ -147,70 +147,74 @@ impl<'s> DocGen<'s> for Combinator {
 impl<'s> DocGen<'s> for ComplexSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.children.len() * 2);
-        let mut pos = self.span.start;
-
-        let mut children = self.children.iter();
-        if let Some(first) = children.next() {
-            match first {
+        self.children.iter().fold(
+            (None, self.span.start),
+            |(prev_compound, pos), child| match child {
                 ComplexSelectorChild::CompoundSelector(selector) => {
-                    docs.push(selector.doc(ctx, state))
-                }
-                ComplexSelectorChild::Combinator(combinator) => {
-                    docs.push(combinator.doc(ctx, state));
-                    docs.push(Doc::space());
-                }
-            }
-            pos = first.span().end;
-        }
-
-        Doc::list(
-            children
-                .fold((docs, pos), |(mut docs, pos), child| match child {
-                    ComplexSelectorChild::CompoundSelector(selector) => {
-                        docs.extend(ctx.end_spaced_comments(
-                            ctx.get_comments_between(pos, selector.span.start),
-                        ));
+                    docs.extend(
+                        ctx.end_spaced_comments(ctx.get_comments_between(pos, selector.span.start)),
+                    );
+                    if prev_compound.is_some() {
                         docs.push(selector.doc(ctx, state).nest(ctx.indent_width));
-                        (docs, selector.span.end)
+                    } else {
+                        docs.push(selector.doc(ctx, state));
                     }
-                    ComplexSelectorChild::Combinator(Combinator {
-                        kind: CombinatorKind::Descendant,
-                        span,
-                    }) => {
-                        let mut has_last_line_comment = false;
-                        let mut pos = pos;
-                        docs.extend(
-                            ctx.start_spaced_comments_without_last_hard_line(
-                                ctx.get_comments_between(pos, span.end)
-                                    .take_while(|comment| {
-                                        ctx.line_bounds
-                                            .line_distance(span.start, comment.span.start)
-                                            == 0
-                                    })
-                                    .inspect(|comment| pos = comment.span.end),
-                                &mut has_last_line_comment,
-                            ),
-                        );
-                        if has_last_line_comment {
-                            docs.push(Doc::hard_line().nest(ctx.indent_width));
+                    (Some(selector), selector.span.end)
+                }
+                ComplexSelectorChild::Combinator(Combinator {
+                    kind: CombinatorKind::Descendant,
+                    span,
+                }) => {
+                    let mut has_last_line_comment = false;
+                    let mut pos = pos;
+                    docs.extend(
+                        ctx.start_spaced_comments_without_last_hard_line(
+                            ctx.get_comments_between(pos, span.end)
+                                .take_while(|comment| {
+                                    ctx.line_bounds
+                                        .line_distance(span.start, comment.span.start)
+                                        == 0
+                                })
+                                .inspect(|comment| pos = comment.span.end),
+                            &mut has_last_line_comment,
+                        ),
+                    );
+                    if has_last_line_comment {
+                        docs.push(Doc::hard_line().nest(ctx.indent_width));
+                    } else if let Some(CompoundSelector { children, .. }) = prev_compound {
+                        if let [SimpleSelector::Type(..) | SimpleSelector::Nesting(..)] =
+                            &children[..]
+                        {
+                            docs.push(Doc::space());
                         } else {
                             docs.push(Doc::line_or_space().nest(ctx.indent_width));
                         }
-                        (docs, pos)
                     }
-                    ComplexSelectorChild::Combinator(combinator) => {
-                        docs.push(Doc::line_or_space().nest(ctx.indent_width));
-                        docs.extend(ctx.end_spaced_comments(
+                    (prev_compound, pos)
+                }
+                ComplexSelectorChild::Combinator(combinator) => {
+                    if let Some(CompoundSelector { children, .. }) = prev_compound {
+                        if let [SimpleSelector::Type(..) | SimpleSelector::Nesting(..)] =
+                            &children[..]
+                        {
+                            docs.push(Doc::space());
+                        } else {
+                            docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                        }
+                    }
+                    docs.extend(
+                        ctx.end_spaced_comments(
                             ctx.get_comments_between(pos, combinator.span.start),
-                        ));
-                        docs.push(combinator.doc(ctx, state));
-                        docs.push(Doc::space());
-                        (docs, combinator.span.end)
-                    }
-                })
-                .0,
-        )
-        .group()
+                        ),
+                    );
+                    docs.push(combinator.doc(ctx, state));
+                    docs.push(Doc::space());
+                    (prev_compound, combinator.span.end)
+                }
+            },
+        );
+
+        Doc::list(docs).group()
     }
 }
 
