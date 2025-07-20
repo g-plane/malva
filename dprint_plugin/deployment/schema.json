@@ -178,7 +178,7 @@
           "description": "Order properties applying outside the box model, moving inward to intrinsic changes. Unknown properties won't be sorted."
         },
         {
-          "const": "null",
+          "const": null,
           "description": "Don't sort CSS declarations."
         }
       ],
