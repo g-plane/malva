@@ -91,3 +91,5 @@ ns|* {}
 *|* {}
 
 |* {}
+
+*:where(:not(html, iframe, canvas, img, svg, video, audio, s, em):not(svg *, symbol *)) {}
