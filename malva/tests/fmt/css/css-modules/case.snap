@@ -1,0 +1,6 @@
+---
+source: malva/tests/fmt.rs
+---
+:export {
+  bLaCk: #000;
+}

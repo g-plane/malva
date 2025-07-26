@@ -78,7 +78,7 @@ pub fn print_stylesheet<'a, 's>(
         line_bounds,
     };
     let state = State {
-        in_less_detached_ruleset: false,
+        keep_decl_name_case: false,
         selector_override: crate::state::SelectorOverride::Unset,
     };
     let doc = stylesheet.doc(&ctx, &state);

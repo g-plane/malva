@@ -6,7 +6,7 @@ use tiny_pretty::Doc;
 impl<'s> DocGen<'s> for Declaration<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
-        docs.push(if state.in_less_detached_ruleset {
+        docs.push(if state.keep_decl_name_case {
             self.name.doc(ctx, state)
         } else {
             helpers::ident_to_lowercase(&self.name, ctx, state)
@@ -244,6 +244,26 @@ impl<'s> DocGen<'s> for ImportantAnnotation<'s> {
 
 impl<'s> DocGen<'s> for QualifiedRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+        let mut keep_decl_name_case = false;
+        if let [ComplexSelector { children, .. }] = &self.selector.selectors[..] {
+            if let [ComplexSelectorChild::CompoundSelector(CompoundSelector { children, .. })] =
+                &children[..]
+            {
+                if let [SimpleSelector::PseudoClass(PseudoClassSelector {
+                    name: InterpolableIdent::Literal(Ident { raw: "export", .. }),
+                    arg: None,
+                    ..
+                })] = &children[..]
+                {
+                    // CSS modules
+                    keep_decl_name_case = true;
+                }
+            }
+        }
+        let state = State {
+            keep_decl_name_case,
+            ..state.clone()
+        };
         // we don't use `SelectorList::doc` here
         // because it's a special case for qualified rule
         helpers::format_selectors_before_block(
@@ -251,14 +271,14 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
             &self.selector.comma_spans,
             self.selector.span.start,
             ctx,
-            state,
+            &state,
         )
         .append(helpers::format_space_before_block(
             self.selector.span.end,
             self.block.span.start,
             ctx,
         ))
-        .append(self.block.doc(ctx, state))
+        .append(self.block.doc(ctx, &state))
     }
 }
 

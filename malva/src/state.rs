@@ -1,6 +1,6 @@
 #[derive(Clone)]
 pub(crate) struct State {
-    pub(crate) in_less_detached_ruleset: bool,
+    pub(crate) keep_decl_name_case: bool,
     pub(crate) selector_override: SelectorOverride,
 }
 

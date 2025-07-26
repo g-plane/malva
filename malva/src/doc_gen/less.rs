@@ -122,7 +122,7 @@ impl<'s> DocGen<'s> for LessDetachedRuleset<'s> {
         self.block.doc(
             ctx,
             &State {
-                in_less_detached_ruleset: true,
+                keep_decl_name_case: true,
                 ..state.clone()
             },
         )
