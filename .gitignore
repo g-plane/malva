@@ -2,3 +2,7 @@
 bench_samples
 wasm/pkg
 docs/book
+/*.css
+/*.scss
+/*.sass
+/*.less
