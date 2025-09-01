@@ -1,0 +1,15 @@
+---
+source: malva/tests/fmt.rs
+---
+.thing {
+  color: black;
+  --shadow-hint:
+    rgb(0 0 0 / 0.45) 0px 4px 4px -1px,
+    rgb(0 0 0 / 0.60) 0px 1px 1px 0px,
+    inset 0px 0.5px 0px 0px rgb(255 255 255 / 0.35);
+  --shadow-single:
+    rgb(0 0 0 / 0.45) 0px 4px 4px -1px,
+    rgb(0 0 0 / 0.60) 0px 1px 1px 0px,
+    inset 0px 0.5px 0px 0px rgb(255 255 255 / 0.35);
+  --shadow-short: rgb(0 0 0 / 0.45) 0 0 0 1px, rgb(0 0 0 / 0.60) 0 0 0 1px;
+}

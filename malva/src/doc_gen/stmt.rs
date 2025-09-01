@@ -63,6 +63,14 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                     docs.push(value.doc(ctx, state));
                     if matches!(
                         value,
+                        ComponentValue::Delimiter(Delimiter {
+                            kind: DelimiterKind::Comma,
+                            ..
+                        })
+                    ) {
+                        docs.push(Doc::line_or_space().nest(ctx.indent_width));
+                    } else if matches!(
+                        value,
                         ComponentValue::TokenWithSpan(TokenWithSpan {
                             token: Token::Comma(..) | Token::Semicolon(..),
                             ..
