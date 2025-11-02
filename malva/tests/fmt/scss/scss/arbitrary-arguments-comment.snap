@@ -3,9 +3,6 @@ source: malva/tests/fmt.rs
 ---
 @include bar(
   rgba(
-    50
-    50
-    0.50
-    50... // comment
+    50 50 0.50 50... // comment
   )
 );

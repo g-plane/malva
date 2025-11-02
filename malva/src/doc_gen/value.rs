@@ -293,7 +293,7 @@ impl<'s> DocGen<'s> for Function<'s> {
         fn format_group<'s>(
             group: &[ComponentValue<'s>],
             pos: &mut usize,
-            separator: Doc<'s>,
+            has_more_than_one_group: bool,
             ctx: &Ctx<'_, 's>,
             state: &State,
         ) -> Doc<'s> {
@@ -301,19 +301,22 @@ impl<'s> DocGen<'s> for Function<'s> {
                 Vec::with_capacity(group.len()),
                 |mut docs, (i, arg)| {
                     let arg_span = arg.span();
+                    let prev_arg = if i == 0 { None } else { group.get(i - 1) };
                     if i > 0 && *pos < arg_span.start {
-                        docs.push(separator.clone());
+                        if has_more_than_one_group {
+                            docs.push(Doc::space());
+                        } else if matches!(prev_arg, Some(ComponentValue::Function(..))) {
+                            docs.push(Doc::line_or_space());
+                        } else {
+                            docs.push(Doc::soft_line());
+                        }
                     }
                     docs.extend(ctx.end_spaced_comments(
                         ctx.get_comments_between(mem::replace(pos, arg_span.end), arg_span.start),
                     ));
                     match arg {
                         ComponentValue::Number(number)
-                            if i > 0
-                                && matches!(
-                                    group.get(i - 1),
-                                    Some(ComponentValue::InterpolableIdent(..))
-                                ) =>
+                            if matches!(prev_arg, Some(ComponentValue::InterpolableIdent(..))) =>
                         {
                             docs.push(Doc::text(number.raw));
                         }
@@ -324,11 +327,7 @@ impl<'s> DocGen<'s> for Function<'s> {
             ))
         }
 
-        let separator = if args_groups.len() == 1 {
-            Doc::line_or_space()
-        } else {
-            Doc::space()
-        };
+        let has_more_than_one_group = args_groups.len() > 1;
         arg_docs.extend(itertools::intersperse(
             args_groups.iter().map(|group| {
                 if let [
@@ -341,14 +340,14 @@ impl<'s> DocGen<'s> for Function<'s> {
                     ),
                 ] = group
                 {
-                    format_group(group, &mut pos, separator.clone(), ctx, state)
+                    format_group(group, &mut pos, has_more_than_one_group, ctx, state)
                         .concat(ctx.start_spaced_comments(ctx.get_comments_between(
                             mem::replace(&mut pos, delimiter_span.end),
                             delimiter_span.start,
                         )))
                         .append(delimiter.doc(ctx, state))
                 } else {
-                    format_group(group, &mut pos, separator.clone(), ctx, state)
+                    format_group(group, &mut pos, has_more_than_one_group, ctx, state)
                 }
             }),
             helpers::get_smart_linebreak(

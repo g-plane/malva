@@ -2,3 +2,10 @@
   src: url('./libertinus-7.050/LibertinusSerif-Regular.woff2') format('woff2'), local(Libertinus Serif), local(Libertinus Serif Regular), local(Libertinus);
   src: local(Libertinus Serif), local(Libertinus Serif Regular), local(Libertinus), url('./libertinus-7.050/LibertinusSerif-Regular.woff2') format('woff2');
 }
+
+.thing {
+  --color-short: rgb(from var(--var-short) r g b / 0.19);
+  --color-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long: rgb(from var(--var-short) r g b / 0.19);
+  --color-structured: rgb(from var(--var-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long) r g b / 0.19);
+  --color-structured-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long: rgb(from var(--var-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long) r g b / 0.19);
+}
