@@ -1,4 +1,4 @@
-use super::super::{helpers, DocGen};
+use super::super::{DocGen, helpers};
 use crate::{ctx::Ctx, state::State};
 use raffia::ast::*;
 use tiny_pretty::Doc;

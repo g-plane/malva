@@ -1,6 +1,6 @@
 use super::{super::DocGen, helpers};
 use crate::{ctx::Ctx, state::State};
-use raffia::{ast::*, Spanned};
+use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
 mod color_profile;

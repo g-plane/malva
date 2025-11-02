@@ -1,7 +1,7 @@
 [package]
 name = "standalone_wasm"
 version = "0.14.3"
-edition = "2021"
+edition = "2024"
 authors = ["Pig Fang <g-plane@hotmail.com>"]
 description = "WebAssembly build of Malva."
 repository = "https://github.com/g-plane/malva"

@@ -1,7 +1,7 @@
 [package]
 name = "malva"
 version = "0.14.3"
-edition = "2021"
+edition = "2024"
 authors = ["Pig Fang <g-plane@hotmail.com>"]
 description = "Configurable, smart and fast CSS, SCSS, Sass and Less formatter."
 repository = "https://github.com/g-plane/malva"

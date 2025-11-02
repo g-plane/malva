@@ -1,6 +1,6 @@
-use super::{comment::format_comment, helpers, DocGen};
+use super::{DocGen, comment::format_comment, helpers};
 use crate::{ctx::Ctx, state::State};
-use raffia::{ast::*, token::TokenWithSpan, Span, Spanned, Syntax};
+use raffia::{Span, Spanned, Syntax, ast::*, token::TokenWithSpan};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for Declaration<'s> {
@@ -253,20 +253,19 @@ impl<'s> DocGen<'s> for ImportantAnnotation<'s> {
 impl<'s> DocGen<'s> for QualifiedRule<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut keep_decl_name_case = false;
-        if let [ComplexSelector { children, .. }] = &self.selector.selectors[..] {
-            if let [ComplexSelectorChild::CompoundSelector(CompoundSelector { children, .. })] =
+        if let [ComplexSelector { children, .. }] = &self.selector.selectors[..]
+            && let [ComplexSelectorChild::CompoundSelector(CompoundSelector { children, .. })] =
                 &children[..]
-            {
-                if let [SimpleSelector::PseudoClass(PseudoClassSelector {
+            && let [
+                SimpleSelector::PseudoClass(PseudoClassSelector {
                     name: InterpolableIdent::Literal(Ident { raw: "export", .. }),
                     arg: None,
                     ..
-                })] = &children[..]
-                {
-                    // CSS modules
-                    keep_decl_name_case = true;
-                }
-            }
+                }),
+            ] = &children[..]
+        {
+            // CSS modules
+            keep_decl_name_case = true;
         }
         let state = State {
             keep_decl_name_case,

@@ -1,6 +1,6 @@
 use super::super::DocGen;
 use crate::{ctx::Ctx, state::State};
-use raffia::{ast::*, Spanned};
+use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
 impl<'s> DocGen<'s> for NamespacePrelude<'s> {

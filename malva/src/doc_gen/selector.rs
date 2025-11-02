@@ -1,10 +1,9 @@
 use super::{
-    helpers,
-    str::{format_str, is_preferred_quote_allowed, CssStrRawFormatter},
-    DocGen,
+    DocGen, helpers,
+    str::{CssStrRawFormatter, format_str, is_preferred_quote_allowed},
 };
 use crate::{ctx::Ctx, state::State};
-use raffia::{ast::*, Spanned};
+use raffia::{Spanned, ast::*};
 use std::mem;
 use tiny_pretty::Doc;
 
@@ -413,11 +412,7 @@ impl<'s> DocGen<'s> for PseudoClassSelector<'s> {
                 PseudoClassSelectorArgKind::SelectorList(selector_list) => {
                     if ctx.options.linebreak_in_pseudo_parens {
                         let doc = selector_list.doc(ctx, state);
-                        if force_break {
-                            doc
-                        } else {
-                            doc.group()
-                        }
+                        if force_break { doc } else { doc.group() }
                     } else {
                         helpers::SeparatedListFormatter::new(",", Doc::space()).format(
                             &selector_list.selectors,

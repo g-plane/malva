@@ -11,7 +11,7 @@ mod state;
 use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen, state::State};
 pub use crate::{error::Error, line_bounds::LineBounds};
 pub use raffia::Syntax;
-use raffia::{ast::Stylesheet, token::Comment, ParserBuilder, ParserOptions};
+use raffia::{ParserBuilder, ParserOptions, ast::Stylesheet, token::Comment};
 use std::path::Path;
 
 /// Format the given source code.

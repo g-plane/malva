@@ -17,11 +17,7 @@ fn strip_vendor_prefix(s: &str) -> &str {
     s.strip_prefix('-')
         .and_then(|s| {
             let trimmed = s.trim_start_matches(|c: char| c.is_ascii_alphanumeric());
-            if s == trimmed {
-                None
-            } else {
-                Some(trimmed)
-            }
+            if s == trimmed { None } else { Some(trimmed) }
         })
         .and_then(|s| s.strip_prefix('-'))
         .unwrap_or(s)

@@ -1,10 +1,9 @@
 use super::{
-    helpers,
-    str::{format_str, is_preferred_quote_allowed, CssStrRawFormatter},
-    DocGen,
+    DocGen, helpers,
+    str::{CssStrRawFormatter, format_str, is_preferred_quote_allowed},
 };
 use crate::{ctx::Ctx, state::State};
-use raffia::{ast::*, token::TokenWithSpan, Spanned};
+use raffia::{Spanned, ast::*, token::TokenWithSpan};
 use std::{borrow::Cow, mem};
 use tiny_pretty::Doc;
 
@@ -332,12 +331,15 @@ impl<'s> DocGen<'s> for Function<'s> {
         };
         arg_docs.extend(itertools::intersperse(
             args_groups.iter().map(|group| {
-                if let [group @ .., ComponentValue::Delimiter(
-                    delimiter @ Delimiter {
-                        kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
-                        span: delimiter_span,
-                    },
-                )] = group
+                if let [
+                    group @ ..,
+                    ComponentValue::Delimiter(
+                        delimiter @ Delimiter {
+                            kind: DelimiterKind::Comma | DelimiterKind::Semicolon,
+                            span: delimiter_span,
+                        },
+                    ),
+                ] = group
                 {
                     format_group(group, &mut pos, separator.clone(), ctx, state)
                         .concat(ctx.start_spaced_comments(ctx.get_comments_between(

@@ -1,13 +1,12 @@
 use super::{
-    helpers,
+    DocGen, helpers,
     str::{
-        format_str, InterpolatedFirstStrRawFormatter, InterpolatedLastStrRawFormatter,
-        InterpolatedMidStrRawFormatter,
+        InterpolatedFirstStrRawFormatter, InterpolatedLastStrRawFormatter,
+        InterpolatedMidStrRawFormatter, format_str,
     },
-    DocGen,
 };
 use crate::{ctx::Ctx, state::State};
-use raffia::{ast::*, Spanned};
+use raffia::{Spanned, ast::*};
 use std::{iter, mem};
 use tiny_pretty::Doc;
 
@@ -265,8 +264,11 @@ impl<'s> DocGen<'s> for LessInterpolatedIdent<'s> {
 
 impl<'s> DocGen<'s> for LessInterpolatedStr<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
-        if let [LessInterpolatedStrElement::Static(first), mid @ .., LessInterpolatedStrElement::Static(last)] =
-            &self.elements[..]
+        if let [
+            LessInterpolatedStrElement::Static(first),
+            mid @ ..,
+            LessInterpolatedStrElement::Static(last),
+        ] = &self.elements[..]
         {
             let allow_prefer = is_preferred_quote_allowed(self, ctx);
 

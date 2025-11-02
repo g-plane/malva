@@ -1,7 +1,7 @@
 use super::DocGen;
 use crate::{ctx::Ctx, state::State};
 use itertools::{EitherOrBoth, Itertools};
-use raffia::{ast::*, Span, Spanned, Syntax};
+use raffia::{Span, Spanned, Syntax, ast::*};
 use std::{iter, mem};
 use tiny_pretty::Doc;
 

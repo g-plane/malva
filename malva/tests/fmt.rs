@@ -1,6 +1,6 @@
-use insta::{assert_snapshot, glob, Settings};
+use insta::{Settings, assert_snapshot, glob};
 use malva::{config::FormatOptions, format_text};
-use raffia::{ast::Stylesheet, ParserBuilder, ParserOptions, Syntax};
+use raffia::{ParserBuilder, ParserOptions, Syntax, ast::Stylesheet};
 use std::fs;
 
 #[test]

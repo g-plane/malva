@@ -1,7 +1,7 @@
 use crate::ctx::Ctx;
 use raffia::{
-    token::{Comment, CommentKind},
     Syntax,
+    token::{Comment, CommentKind},
 };
 use tiny_pretty::Doc;
 

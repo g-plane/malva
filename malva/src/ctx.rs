@@ -1,7 +1,7 @@
-use crate::{config::LanguageOptions, doc_gen::format_comment, LineBounds};
+use crate::{LineBounds, config::LanguageOptions, doc_gen::format_comment};
 use raffia::{
-    token::{Comment, CommentKind},
     Syntax,
+    token::{Comment, CommentKind},
 };
 use std::{array, iter::Peekable, mem};
 use tiny_pretty::Doc;
