@@ -109,7 +109,7 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                             docs.push(Doc::hard_line().nest(ctx.indent_width));
                         }
                         docs.push(Doc::list(comments).nest(ctx.indent_width));
-                        docs.push(value.doc(ctx, state));
+                        docs.push(value.doc(ctx, state).nest(ctx.indent_width));
 
                         span.end
                     });
