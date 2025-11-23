@@ -543,7 +543,7 @@ p {
   background-#{$var}: #7b3d66;
   animation-name: #{var};
   line-height: #{strip-unit($line-height)}em;
-  height: 1 #{$var};
+  height: 1#{$var};
   width: calc(100% - #{$sidebar-width});
   max-width: calc(#{$m * 100}vw #{$sign} #{$b});
   font: #{$font-size}/#{$line-height};

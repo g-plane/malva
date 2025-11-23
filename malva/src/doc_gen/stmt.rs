@@ -219,7 +219,11 @@ impl<'s> DocGen<'s> for Declaration<'s> {
                                     docs.push(Doc::soft_line().nest(ctx.indent_width));
                                 }
                             }
-                            _ => docs.push(Doc::soft_line().nest(ctx.indent_width)),
+                            Some((_, next)) => {
+                                if span.end < next.span().start {
+                                    docs.push(Doc::soft_line().nest(ctx.indent_width));
+                                }
+                            }
                         },
                     }
 

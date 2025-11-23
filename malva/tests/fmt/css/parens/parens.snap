@@ -101,7 +101,7 @@ a {
   prop7: attr(data-foo);
   prop8: attr(data-foo);
 
-  prop9: "(" attr(title) ")";
+  prop9: "(" attr(title)")";
   prop10: "(" attr(title) ")";
   prop11: "(" attr(title) ")";
   prop12: "(" attr(title) ")";
