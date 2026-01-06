@@ -500,7 +500,7 @@ fn format_statements<'s>(
                     docs.extend(
                         itertools::intersperse(
                             sortable_decls.drain(..).map(|(_, docs)| docs),
-                            vec![Doc::hard_line()],
+                            vec![line_break_doc.clone()],
                         )
                         .flatten(),
                     );

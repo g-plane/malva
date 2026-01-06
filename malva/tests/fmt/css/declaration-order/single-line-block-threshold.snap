@@ -1,0 +1,10 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg declarationOrder = "alphabetical"
+      singleLineBlockThreshold = 2 */
+#shell:has(> .browser) {
+  --max-shell-width: 1800px;
+  > :is(header, footer) { display: none; }
+  > main > header { color: #000; display: none; }
+}
