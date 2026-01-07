@@ -13,8 +13,18 @@ impl<'s> DocGen<'s> for TokenSeq<'s> {
             docs.extend(ctx.start_spaced_comments(ctx.get_comments_between(pos, span.start)));
 
             docs.push(token.doc(ctx, state));
-            if matches!(iter.peek(), Some(next) if token.span().end < next.span().start) {
-                docs.push(Doc::soft_line());
+            if let Some(next) = iter.peek()
+                && token.span.end < next.span.start
+            {
+                if ctx
+                    .line_bounds
+                    .line_distance(token.span.end, next.span.start)
+                    == 0
+                {
+                    docs.push(Doc::space());
+                } else {
+                    docs.push(Doc::hard_line());
+                }
             }
 
             pos = span.end;

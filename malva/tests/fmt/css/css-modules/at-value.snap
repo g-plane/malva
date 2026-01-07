@@ -1,0 +1,5 @@
+---
+source: malva/tests/fmt.rs
+---
+@value completedMainColor, completedTextColor, inProgressMainColor, inProgressTextColor from truckloadListColors;
+@value defaultSuccessBackgroundColor, defaultSuccessColor, defaultSevereWarningBackgroundColor, defaultSevereWarningColor, defaultWarningColor, defaultWarningBackgroundColor from colors;
