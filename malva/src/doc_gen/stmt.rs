@@ -338,11 +338,10 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
 
         let has_stmts = !stmt_docs.is_empty();
         docs.push(Doc::list(stmt_docs).nest(ctx.indent_width));
-        if has_stmts {
-            docs.push(line_break_doc);
-        }
-
         if !is_sass {
+            if has_stmts {
+                docs.push(line_break_doc);
+            }
             docs.push(Doc::text("}"));
         }
 
@@ -416,9 +415,7 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
             );
         }
 
-        if ctx.syntax != Syntax::Sass {
-            stmt_docs.push(Doc::empty_line());
-        }
+        stmt_docs.push(Doc::empty_line());
         Doc::list(stmt_docs)
     }
 }

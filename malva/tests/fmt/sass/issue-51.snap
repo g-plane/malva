@@ -1,0 +1,20 @@
+---
+source: malva/tests/fmt.rs
+---
+$theme-light: (
+  col-primary-bg: #f8fafc,
+  col-secondary-bg: #e2e8f0,
+  col-text: #1e293b,
+  col-text-secondary: #475569,
+  col-card-bg: rgba(255, 255, 255, 0.8),
+  col-border: rgba(59, 130, 246, 0.2),
+  shadow: 0 10px 25px rgba(59, 130, 246, 0.15),
+  shadow-light: 0 25px 50px rgba(59, 130, 246, 0.2)
+)
+
+@mixin css-vars($map)
+  @each $k, $v in $map
+    --#{$k}: #{$v}
+
+:root
+  @include css-vars($theme-light)
