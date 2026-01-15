@@ -12,6 +12,10 @@ impl<'s> DocGen<'s> for Declaration<'s> {
             helpers::ident_to_lowercase(&self.name, ctx, state)
         });
 
+        if let Some(suffix) = self.name_suffix {
+            docs.push(Doc::text(suffix.to_string()));
+        }
+
         if let Some(less_property_merge) = &self.less_property_merge {
             docs.push(less_property_merge.doc(ctx, state));
             docs.extend(ctx.start_spaced_comments(
