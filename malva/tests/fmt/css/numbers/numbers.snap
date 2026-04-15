@@ -74,4 +74,5 @@ source: malva/tests/fmt.rs
 
 @media only screen and (-webkit-min-device-pixel-ratio: 0.5),
   only screen and (min-device-pixel-ratio: 0.5) {}
-@include single-transition(transform, 0.5s ease);
+@include single-transition(transform, .5s ease);
+@apply bg-size-[0.75em_0.75em];
