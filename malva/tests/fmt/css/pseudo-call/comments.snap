@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg linebreakInPseudoParens = true*/
+li[data-testid="commit-row-item"] code /* `isCommitList` commit message */,
+div[class^="CommitHeader-module__commitMessageContainer"]
+  code, /* `isCommit` commit message */
+/* React commit page */
+.diff-text-marker {}

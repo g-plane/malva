@@ -133,7 +133,7 @@ where
 
             [
                 match mem::replace(&mut self.prev_kind, comment.kind.clone()) {
-                    CommentKind::Block => Doc::soft_line(),
+                    CommentKind::Block => Doc::space(),
                     CommentKind::Line => Doc::nil(),
                 },
                 format_comment(comment, self.ctx),
