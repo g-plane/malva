@@ -6,8 +6,10 @@ mod doc_gen;
 mod error;
 mod helpers;
 mod line_bounds;
+pub mod range;
 mod state;
 
+pub use crate::range::FormatRangeResult;
 use crate::{config::FormatOptions, ctx::Ctx, doc_gen::DocGen, state::State};
 pub use crate::{error::Error, line_bounds::LineBounds};
 pub use raffia::Syntax;
@@ -106,4 +108,19 @@ pub fn detect_syntax(path: impl AsRef<Path>) -> Option<Syntax> {
         Some(ext) if ext.eq_ignore_ascii_case("less") => Some(Syntax::Less),
         _ => None,
     }
+}
+
+/// Format a specific range of CSS code.
+///
+/// This function formats only the specified range of code, which is useful for
+/// editor integrations where users select a portion of code to format.
+///
+/// See [`crate::range::format_range`] for more details.
+pub fn format_range(
+    source: &str,
+    range: std::ops::Range<usize>,
+    syntax: Syntax,
+    options: &FormatOptions,
+) -> Result<FormatRangeResult, Error> {
+    crate::range::format_range(source, range, syntax, options)
 }
