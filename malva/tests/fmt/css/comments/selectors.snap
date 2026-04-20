@@ -37,27 +37,37 @@ source: malva/tests/fmt.rs
 /* comment 23 */
 .element /* comment 24 */ .element /* comment 25 */ {}
 /* comment 26 */
-.element /* comment 27 */ .element /* comment 28 */ {}
+.element
+  /* comment 27 */
+  .element /* comment 28 */ {}
 
 /* comment 29 */
 .element /* comment 30 */ > /* comment 31 */ .element /* comment 32 */ {}
 /* comment 33 */
-.element /* comment 34 */ > /* comment 35 */ .element /* comment 36 */ {}
+.element
+  /* comment 34 */ > /* comment 35 */
+  .element /* comment 36 */ {}
 
 /* comment 37 */
 .element /* comment 38 */ + /* comment 39 */ .element /* comment 40 */ {}
 /* comment 41 */
-.element /* comment 42 */ + /* comment 43 */ .element /* comment 44 */ {}
+.element
+  /* comment 42 */ + /* comment 43 */
+  .element /* comment 44 */ {}
 
 /* comment 45 */
 .element /* comment 46 */ ~ /* comment 47 */ .element /* comment 48 */ {}
 /* comment 49 */
-.element /* comment 50 */ ~ /* comment 51 */ .element /* comment 52 */ {}
+.element
+  /* comment 50 */ ~ /* comment 51 */
+  .element /* comment 52 */ {}
 
 /* comment 53 */
 .element /* comment 54 */ > /* comment 55 */ .element /* comment 56 */ {}
 /* comment 57 */
-.element /* comment 58 */ > /* comment 59 */ .element /* comment 60 */ {}
+.element
+  /* comment 58 */ > /* comment 59 */
+  .element /* comment 60 */ {}
 
 a[/* comment 61 */ target /* comment 62 */] {}
 a[/* comment 63 */ target/* comment 64 */ =/* comment 65 */ "_blank"
@@ -175,4 +185,10 @@ article /* comment 168 */ :--heading
   /* comments 192 */
   --centered /* comments 193 */: /* comments 194 */ { display: flex;
     align-items: center; justify-content: center; };
+}
+
+.merge-status-list:has(.octicon-x, .text-italic):not(:hover)
+  /* Only if any checks are failing or in progress */
+  .merge-status-item:has(.octicon-check, .octicon-skip, .octicon-square-fill) {
+  opacity: 50%;
 }

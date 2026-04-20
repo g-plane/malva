@@ -150,9 +150,22 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
             (None, self.span.start),
             |(prev_compound, pos), child| match child {
                 ComplexSelectorChild::CompoundSelector(selector) => {
-                    docs.extend(
-                        ctx.end_spaced_comments(ctx.get_comments_between(pos, selector.span.start)),
-                    );
+                    let mut comment_end = None;
+                    docs.extend(ctx.end_spaced_comments_without_last_space(
+                        ctx.get_comments_between(pos, selector.span.start),
+                        &mut comment_end,
+                    ));
+                    if let Some(comment_end) = comment_end {
+                        if ctx
+                            .line_bounds
+                            .line_distance(comment_end, selector.span.start)
+                            > 0
+                        {
+                            docs.push(Doc::hard_line().nest(ctx.indent_width));
+                        } else {
+                            docs.push(Doc::space());
+                        }
+                    }
                     if prev_compound.is_some() {
                         docs.push(selector.doc(ctx, state).nest(ctx.indent_width));
                     } else {

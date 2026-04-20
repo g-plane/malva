@@ -155,3 +155,9 @@ input:not(/* comment 125 */[/* comment 126 */disabled/* comment 127 */]/* commen
         justify-content: center;
     };
 }
+
+.merge-status-list:has(.octicon-x, .text-italic):not(:hover)
+/* Only if any checks are failing or in progress */
+.merge-status-item:has(.octicon-check, .octicon-skip, .octicon-square-fill) {
+	opacity: 50%;
+}
