@@ -548,7 +548,20 @@ impl<'s> DocGen<'s> for RelativeSelector<'s> {
 
 impl<'s> DocGen<'s> for RelativeSelectorList<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
-        helpers::SeparatedListFormatter::new(",", Doc::space()).format(
+        helpers::SeparatedListFormatter::new(
+            ",",
+            if ctx.options.linebreak_in_pseudo_parens {
+                helpers::get_smart_linebreak(
+                    self.span.start,
+                    &self.selectors,
+                    ctx.options.selectors_prefer_single_line,
+                    ctx,
+                )
+            } else {
+                Doc::space()
+            },
+        )
+        .format(
             &self.selectors,
             &self.comma_spans,
             self.span.start,
