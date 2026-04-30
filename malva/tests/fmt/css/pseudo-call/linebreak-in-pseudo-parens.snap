@@ -37,3 +37,9 @@ source: malva/tests/fmt.rs
     )
     svg {}
 }
+
+& span:is([class*="emptyText"], [class*="developmentHelpText"]):not(
+  :has(> button)
+) {
+  display: none;
+}

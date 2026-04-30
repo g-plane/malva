@@ -21,3 +21,7 @@
 	/* Global PR lists */
 	[aria-label='Draft Pull Request']
 ) svg {}}
+
+& span:is([class*='emptyText'], [class*='developmentHelpText']):not(:has(> button)) {
+  display: none;
+}

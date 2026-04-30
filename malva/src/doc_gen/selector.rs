@@ -147,7 +147,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
     fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.children.len() * 2);
         self.children.iter().fold(
-            (None, self.span.start),
+            (Option::<&CompoundSelector>::None, self.span.start),
             |(prev_compound, pos), child| match child {
                 ComplexSelectorChild::CompoundSelector(selector) => {
                     let mut comment_end = None;
@@ -166,8 +166,14 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                             docs.push(Doc::space());
                         }
                     }
-                    if prev_compound.is_some() {
-                        docs.push(selector.doc(ctx, state).nest(ctx.indent_width));
+                    if let Some(CompoundSelector { children, .. }) = prev_compound {
+                        if let [SimpleSelector::Type(..) | SimpleSelector::Nesting(..)] =
+                            &**children
+                        {
+                            docs.push(selector.doc(ctx, state));
+                        } else {
+                            docs.push(selector.doc(ctx, state).nest(ctx.indent_width));
+                        }
                     } else {
                         docs.push(selector.doc(ctx, state));
                     }
@@ -195,7 +201,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                         docs.push(Doc::hard_line().nest(ctx.indent_width));
                     } else if let Some(CompoundSelector { children, .. }) = prev_compound {
                         if let [SimpleSelector::Type(..) | SimpleSelector::Nesting(..)] =
-                            &children[..]
+                            &**children
                         {
                             docs.push(Doc::space());
                         } else {
@@ -207,7 +213,7 @@ impl<'s> DocGen<'s> for ComplexSelector<'s> {
                 ComplexSelectorChild::Combinator(combinator) => {
                     if let Some(CompoundSelector { children, .. }) = prev_compound {
                         if let [SimpleSelector::Type(..) | SimpleSelector::Nesting(..)] =
-                            &children[..]
+                            &**children
                         {
                             docs.push(Doc::space());
                         } else {
