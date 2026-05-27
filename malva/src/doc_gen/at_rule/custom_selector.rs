@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::ast::*;
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for CustomSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for CustomSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(1);
 
         if let Some(prefix_arg) = &self.prefix_arg {
@@ -22,14 +22,14 @@ impl<'s> DocGen<'s> for CustomSelector<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for CustomSelectorArg<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for CustomSelectorArg<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text("$").append(self.name.doc(ctx, state))
     }
 }
 
-impl<'s> DocGen<'s> for CustomSelectorArgs<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for CustomSelectorArgs<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
@@ -51,8 +51,8 @@ impl<'s> DocGen<'s> for CustomSelectorArgs<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for CustomSelectorPrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for CustomSelectorPrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.custom_selector
             .doc(ctx, state)
             .append(Doc::line_or_space().nest(ctx.indent_width))

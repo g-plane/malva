@@ -18,8 +18,8 @@ mod page;
 mod scope;
 mod supports;
 
-impl<'s> DocGen<'s> for AtRule<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for AtRule<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(5);
         let mut pos = self.name.span.end;
 
@@ -49,8 +49,8 @@ impl<'s> DocGen<'s> for AtRule<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for AtRulePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for AtRulePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             AtRulePrelude::Media(media) => media.doc(ctx, state),
             AtRulePrelude::Charset(charset) => Doc::text(charset.raw),
@@ -96,8 +96,8 @@ impl<'s> DocGen<'s> for AtRulePrelude<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for UnknownAtRulePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for UnknownAtRulePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             UnknownAtRulePrelude::ComponentValue(component_value) => {
                 component_value.doc(ctx, state)

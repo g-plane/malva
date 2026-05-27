@@ -551,9 +551,9 @@ dependencies = [
 
 [[package]]
 name = "tiny_pretty"
-version = "0.2.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "650d82e943da333637be9f1567d33d605e76810a26464edfd7ae74f7ef181e95"
+checksum = "744bb87c05191e74d48f3b0390a38b42950ee1774ff8ff1679a313480747147f"
 
 [[package]]
 name = "toml"

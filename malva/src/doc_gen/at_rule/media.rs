@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for MediaAnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaAnd<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -20,8 +20,8 @@ impl<'s> DocGen<'s> for MediaAnd<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaCondition<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             self.conditions
                 .iter()
@@ -41,8 +41,8 @@ impl<'s> DocGen<'s> for MediaCondition<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaConditionAfterMediaType<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaConditionAfterMediaType<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -58,8 +58,8 @@ impl<'s> DocGen<'s> for MediaConditionAfterMediaType<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaConditionKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaConditionKind<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             MediaConditionKind::MediaInParens(media_in_parens) => media_in_parens.doc(ctx, state),
             MediaConditionKind::And(and) => and.doc(ctx, state),
@@ -69,8 +69,8 @@ impl<'s> DocGen<'s> for MediaConditionKind<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaFeature<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaFeature<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             MediaFeature::Plain(plain) => plain.doc(ctx, state),
             MediaFeature::Boolean(boolean) => boolean.doc(ctx, state),
@@ -80,14 +80,14 @@ impl<'s> DocGen<'s> for MediaFeature<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaFeatureBoolean<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaFeatureBoolean<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.name.doc(ctx, state)
     }
 }
 
-impl<'s> DocGen<'s> for MediaFeatureComparison {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaFeatureComparison {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(match self.kind {
             MediaFeatureComparisonKind::Equal => "=",
             MediaFeatureComparisonKind::GreaterThan => ">",
@@ -98,8 +98,8 @@ impl<'s> DocGen<'s> for MediaFeatureComparison {
     }
 }
 
-impl<'s> DocGen<'s> for MediaFeatureName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaFeatureName<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             MediaFeatureName::Ident(InterpolableIdent::Literal(ident))
                 if !ident.name.starts_with("--") =>
@@ -112,8 +112,8 @@ impl<'s> DocGen<'s> for MediaFeatureName<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaFeaturePlain<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaFeaturePlain<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.name
             .doc(ctx, state)
             .concat(ctx.start_spaced_comments(
@@ -127,8 +127,8 @@ impl<'s> DocGen<'s> for MediaFeaturePlain<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaFeatureRange<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaFeatureRange<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.left
             .doc(ctx, state)
             .append(Doc::space())
@@ -144,8 +144,8 @@ impl<'s> DocGen<'s> for MediaFeatureRange<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaFeatureRangeInterval<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaFeatureRangeInterval<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let name_span = self.name.span();
         self.left
             .doc(ctx, state)
@@ -172,8 +172,8 @@ impl<'s> DocGen<'s> for MediaFeatureRangeInterval<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaInParens<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaInParens<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let kind = match &self.kind {
             MediaInParensKind::MediaCondition(media_condition) => media_condition.doc(ctx, state),
             MediaInParensKind::MediaFeature(media_feature) => media_feature.doc(ctx, state),
@@ -192,8 +192,8 @@ impl<'s> DocGen<'s> for MediaInParens<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaNot<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaNot<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -209,8 +209,8 @@ impl<'s> DocGen<'s> for MediaNot<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaOr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaOr<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -226,8 +226,8 @@ impl<'s> DocGen<'s> for MediaOr<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaQuery<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaQuery<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             MediaQuery::ConditionOnly(media_condition) => media_condition.doc(ctx, state),
             MediaQuery::WithType(media_query_with_type) => media_query_with_type.doc(ctx, state),
@@ -240,8 +240,8 @@ impl<'s> DocGen<'s> for MediaQuery<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaQueryWithType<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let media_type_span = self.media_type.span();
 
         let mut docs = Vec::with_capacity(5);
@@ -264,8 +264,8 @@ impl<'s> DocGen<'s> for MediaQueryWithType<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for MediaQueryList<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for MediaQueryList<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
             .format(
                 &self.queries,

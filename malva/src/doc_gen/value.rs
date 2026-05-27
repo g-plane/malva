@@ -7,8 +7,8 @@ use raffia::{Spanned, ast::*, token::TokenWithSpan};
 use std::{borrow::Cow, mem};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for BracketBlock<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for BracketBlock<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = itertools::intersperse(
             self.value.iter().map(|value| value.doc(ctx, state)),
             Doc::soft_line(),
@@ -20,8 +20,8 @@ impl<'s> DocGen<'s> for BracketBlock<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Calc<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Calc<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let left = if let (
             ComponentValue::Calc(Calc {
                 op:
@@ -134,8 +134,8 @@ impl<'s> DocGen<'s> for Calc<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for CalcOperator {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for CalcOperator {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(match self.kind {
             CalcOperatorKind::Plus => "+",
             CalcOperatorKind::Minus => "-",
@@ -145,8 +145,8 @@ impl<'s> DocGen<'s> for CalcOperator {
     }
 }
 
-impl<'s> DocGen<'s> for ComponentValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ComponentValue<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             ComponentValue::BracketBlock(bracket_block) => bracket_block.doc(ctx, state),
             ComponentValue::Calc(calc) => calc.doc(ctx, state),
@@ -228,8 +228,8 @@ impl<'s> DocGen<'s> for ComponentValue<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Delimiter {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Delimiter {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
             DelimiterKind::Comma => Doc::text(","),
             DelimiterKind::Solidus => Doc::text("/"),
@@ -238,8 +238,8 @@ impl<'s> DocGen<'s> for Delimiter {
     }
 }
 
-impl<'s> DocGen<'s> for Dimension<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Dimension<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let unit = match self.kind {
             DimensionKind::Length => {
                 if self.unit.name.eq_ignore_ascii_case("Q") {
@@ -267,8 +267,8 @@ impl<'s> DocGen<'s> for Dimension<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Function<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Function<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(4);
         docs.push(self.name.doc(ctx, state));
         docs.push(Doc::text("("));
@@ -290,11 +290,11 @@ impl<'s> DocGen<'s> for Function<'s> {
             })
             .collect::<Vec<_>>();
 
-        fn format_group<'s>(
+        fn format_group<'a, 's: 'a>(
             group: &[ComponentValue<'s>],
             pos: &mut usize,
             has_more_than_one_group: bool,
-            ctx: &Ctx<'_, 's>,
+            ctx: &Ctx<'a, 's>,
             state: &State,
         ) -> Doc<'s> {
             Doc::list(group.iter().enumerate().fold(
@@ -380,8 +380,8 @@ impl<'s> DocGen<'s> for Function<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for FunctionName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for FunctionName<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             FunctionName::Ident(ident) => ident.doc(ctx, state),
             FunctionName::LessFormatFunction(less_format_fn) => less_format_fn.doc(ctx, state),
@@ -393,20 +393,20 @@ impl<'s> DocGen<'s> for FunctionName<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Ident<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Ident<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
-impl<'s> DocGen<'s> for HexColor<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for HexColor<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(format_hex_raw(self.raw, ctx))
     }
 }
 
-impl<'s> DocGen<'s> for InterpolableIdent<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for InterpolableIdent<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             InterpolableIdent::Literal(literal) => literal.doc(ctx, state),
             InterpolableIdent::SassInterpolated(sass_interpolated) => {
@@ -419,14 +419,14 @@ impl<'s> DocGen<'s> for InterpolableIdent<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for InterpolableIdentStaticPart<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for InterpolableIdentStaticPart<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
-impl<'s> DocGen<'s> for InterpolableStr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for InterpolableStr<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             InterpolableStr::Literal(literal) => literal.doc(ctx, state),
             InterpolableStr::SassInterpolated(sass_interpolated) => {
@@ -439,26 +439,26 @@ impl<'s> DocGen<'s> for InterpolableStr<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for InterpolableUrlStaticPart<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for InterpolableUrlStaticPart<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
-impl<'s> DocGen<'s> for Number<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Number<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(format_number_raw(self.raw, ctx))
     }
 }
 
-impl<'s> DocGen<'s> for Percentage<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Percentage<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.value.doc(ctx, state).append(Doc::text("%"))
     }
 }
 
-impl<'s> DocGen<'s> for Ratio<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Ratio<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.numerator
             .doc(ctx, state)
             .append(Doc::text("/"))
@@ -466,8 +466,8 @@ impl<'s> DocGen<'s> for Ratio<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Str<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Str<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(format_str(
             self.raw,
             CssStrRawFormatter::new(self.raw),
@@ -477,8 +477,8 @@ impl<'s> DocGen<'s> for Str<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for TokenWithSpan<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for TokenWithSpan<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         use raffia::token::Token;
 
         match &self.token {
@@ -555,8 +555,8 @@ impl<'s> DocGen<'s> for TokenWithSpan<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for UnicodeRange<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for UnicodeRange<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         let mut s = format!("U+{}", self.start_raw);
         if let Some(end_raw) = self.end_raw {
             s.push('-');
@@ -567,8 +567,8 @@ impl<'s> DocGen<'s> for UnicodeRange<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Url<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Url<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         docs.push(Doc::text(format!(
             "{}(",
@@ -600,8 +600,8 @@ impl<'s> DocGen<'s> for Url<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for UrlModifier<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for UrlModifier<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             UrlModifier::Ident(ident) => ident.doc(ctx, state),
             UrlModifier::Function(function) => function.doc(ctx, state),
@@ -609,14 +609,14 @@ impl<'s> DocGen<'s> for UrlModifier<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for UrlRaw<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for UrlRaw<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(self.raw)
     }
 }
 
-impl<'s> DocGen<'s> for UrlValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for UrlValue<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             UrlValue::Raw(raw) => raw.doc(ctx, state),
             UrlValue::SassInterpolated(sass_interpolated) => sass_interpolated.doc(ctx, state),
@@ -672,7 +672,7 @@ fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
     hex
 }
 
-fn format_number_raw<'s>(raw: &'s str, ctx: &Ctx<'_, 's>) -> Cow<'s, str> {
+fn format_number_raw<'a, 's: 'a>(raw: &'s str, ctx: &Ctx<'a, 's>) -> Cow<'s, str> {
     let number = raw.strip_suffix('.').unwrap_or(raw);
     #[allow(clippy::collapsible_else_if)]
     let number: Cow<_> = if ctx.options.omit_number_leading_zero {

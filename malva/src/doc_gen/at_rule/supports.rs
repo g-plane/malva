@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for SupportsAnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SupportsAnd<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -20,8 +20,8 @@ impl<'s> DocGen<'s> for SupportsAnd<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SupportsCondition<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SupportsCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             self.conditions
                 .iter()
@@ -41,8 +41,8 @@ impl<'s> DocGen<'s> for SupportsCondition<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SupportsConditionKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SupportsConditionKind<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             SupportsConditionKind::SupportsInParens(supports_in_parens) => {
                 supports_in_parens.doc(ctx, state)
@@ -54,8 +54,8 @@ impl<'s> DocGen<'s> for SupportsConditionKind<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SupportsDecl<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SupportsDecl<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text("(")
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.span.start, self.decl.span.start),
@@ -70,8 +70,8 @@ impl<'s> DocGen<'s> for SupportsDecl<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SupportsInParens<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SupportsInParens<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match &self.kind {
             SupportsInParensKind::Feature(feature) => feature.doc(ctx, state),
             SupportsInParensKind::SupportsCondition(condition) => Doc::text("(")
@@ -103,8 +103,8 @@ impl<'s> DocGen<'s> for SupportsInParens<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SupportsNot<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SupportsNot<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -120,8 +120,8 @@ impl<'s> DocGen<'s> for SupportsNot<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SupportsOr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SupportsOr<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {

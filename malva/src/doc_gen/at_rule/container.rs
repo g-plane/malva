@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for ContainerCondition<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ContainerCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             self.conditions
                 .iter()
@@ -24,8 +24,8 @@ impl<'s> DocGen<'s> for ContainerCondition<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ContainerConditionAnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ContainerConditionAnd<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -41,8 +41,8 @@ impl<'s> DocGen<'s> for ContainerConditionAnd<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ContainerConditionKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ContainerConditionKind<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             ContainerConditionKind::QueryInParens(query_in_parens) => {
                 query_in_parens.doc(ctx, state)
@@ -54,8 +54,8 @@ impl<'s> DocGen<'s> for ContainerConditionKind<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ContainerConditionNot<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ContainerConditionNot<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -71,8 +71,8 @@ impl<'s> DocGen<'s> for ContainerConditionNot<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ContainerConditionOr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ContainerConditionOr<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -88,8 +88,8 @@ impl<'s> DocGen<'s> for ContainerConditionOr<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ContainerPrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ContainerPrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         if let Some(name) = &self.name {
             docs.push(name.doc(ctx, state));
@@ -103,8 +103,8 @@ impl<'s> DocGen<'s> for ContainerPrelude<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for QueryInParens<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for QueryInParens<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match &self.kind {
             QueryInParensKind::ContainerCondition(condition) => Doc::text("(")
                 .concat(ctx.end_spaced_comments(
@@ -167,8 +167,8 @@ impl<'s> DocGen<'s> for QueryInParens<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleCondition<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleCondition<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::list(
             self.conditions
                 .iter()
@@ -188,8 +188,8 @@ impl<'s> DocGen<'s> for StyleCondition<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleConditionAnd<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleConditionAnd<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -205,8 +205,8 @@ impl<'s> DocGen<'s> for StyleConditionAnd<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleConditionKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleConditionKind<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             StyleConditionKind::StyleInParens(style_in_parens) => style_in_parens.doc(ctx, state),
             StyleConditionKind::And(and) => and.doc(ctx, state),
@@ -216,8 +216,8 @@ impl<'s> DocGen<'s> for StyleConditionKind<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleConditionNot<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleConditionNot<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -233,8 +233,8 @@ impl<'s> DocGen<'s> for StyleConditionNot<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleConditionOr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleConditionOr<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let mut docs = match ctx.options.operator_linebreak {
@@ -250,8 +250,8 @@ impl<'s> DocGen<'s> for StyleConditionOr<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleInParens<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleInParens<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let kind_span = self.kind.span();
         Doc::text("(")
             .concat(
@@ -265,8 +265,8 @@ impl<'s> DocGen<'s> for StyleInParens<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleInParensKind<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleInParensKind<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             StyleInParensKind::Condition(condition) => condition.doc(ctx, state),
             StyleInParensKind::Feature(feature) => feature.doc(ctx, state),
@@ -274,8 +274,8 @@ impl<'s> DocGen<'s> for StyleInParensKind<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for StyleQuery<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for StyleQuery<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             StyleQuery::Condition(condition) => condition.doc(ctx, state),
             StyleQuery::Feature(feature) => feature.doc(ctx, state),

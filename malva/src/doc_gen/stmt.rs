@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Span, Spanned, Syntax, ast::*, token::TokenWithSpan};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for Declaration<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         docs.push(if state.keep_decl_name_case {
             self.name.doc(ctx, state)
@@ -252,14 +252,14 @@ impl<'s> DocGen<'s> for Declaration<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ImportantAnnotation<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ImportantAnnotation<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text("!important")
     }
 }
 
-impl<'s> DocGen<'s> for QualifiedRule<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for QualifiedRule<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut keep_decl_name_case = false;
         if let [ComplexSelector { children, .. }] = &self.selector.selectors[..]
             && let [ComplexSelectorChild::CompoundSelector(CompoundSelector { children, .. })] =
@@ -297,8 +297,8 @@ impl<'s> DocGen<'s> for QualifiedRule<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SimpleBlock<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SimpleBlock<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let is_sass = ctx.syntax == Syntax::Sass;
         let mut docs = vec![];
 
@@ -353,8 +353,8 @@ impl<'s> DocGen<'s> for SimpleBlock<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Statement<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Statement<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             Statement::QualifiedRule(qualified_rule) => qualified_rule.doc(ctx, state),
             Statement::AtRule(at_rule) => at_rule.doc(ctx, state),
@@ -384,8 +384,8 @@ impl<'s> DocGen<'s> for Statement<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for Stylesheet<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for Stylesheet<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut stmt_docs = vec![];
         if ctx.syntax == Syntax::Css
             && ctx.options.single_line_top_level_declarations
@@ -420,12 +420,12 @@ impl<'s> DocGen<'s> for Stylesheet<'s> {
     }
 }
 
-fn format_statements<'s>(
+fn format_statements<'a, 's: 'a>(
     docs: &mut Vec<Doc<'s>>,
     statements: &[Statement<'s>],
     outer_span: &Span,
     line_break_doc: Doc<'s>,
-    ctx: &Ctx<'_, 's>,
+    ctx: &Ctx<'a, 's>,
     state: &State,
 ) {
     use crate::config::DeclarationOrderGroupBy;
@@ -557,7 +557,7 @@ fn format_statements<'s>(
         });
 }
 
-struct SingleStmtFormatter<'a, 's> {
+struct SingleStmtFormatter<'a, 's: 'a> {
     stmt: &'a Statement<'s>,
     next_stmt: Option<&'a Statement<'s>>,
     pos: &'a mut usize,
@@ -565,8 +565,8 @@ struct SingleStmtFormatter<'a, 's> {
     ignore_leading_whitespace: bool,
     line_break_doc: Doc<'s>,
 }
-impl<'s> SingleStmtFormatter<'_, 's> {
-    fn format(self, ctx: &Ctx<'_, 's>, state: &State) -> Vec<Doc<'s>> {
+impl<'a, 's: 'a> SingleStmtFormatter<'a, 's> {
+    fn format(self, ctx: &Ctx<'a, 's>, state: &State) -> Vec<Doc<'s>> {
         use crate::state::SelectorOverride;
 
         let mut docs = Vec::with_capacity(3);

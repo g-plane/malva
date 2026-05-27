@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for CustomMedia<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for CustomMedia<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.name
             .doc(ctx, state)
             .append(Doc::space())
@@ -15,8 +15,8 @@ impl<'s> DocGen<'s> for CustomMedia<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for CustomMediaValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for CustomMediaValue<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             CustomMediaValue::MediaQueryList(media_query_list) => media_query_list.doc(ctx, state),
             CustomMediaValue::True(..) => Doc::text("true"),

@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for KeyframeBlock<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for KeyframeBlock<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::format_selectors_before_block(
             &self.selectors,
             &self.comma_spans,
@@ -24,8 +24,8 @@ impl<'s> DocGen<'s> for KeyframeBlock<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for KeyframesName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for KeyframesName<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             KeyframesName::Ident(ident) => ident.doc(ctx, state),
             KeyframesName::Str(str) => str.doc(ctx, state),
@@ -35,8 +35,8 @@ impl<'s> DocGen<'s> for KeyframesName<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for KeyframeSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for KeyframeSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::KeyframeSelectorNotation;
 
         match self {

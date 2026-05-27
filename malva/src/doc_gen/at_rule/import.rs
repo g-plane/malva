@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for ImportPrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ImportPrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         docs.push(self.href.doc(ctx, state));
         let mut pos = self.href.span().end;
@@ -35,8 +35,8 @@ impl<'s> DocGen<'s> for ImportPrelude<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ImportPreludeHref<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ImportPreludeHref<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             ImportPreludeHref::Str(str) => str.doc(ctx, state),
             ImportPreludeHref::Url(url) => url.doc(ctx, state),
@@ -44,8 +44,8 @@ impl<'s> DocGen<'s> for ImportPreludeHref<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ImportPreludeLayer<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ImportPreludeLayer<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             ImportPreludeLayer::Empty(empty) => empty.doc(ctx, state),
             ImportPreludeLayer::WithName(with_name) => with_name.doc(ctx, state),
@@ -53,8 +53,8 @@ impl<'s> DocGen<'s> for ImportPreludeLayer<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for ImportPreludeSupports<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for ImportPreludeSupports<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let kind_span = self.kind.span();
         Doc::text("supports(")
             .concat(

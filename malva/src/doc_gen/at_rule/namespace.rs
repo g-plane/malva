@@ -3,8 +3,8 @@ use crate::{ctx::Ctx, state::State};
 use raffia::{Spanned, ast::*};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for NamespacePrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for NamespacePrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         if let Some(prefix) = &self.prefix {
             prefix
                 .doc(ctx, state)
@@ -21,8 +21,8 @@ impl<'s> DocGen<'s> for NamespacePrelude<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for NamespacePreludeUri<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for NamespacePreludeUri<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             NamespacePreludeUri::Str(str) => str.doc(ctx, state),
             NamespacePreludeUri::Url(url) => url.doc(ctx, state),

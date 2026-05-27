@@ -13,6 +13,6 @@ mod str;
 mod token_seq;
 mod value;
 
-pub(super) trait DocGen<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s>;
+pub(super) trait DocGen<'a, 's: 'a> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s>;
 }

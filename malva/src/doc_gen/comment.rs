@@ -5,7 +5,7 @@ use raffia::{
 };
 use tiny_pretty::Doc;
 
-pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Doc<'s> {
+pub(crate) fn format_comment<'a, 's: 'a>(comment: &Comment<'s>, ctx: &Ctx<'a, 's>) -> Doc<'s> {
     match comment.kind {
         CommentKind::Block => {
             let mut docs = vec![Doc::text("/*")];
@@ -89,7 +89,7 @@ pub(crate) fn format_comment<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Do
     }
 }
 
-pub(super) fn reflow<'s>(comment: &Comment<'s>, ctx: &Ctx<'_, 's>) -> Vec<Doc<'s>> {
+pub(super) fn reflow<'a, 's: 'a>(comment: &Comment<'s>, ctx: &Ctx<'a, 's>) -> Vec<Doc<'s>> {
     let col = comment
         .content
         .lines()

@@ -10,20 +10,20 @@ use raffia::{Spanned, ast::*};
 use std::{iter, mem};
 use tiny_pretty::Doc;
 
-impl<'s> DocGen<'s> for SassArbitraryArgument<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassArbitraryArgument<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.value.doc(ctx, state).append(Doc::text("..."))
     }
 }
 
-impl<'s> DocGen<'s> for SassArbitraryParameter<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassArbitraryParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.name.doc(ctx, state).append(Doc::text("..."))
     }
 }
 
-impl<'s> DocGen<'s> for SassAtRoot<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassAtRoot<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match &self.kind {
             SassAtRootKind::Selector(selector) => selector.doc(ctx, state),
             SassAtRootKind::Query(query) => query.doc(ctx, state),
@@ -31,8 +31,8 @@ impl<'s> DocGen<'s> for SassAtRoot<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassAtRootQuery<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassAtRootQuery<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(7);
         docs.push(Doc::text("("));
         docs.extend(ctx.end_spaced_comments(
@@ -75,8 +75,8 @@ impl<'s> DocGen<'s> for SassAtRootQuery<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassAtRootQueryModifier {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassAtRootQueryModifier {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
             SassAtRootQueryModifierKind::With => Doc::text("with"),
             SassAtRootQueryModifierKind::Without => Doc::text("without"),
@@ -84,8 +84,8 @@ impl<'s> DocGen<'s> for SassAtRootQueryModifier {
     }
 }
 
-impl<'s> DocGen<'s> for SassAtRootQueryRule<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassAtRootQueryRule<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             SassAtRootQueryRule::Ident(ident) => ident.doc(ctx, state),
             SassAtRootQueryRule::Str(str) => str.doc(ctx, state),
@@ -93,8 +93,8 @@ impl<'s> DocGen<'s> for SassAtRootQueryRule<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassBinaryExpression<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.left
             .doc(ctx, state)
             .append(helpers::format_operator_prefix_space(ctx))
@@ -111,8 +111,8 @@ impl<'s> DocGen<'s> for SassBinaryExpression<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassBinaryOperator {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassBinaryOperator {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(match self.kind {
             SassBinaryOperatorKind::Multiply => "*",
             SassBinaryOperatorKind::Division => "/",
@@ -131,8 +131,8 @@ impl<'s> DocGen<'s> for SassBinaryOperator {
     }
 }
 
-impl<'s> DocGen<'s> for SassConditionalClause<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassConditionalClause<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.condition
             .doc(ctx, state)
             .append(helpers::format_space_before_block(
@@ -144,8 +144,8 @@ impl<'s> DocGen<'s> for SassConditionalClause<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassContent<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassContent<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
@@ -171,8 +171,8 @@ impl<'s> DocGen<'s> for SassContent<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassEach<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassEach<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::SeparatedListFormatter::new(",", Doc::line_or_space())
             .format(
                 &self.bindings,
@@ -200,8 +200,8 @@ impl<'s> DocGen<'s> for SassEach<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassExtend<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassExtend<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let selectors =
             helpers::SeparatedListFormatter::new(",", Doc::line_or_space().nest(ctx.indent_width))
                 .format(
@@ -225,14 +225,14 @@ impl<'s> DocGen<'s> for SassExtend<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassFlag<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassFlag<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(format!("!{}", self.keyword.raw))
     }
 }
 
-impl<'s> DocGen<'s> for SassFor<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassFor<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         use crate::config::OperatorLineBreak;
 
         let start_value_span = self.start.span();
@@ -273,8 +273,8 @@ impl<'s> DocGen<'s> for SassFor<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassForBoundary {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassForBoundary {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
             SassForBoundaryKind::Exclusive => Doc::text("to"),
             SassForBoundaryKind::Inclusive => Doc::text("through"),
@@ -282,8 +282,8 @@ impl<'s> DocGen<'s> for SassForBoundary {
     }
 }
 
-impl<'s> DocGen<'s> for SassForward<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassForward<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = vec![self.path.doc(ctx, state)];
         let mut pos = self.path.span().end;
 
@@ -325,8 +325,8 @@ impl<'s> DocGen<'s> for SassForward<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassForwardMember<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassForwardMember<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             SassForwardMember::Ident(ident) => ident.doc(ctx, state),
             SassForwardMember::Variable(variable) => variable.doc(ctx, state),
@@ -334,8 +334,8 @@ impl<'s> DocGen<'s> for SassForwardMember<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassForwardPrefix<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassForwardPrefix<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text("as ")
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.as_span.end, self.name.span.start),
@@ -345,8 +345,8 @@ impl<'s> DocGen<'s> for SassForwardPrefix<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassForwardVisibility<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassForwardVisibility<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.modifier.doc(ctx, state).append(Doc::space()).append(
             helpers::SeparatedListFormatter::new(",", Doc::soft_line()).format(
                 &self.members,
@@ -359,8 +359,8 @@ impl<'s> DocGen<'s> for SassForwardVisibility<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassForwardVisibilityModifier {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassForwardVisibilityModifier {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
             SassForwardVisibilityModifierKind::Hide => Doc::text("hide"),
             SassForwardVisibilityModifierKind::Show => Doc::text("show"),
@@ -368,16 +368,16 @@ impl<'s> DocGen<'s> for SassForwardVisibilityModifier {
     }
 }
 
-impl<'s> DocGen<'s> for SassFunction<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassFunction<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.name
             .doc(ctx, state)
             .append(self.parameters.doc(ctx, state))
     }
 }
 
-impl<'s> DocGen<'s> for SassIfAtRule<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassIfAtRule<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = vec![Doc::text("@if ")];
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.span.start, self.if_clause.span.start),
@@ -426,16 +426,16 @@ impl<'s> DocGen<'s> for SassIfAtRule<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassImportPrelude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassImportPrelude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::SeparatedListFormatter::new(",", Doc::line_or_space().nest(ctx.indent_width))
             .format(&self.paths, &self.comma_spans, self.span.start, ctx, state)
             .group()
     }
 }
 
-impl<'s> DocGen<'s> for SassInclude<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassInclude<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = vec![self.name.doc(ctx, state)];
         let mut pos = self.name.span().end;
 
@@ -461,8 +461,8 @@ impl<'s> DocGen<'s> for SassInclude<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassIncludeArgs<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
@@ -488,8 +488,8 @@ impl<'s> DocGen<'s> for SassIncludeArgs<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassIncludeContentBlockParams<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassIncludeContentBlockParams<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text("using ")
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.using_span.end, self.params.span.start),
@@ -498,8 +498,8 @@ impl<'s> DocGen<'s> for SassIncludeContentBlockParams<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassInterpolatedIdent<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.elements.len());
         let mut iter = self.elements.iter().peekable();
         let mut pos = self.span.start;
@@ -535,8 +535,8 @@ impl<'s> DocGen<'s> for SassInterpolatedIdent<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassInterpolatedStr<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassInterpolatedStr<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         if let [
             SassInterpolatedStrElement::Static(first),
             mid @ ..,
@@ -599,8 +599,8 @@ impl<'s> DocGen<'s> for SassInterpolatedStr<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassInterpolatedUrl<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(self.elements.len());
         let mut iter = self.elements.iter().peekable();
         let mut pos = self.span.start;
@@ -636,8 +636,8 @@ impl<'s> DocGen<'s> for SassInterpolatedUrl<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassKeywordArgument<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassKeywordArgument<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.name
             .doc(ctx, state)
             .concat(ctx.start_spaced_comments(
@@ -651,8 +651,8 @@ impl<'s> DocGen<'s> for SassKeywordArgument<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassList<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassList<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::format_values_list(
             &self.elements,
             self.comma_spans.as_deref(),
@@ -663,8 +663,8 @@ impl<'s> DocGen<'s> for SassList<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassMap<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassMap<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         helpers::format_parenthesized(
             helpers::SeparatedListFormatter::new(
                 ",",
@@ -687,8 +687,8 @@ impl<'s> DocGen<'s> for SassMap<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassMapItem<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassMapItem<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.key
             .doc(ctx, state)
             .concat(ctx.start_spaced_comments(
@@ -702,8 +702,8 @@ impl<'s> DocGen<'s> for SassMapItem<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassMixin<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassMixin<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let name = self.name.doc(ctx, state);
         if let Some(parameters) = &self.parameters {
             name.append(parameters.doc(ctx, state))
@@ -713,8 +713,8 @@ impl<'s> DocGen<'s> for SassMixin<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassModuleConfig<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassModuleConfig<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text("with ")
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.with_span.end, self.lparen_span.start),
@@ -747,8 +747,8 @@ impl<'s> DocGen<'s> for SassModuleConfig<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassModuleConfigItem<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassModuleConfigItem<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let value_span = self.value.span();
         self.variable
             .doc(ctx, state)
@@ -780,8 +780,8 @@ impl<'s> DocGen<'s> for SassModuleConfigItem<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassModuleMemberName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassModuleMemberName<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match self {
             SassModuleMemberName::Ident(ident) => ident.doc(ctx, state),
             SassModuleMemberName::Variable(variable) => variable.doc(ctx, state),
@@ -789,14 +789,14 @@ impl<'s> DocGen<'s> for SassModuleMemberName<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassNestingDeclaration<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassNestingDeclaration<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.block.doc(ctx, state)
     }
 }
 
-impl<'s> DocGen<'s> for SassParameter<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassParameter<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let name = self.name.doc(ctx, state);
         if let Some(default_value) = &self.default_value {
             name.concat(ctx.start_spaced_comments(
@@ -809,8 +809,8 @@ impl<'s> DocGen<'s> for SassParameter<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassParameterDefaultValue<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassParameterDefaultValue<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text(": ")
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.colon_span.end, self.value.span().start),
@@ -819,8 +819,8 @@ impl<'s> DocGen<'s> for SassParameterDefaultValue<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassParameters<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassParameters<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         enum ParameterOrArbitrary<'a, 's> {
             Parameter(&'a SassParameter<'s>),
             Arbitrary(&'a SassArbitraryParameter<'s>),
@@ -833,8 +833,8 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
                 }
             }
         }
-        impl<'s> DocGen<'s> for ParameterOrArbitrary<'_, 's> {
-            fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+        impl<'a, 's: 'a> DocGen<'a, 's> for ParameterOrArbitrary<'a, 's> {
+            fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
                 match self {
                     ParameterOrArbitrary::Parameter(p) => p.doc(ctx, state),
                     ParameterOrArbitrary::Arbitrary(a) => a.doc(ctx, state),
@@ -877,8 +877,8 @@ impl<'s> DocGen<'s> for SassParameters<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassParenthesizedExpression<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let expr_span = self.expr.span();
         helpers::format_parenthesized(
             Doc::list(
@@ -893,14 +893,14 @@ impl<'s> DocGen<'s> for SassParenthesizedExpression<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassPlaceholderSelector<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassPlaceholderSelector<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text("%").append(self.name.doc(ctx, state))
     }
 }
 
-impl<'s> DocGen<'s> for SassQualifiedName<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassQualifiedName<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::list(vec![
             self.module.doc(ctx, state),
             Doc::text("."),
@@ -909,14 +909,14 @@ impl<'s> DocGen<'s> for SassQualifiedName<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassUnaryExpression<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassUnaryExpression<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.op.doc(ctx, state).append(self.expr.doc(ctx, state))
     }
 }
 
-impl<'s> DocGen<'s> for SassUnaryOperator {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassUnaryOperator {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
             SassUnaryOperatorKind::Plus => Doc::text("+"),
             SassUnaryOperatorKind::Minus => Doc::text("-"),
@@ -925,14 +925,14 @@ impl<'s> DocGen<'s> for SassUnaryOperator {
     }
 }
 
-impl<'s> DocGen<'s> for SassUnnamedNamespace {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassUnnamedNamespace {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text("*")
     }
 }
 
-impl<'s> DocGen<'s> for SassUse<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassUse<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = vec![self.path.doc(ctx, state)];
         let mut pos = self.path.span().end;
 
@@ -955,8 +955,8 @@ impl<'s> DocGen<'s> for SassUse<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassUseNamespace<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassUseNamespace<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::text("as ")
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.as_span.end, self.kind.span().start),
@@ -968,14 +968,14 @@ impl<'s> DocGen<'s> for SassUseNamespace<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for SassVariable<'s> {
-    fn doc(&self, _: &Ctx<'_, 's>, _: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassVariable<'s> {
+    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         Doc::text(format!("${}", self.name.raw))
     }
 }
 
-impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for SassVariableDeclaration<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(3);
         let value_span = self.value.span();
 
@@ -1056,8 +1056,8 @@ impl<'s> DocGen<'s> for SassVariableDeclaration<'s> {
     }
 }
 
-impl<'s> DocGen<'s> for UnknownSassAtRule<'s> {
-    fn doc(&self, ctx: &Ctx<'_, 's>, state: &State) -> Doc<'s> {
+impl<'a, 's: 'a> DocGen<'a, 's> for UnknownSassAtRule<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(6);
         let mut pos = self.name.span().end;
 

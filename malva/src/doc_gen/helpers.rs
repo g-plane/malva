@@ -5,15 +5,15 @@ use raffia::{Span, Spanned, Syntax, ast::*};
 use std::{iter, mem};
 use tiny_pretty::Doc;
 
-pub(super) fn format_selectors_before_block<'s, N>(
+pub(super) fn format_selectors_before_block<'a, 's: 'a, N>(
     selectors: &[N],
     comma_spans: &[Span],
     start: usize,
-    ctx: &Ctx<'_, 's>,
+    ctx: &Ctx<'a, 's>,
     state: &State,
 ) -> Doc<'s>
 where
-    N: DocGen<'s> + Spanned,
+    N: DocGen<'a, 's> + Spanned,
 {
     use crate::{config::BlockSelectorLineBreak, state::SelectorOverride};
 
@@ -70,14 +70,14 @@ where
     .group()
 }
 
-pub(super) struct SeparatedListFormatter {
-    separator: Doc<'static>,
-    space_after_separator: Doc<'static>,
+pub(super) struct SeparatedListFormatter<'s> {
+    separator: Doc<'s>,
+    space_after_separator: Doc<'s>,
     trailing: bool,
 }
 
-impl SeparatedListFormatter {
-    pub(super) fn new(separator: &'static str, space_after_separator: Doc<'static>) -> Self {
+impl<'s> SeparatedListFormatter<'s> {
+    pub(super) fn new(separator: &'static str, space_after_separator: Doc<'s>) -> Self {
         Self {
             separator: Doc::text(separator),
             space_after_separator,
@@ -92,16 +92,16 @@ impl SeparatedListFormatter {
         self
     }
 
-    pub(super) fn format<'s, N>(
+    pub(super) fn format<'a, N>(
         self,
         list: &[N],
         separator_spans: &[Span],
         start: usize,
-        ctx: &Ctx<'_, 's>,
+        ctx: &Ctx<'a, 's>,
         state: &State,
     ) -> Doc<'s>
     where
-        N: DocGen<'s> + Spanned,
+        N: DocGen<'a, 's> + Spanned,
     {
         let mut pos = start;
         let mut docs = Vec::<Doc<'s>>::with_capacity(list.len() * 2);
@@ -188,11 +188,11 @@ impl SeparatedListFormatter {
 }
 
 /// Only for SCSS/Sass/Less.
-pub(super) fn format_values_list<'s>(
+pub(super) fn format_values_list<'a, 's: 'a>(
     values: &[ComponentValue<'s>],
     comma_spans: Option<&[Span]>,
     list_span: &Span,
-    ctx: &Ctx<'_, 's>,
+    ctx: &Ctx<'a, 's>,
     state: &State,
 ) -> Doc<'s> {
     if let Some(comma_spans) = comma_spans {
@@ -243,7 +243,7 @@ pub(super) fn format_values_list<'s>(
 
 /// Remember to call `.group()` if use this,
 /// otherwise it will always add linebreak.
-pub(super) fn format_operator_prefix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
+pub(super) fn format_operator_prefix_space<'a, 's: 'a>(ctx: &Ctx<'a, 's>) -> Doc<'s> {
     use crate::config::OperatorLineBreak;
 
     match ctx.options.operator_linebreak {
@@ -254,7 +254,7 @@ pub(super) fn format_operator_prefix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
 
 /// Remember to call `.group()` if use this,
 /// otherwise it will always add linebreak.
-pub(super) fn format_operator_suffix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
+pub(super) fn format_operator_suffix_space<'a, 's: 'a>(ctx: &Ctx<'a, 's>) -> Doc<'s> {
     use crate::config::OperatorLineBreak;
 
     match ctx.options.operator_linebreak {
@@ -263,11 +263,11 @@ pub(super) fn format_operator_suffix_space<'s>(ctx: &Ctx<'_, 's>) -> Doc<'s> {
     }
 }
 
-pub(super) fn format_parenthesized<'s>(
+pub(super) fn format_parenthesized<'a, 's: 'a>(
     body: Doc<'s>,
     trailing_comments_start: usize,
     trailing_comments_end: usize,
-    ctx: &Ctx<'_, 's>,
+    ctx: &Ctx<'a, 's>,
 ) -> Doc<'s> {
     let mut has_last_line_comment = false;
 
@@ -288,10 +288,10 @@ pub(super) fn format_parenthesized<'s>(
         .append(Doc::text(")"))
 }
 
-pub(super) fn format_space_before_block<'s>(
+pub(super) fn format_space_before_block<'a, 's: 'a>(
     previous_end: usize,
     block_start: usize,
-    ctx: &Ctx<'_, 's>,
+    ctx: &Ctx<'a, 's>,
 ) -> Doc<'s> {
     if ctx.syntax == Syntax::Sass {
         let mut has_last_line_comment = false;
@@ -308,9 +308,9 @@ pub(super) fn format_space_before_block<'s>(
     }
 }
 
-pub(super) fn ident_to_lowercase<'s>(
+pub(super) fn ident_to_lowercase<'a, 's: 'a>(
     interpolable_ident: &InterpolableIdent<'s>,
-    ctx: &Ctx<'_, 's>,
+    ctx: &Ctx<'a, 's>,
     state: &State,
 ) -> Doc<'s> {
     match &interpolable_ident {
@@ -321,12 +321,12 @@ pub(super) fn ident_to_lowercase<'s>(
     }
 }
 
-pub(super) fn get_smart_linebreak<N>(
+pub(super) fn get_smart_linebreak<'a, 's: 'a, N>(
     start: usize,
     elements: &[N],
     prefer_single_line: Option<bool>,
-    ctx: &Ctx<'_, '_>,
-) -> Doc<'static>
+    ctx: &Ctx<'a, 's>,
+) -> Doc<'s>
 where
     N: Spanned,
 {
