@@ -1,0 +1,6 @@
+/*cfg nthPlusSpacing = false*/
+:nth-child(2n+1) {}
+:nth-child(2n-1) {}
+:nth-child(2n+0) {}
+:nth-child(2n) {}
+:nth-child(2n - 0) {}

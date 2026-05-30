@@ -253,6 +253,10 @@ pub struct LanguageOptions {
     /// See [`fontFamilyNames`](https://malva.netlify.app/config/font-family-names.html)
     pub font_family_names: FontFamilyNames,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "nthPlusSpacing"))]
+    /// See [`nthPlusSpacing`](https://malva.netlify.app/config/nth-plus-spacing.html)
+    pub nth_plus_spacing: bool,
+
     #[cfg_attr(
         feature = "config_serde",
         serde(alias = "selectorOverrideCommentDirective")
@@ -301,6 +305,7 @@ impl Default for LanguageOptions {
             less_mixin_params_prefer_single_line: None,
             single_line_top_level_declarations: false,
             font_family_names: FontFamilyNames::default(),
+            nth_plus_spacing: false,
             selector_override_comment_directive: "malva-selector-override".into(),
             ignore_comment_directive: "malva-ignore".into(),
             ignore_file_comment_directive: "malva-ignore-file".into(),

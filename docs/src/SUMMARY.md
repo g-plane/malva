@@ -23,6 +23,7 @@
   - [preferSingleLine](./config/prefer-single-line.md)
   - [singleLineTopLevelDeclarations](./config/single-line-top-level-declarations.md)
   - [fontFamilyNames](./config/font-family-names.md)
+  - [nthPlusSpacing](./config/nth-plus-spacing.md)
   - [selectorOverrideCommentDirective](./config/selector-override-comment-directive.md)
   - [ignoreCommentDirective](./config/ignore-comment-directive.md)
   - [ignoreFileCommentDirective](./config/ignore-file-comment-directive.md)

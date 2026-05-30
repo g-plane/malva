@@ -319,6 +319,7 @@ pub(crate) fn resolve_config(
                     Default::default()
                 }
             },
+            nth_plus_spacing: get_value(&mut config, "nthPlusSpacing", false, &mut diagnostics),
             selector_override_comment_directive: get_value(
                 &mut config,
                 "selectorOverrideCommentDirective",

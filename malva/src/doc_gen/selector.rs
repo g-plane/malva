@@ -8,19 +8,24 @@ use std::mem;
 use tiny_pretty::Doc;
 
 impl<'a, 's: 'a> DocGen<'a, 's> for AnPlusB {
-    fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
+    fn doc(&self, ctx: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         let a = match self.a {
             0 => Doc::nil(),
             1 => Doc::text("n"),
             -1 => Doc::text("-n"),
             a => Doc::text(format!("{a}n")),
         };
-        let b = match self.b {
-            0 => Doc::nil(),
-            b if b > 0 => Doc::text(format!("+{b}")),
-            b => Doc::text(b.to_string()),
-        };
-        a.append(b)
+        if self.b == 0 {
+            a
+        } else {
+            let sign = if self.b > 0 { '+' } else { '-' };
+            let b = if ctx.options.nth_plus_spacing {
+                Doc::text(format!(" {sign} {}", self.b.abs()))
+            } else {
+                Doc::text(format!("{sign}{}", self.b.abs()))
+            };
+            a.append(b)
+        }
     }
 }
 

@@ -292,6 +292,11 @@
       ],
       "default": "consistent"
     },
+    "nthPlusSpacing": {
+      "description": "Control whether there should be spaces around the `+` or `-` operator in \"An+B\" selector syntax.",
+      "type": "boolean",
+      "default": false
+    },
     "selectorOverrideCommentDirective": {
       "description": "Text directive for overriding selector formatting.",
       "type": "string",

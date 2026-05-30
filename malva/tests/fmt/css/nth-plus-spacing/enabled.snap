@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg nthPlusSpacing = true*/
+:nth-child(2n + 1) {}
+:nth-child(2n - 1) {}
+:nth-child(2n) {}
+:nth-child(2n) {}
+:nth-child(2n) {}
