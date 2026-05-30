@@ -277,6 +277,21 @@
       "type": "boolean",
       "default": false
     },
+    "fontFamilyNames": {
+      "description": "Control the layout of font names in `font-family` declaration.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "consistent",
+          "description": "If all font names can be put on a single line, there won't be line breaks; otherwise, there will be line breaks after each comma."
+        },
+        {
+          "const": "wrap",
+          "description": "Font names will be put on one line as possible. Once it exceeds `printWidth`, line break will be inserted where the code exceeds `printWidth`."
+        }
+      ],
+      "default": "consistent"
+    },
     "selectorOverrideCommentDirective": {
       "description": "Text directive for overriding selector formatting.",
       "type": "string",

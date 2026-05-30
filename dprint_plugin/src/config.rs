@@ -303,6 +303,22 @@ pub(crate) fn resolve_config(
                 false,
                 &mut diagnostics,
             ),
+            font_family_names: match &*get_value(
+                &mut config,
+                "fontFamilyNames",
+                "consistent".to_string(),
+                &mut diagnostics,
+            ) {
+                "consistent" => FontFamilyNames::Consistent,
+                "wrap" => FontFamilyNames::Wrap,
+                _ => {
+                    diagnostics.push(ConfigurationDiagnostic {
+                        property_name: "fontFamilyNames".into(),
+                        message: "invalid value for config `fontFamilyNames`".into(),
+                    });
+                    Default::default()
+                }
+            },
             selector_override_comment_directive: get_value(
                 &mut config,
                 "selectorOverrideCommentDirective",

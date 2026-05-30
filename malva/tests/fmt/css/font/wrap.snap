@@ -1,0 +1,12 @@
+---
+source: malva/tests/fmt.rs
+---
+/*cfg fontFamilyNames = "wrap"*/
+#container {
+  font-family:
+    Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Arial,
+    sans-serif;
+  font-family:
+    Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Arial,
+    sans-serif;
+}

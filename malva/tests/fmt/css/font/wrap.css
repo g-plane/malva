@@ -1,9 +1,6 @@
----
-source: malva/tests/fmt.rs
----
+/*cfg fontFamilyNames = "wrap"*/
 #container {
-  font-family:
-    Inter,
+  font-family: Inter,
     Roboto,
     "Helvetica Neue",
     "Arial Nova",

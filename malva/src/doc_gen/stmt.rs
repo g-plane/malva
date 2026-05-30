@@ -5,6 +5,8 @@ use tiny_pretty::Doc;
 
 impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
+        use crate::config::FontFamilyNames;
+
         let mut docs = Vec::with_capacity(3);
         docs.push(if state.keep_decl_name_case {
             self.name.doc(ctx, state)
@@ -127,7 +129,8 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
 
                 let space_after_comma = match &self.name {
                     InterpolableIdent::Literal(Ident { name, .. })
-                        if name.eq_ignore_ascii_case("font-family") =>
+                        if name.eq_ignore_ascii_case("font-family")
+                            && matches!(ctx.options.font_family_names, FontFamilyNames::Wrap) =>
                     {
                         Doc::soft_line()
                     }
