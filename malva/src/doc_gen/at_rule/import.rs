@@ -69,6 +69,6 @@ impl<'a, 's: 'a> DocGen<'a, 's> for ImportPreludeSupports<'s> {
             .concat(
                 ctx.start_spaced_comments(ctx.get_comments_between(kind_span.end, self.span.end)),
             )
-            .append(Doc::text(")"))
+            .append(Doc::char(')'))
     }
 }

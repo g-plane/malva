@@ -34,6 +34,6 @@ impl<'a, 's: 'a> DocGen<'a, 's> for PageSelectorList<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for PseudoPage<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        Doc::text(":").append(self.name.doc(ctx, state))
+        Doc::char(':').append(self.name.doc(ctx, state))
     }
 }

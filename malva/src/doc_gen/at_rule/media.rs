@@ -180,7 +180,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for MediaInParens<'s> {
         };
         let kind_span = self.kind.span();
 
-        Doc::text("(")
+        Doc::char('(')
             .concat(
                 ctx.end_spaced_comments(ctx.get_comments_between(self.span.start, kind_span.start)),
             )
@@ -188,7 +188,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for MediaInParens<'s> {
             .concat(
                 ctx.start_spaced_comments(ctx.get_comments_between(kind_span.end, self.span.end)),
             )
-            .append(Doc::text(")"))
+            .append(Doc::char(')'))
     }
 }
 

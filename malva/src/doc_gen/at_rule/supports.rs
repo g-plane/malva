@@ -56,7 +56,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SupportsConditionKind<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for SupportsDecl<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        Doc::text("(")
+        Doc::char('(')
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.span.start, self.decl.span.start),
             ))
@@ -66,7 +66,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SupportsDecl<'s> {
                     ctx.get_comments_between(self.decl.span.end, self.span.end),
                 ),
             )
-            .append(Doc::text(")"))
+            .append(Doc::char(')'))
     }
 }
 
@@ -74,7 +74,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SupportsInParens<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match &self.kind {
             SupportsInParensKind::Feature(feature) => feature.doc(ctx, state),
-            SupportsInParensKind::SupportsCondition(condition) => Doc::text("(")
+            SupportsInParensKind::SupportsCondition(condition) => Doc::char('(')
                 .concat(ctx.end_spaced_comments(
                     ctx.get_comments_between(self.span.start, condition.span.start),
                 ))
@@ -82,7 +82,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SupportsInParens<'s> {
                 .concat(ctx.start_spaced_comments(
                     ctx.get_comments_between(condition.span.end, self.span.end),
                 ))
-                .append(Doc::text(")")),
+                .append(Doc::char(')')),
             SupportsInParensKind::Selector(selector) => Doc::text("selector(")
                 .append(
                     Doc::line_or_nil()
@@ -97,7 +97,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SupportsInParens<'s> {
                         .append(Doc::line_or_nil())
                         .group(),
                 )
-                .append(Doc::text(")")),
+                .append(Doc::char(')')),
             SupportsInParensKind::Function(function) => function.doc(ctx, state),
         }
     }

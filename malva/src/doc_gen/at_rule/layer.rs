@@ -8,7 +8,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LayerName<'s> {
         Doc::list(
             itertools::intersperse(
                 self.idents.iter().map(|ident| ident.doc(ctx, state)),
-                Doc::text("."),
+                Doc::char('.'),
             )
             .collect(),
         )

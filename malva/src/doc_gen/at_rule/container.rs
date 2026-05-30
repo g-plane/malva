@@ -106,7 +106,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for ContainerPrelude<'s> {
 impl<'a, 's: 'a> DocGen<'a, 's> for QueryInParens<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         match &self.kind {
-            QueryInParensKind::ContainerCondition(condition) => Doc::text("(")
+            QueryInParensKind::ContainerCondition(condition) => Doc::char('(')
                 .concat(ctx.end_spaced_comments(
                     ctx.get_comments_between(self.span.start, condition.span.start),
                 ))
@@ -114,10 +114,10 @@ impl<'a, 's: 'a> DocGen<'a, 's> for QueryInParens<'s> {
                 .concat(ctx.start_spaced_comments(
                     ctx.get_comments_between(condition.span.end, self.span.end),
                 ))
-                .append(Doc::text(")")),
+                .append(Doc::char(')')),
             QueryInParensKind::SizeFeature(size_feature) => {
                 let span = size_feature.span();
-                Doc::text("(")
+                Doc::char('(')
                     .concat(
                         ctx.end_spaced_comments(
                             ctx.get_comments_between(self.span.start, span.start),
@@ -129,7 +129,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for QueryInParens<'s> {
                             ctx.get_comments_between(span.end, self.span.end),
                         ),
                     )
-                    .append(Doc::text(")"))
+                    .append(Doc::char(')'))
             }
             QueryInParensKind::StyleQuery(style_query) => {
                 let span = style_query.span();
@@ -145,7 +145,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for QueryInParens<'s> {
                             ctx.get_comments_between(span.end, self.span.end),
                         ),
                     )
-                    .append(Doc::text(")"))
+                    .append(Doc::char(')'))
             }
             QueryInParensKind::ScrollState(scroll_state) => {
                 let span = scroll_state.span();
@@ -161,7 +161,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for QueryInParens<'s> {
                             ctx.get_comments_between(span.end, self.span.end),
                         ),
                     )
-                    .append(Doc::text(")"))
+                    .append(Doc::char(')'))
             }
         }
     }
@@ -253,7 +253,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for StyleConditionOr<'s> {
 impl<'a, 's: 'a> DocGen<'a, 's> for StyleInParens<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let kind_span = self.kind.span();
-        Doc::text("(")
+        Doc::char('(')
             .concat(
                 ctx.end_spaced_comments(ctx.get_comments_between(self.span.start, kind_span.start)),
             )
@@ -261,7 +261,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for StyleInParens<'s> {
             .concat(
                 ctx.start_spaced_comments(ctx.get_comments_between(kind_span.end, self.span.end)),
             )
-            .append(Doc::text(")"))
+            .append(Doc::char(')'))
     }
 }
 

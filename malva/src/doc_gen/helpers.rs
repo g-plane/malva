@@ -203,10 +203,10 @@ pub(super) fn format_values_list<'a, 's: 'a>(
         if values.len() == 1 {
             if ctx.options.trailing_comma {
                 // trailing comma was added by `SeparatedListFormatter` when there're multiple lines
-                doc.append(Doc::flat_or_break(Doc::text(","), Doc::nil()))
+                doc.append(Doc::flat_or_break(Doc::char(','), Doc::nil()))
                     .group()
             } else {
-                doc.append(Doc::text(","))
+                doc.append(Doc::char(','))
             }
         } else {
             doc
@@ -271,7 +271,7 @@ pub(super) fn format_parenthesized<'a, 's: 'a>(
 ) -> Doc<'s> {
     let mut has_last_line_comment = false;
 
-    Doc::text("(")
+    Doc::char('(')
         .append(Doc::line_or_nil())
         .append(body)
         .concat(ctx.start_spaced_comments_without_last_hard_line(
@@ -285,7 +285,7 @@ pub(super) fn format_parenthesized<'a, 's: 'a>(
             Doc::line_or_nil()
         })
         .group()
-        .append(Doc::text(")"))
+        .append(Doc::char(')'))
 }
 
 pub(super) fn format_space_before_block<'a, 's: 'a>(

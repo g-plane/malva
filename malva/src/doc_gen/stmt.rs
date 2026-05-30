@@ -29,7 +29,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
             ));
         }
 
-        docs.push(Doc::text(":"));
+        docs.push(Doc::char(':'));
         let has_comma = self.value.iter().any(|value| {
             matches!(
                 value,
@@ -306,7 +306,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SimpleBlock<'s> {
         let mut docs = vec![];
 
         if !is_sass {
-            docs.push(Doc::text("{"));
+            docs.push(Doc::char('{'));
         }
 
         let line_break_doc = match ctx.options.single_line_block_threshold {
@@ -345,7 +345,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SimpleBlock<'s> {
             if has_stmts {
                 docs.push(line_break_doc);
             }
-            docs.push(Doc::text("}"));
+            docs.push(Doc::char('}'));
         }
 
         if ctx.options.single_line_block_threshold.is_some() {
@@ -655,25 +655,25 @@ impl<'a, 's: 'a> SingleStmtFormatter<'a, 's> {
 
         if ctx.syntax != Syntax::Sass {
             match self.stmt {
-                Statement::AtRule(at_rule) if at_rule.block.is_none() => docs.push(Doc::text(";")),
+                Statement::AtRule(at_rule) if at_rule.block.is_none() => docs.push(Doc::char(';')),
                 Statement::Declaration(decl)
                     if !matches!(
                         decl.value.last(),
                         Some(ComponentValue::SassNestingDeclaration(..))
                     ) =>
                 {
-                    docs.push(Doc::text(";"));
+                    docs.push(Doc::char(';'));
                 }
                 Statement::LessExtendRule(..)
                 | Statement::LessFunctionCall(..)
                 | Statement::LessMixinCall(..)
                 | Statement::LessVariableCall(..)
                 | Statement::LessVariableDeclaration(..)
-                | Statement::SassVariableDeclaration(..) => docs.push(Doc::text(";")),
+                | Statement::SassVariableDeclaration(..) => docs.push(Doc::char(';')),
                 Statement::UnknownSassAtRule(unknown_sass_at_rule)
                     if unknown_sass_at_rule.block.is_none() =>
                 {
-                    docs.push(Doc::text(";"));
+                    docs.push(Doc::char(';'));
                 }
                 _ => {}
             }

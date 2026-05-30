@@ -31,11 +31,11 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessBinaryCondition<'s> {
 impl<'a, 's: 'a> DocGen<'a, 's> for LessBinaryConditionOperator {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
-            LessBinaryConditionOperatorKind::GreaterThan => Doc::text(">"),
+            LessBinaryConditionOperatorKind::GreaterThan => Doc::char('>'),
             LessBinaryConditionOperatorKind::GreaterThanOrEqual => Doc::text(">="),
-            LessBinaryConditionOperatorKind::LessThan => Doc::text("<"),
+            LessBinaryConditionOperatorKind::LessThan => Doc::char('<'),
             LessBinaryConditionOperatorKind::LessThanOrEqual => Doc::text("<="),
-            LessBinaryConditionOperatorKind::Equal => Doc::text("="),
+            LessBinaryConditionOperatorKind::Equal => Doc::char('='),
             LessBinaryConditionOperatorKind::EqualOrGreaterThan => Doc::text("=>"),
             LessBinaryConditionOperatorKind::EqualOrLessThan => Doc::text("=<"),
             LessBinaryConditionOperatorKind::And => Doc::text("and"),
@@ -130,7 +130,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessDetachedRuleset<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessEscapedStr<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        Doc::text("~").append(self.str.doc(ctx, state))
+        Doc::char('~').append(self.str.doc(ctx, state))
     }
 }
 
@@ -190,13 +190,13 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessExtendRule<'s> {
                     Doc::list(extend_doc)
                 }
             })
-            .append(Doc::text(")"))
+            .append(Doc::char(')'))
     }
 }
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessFormatFunction {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
-        Doc::text("%")
+        Doc::char('%')
     }
 }
 
@@ -314,7 +314,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessJavaScriptSnippet<'s> {
             .collect(),
         );
         if self.escaped {
-            Doc::text("~").append(code)
+            Doc::char('~').append(code)
         } else {
             code
         }
@@ -335,7 +335,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessList<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessListFunction {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
-        Doc::text("~")
+        Doc::char('~')
     }
 }
 
@@ -343,7 +343,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessLookup<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         if let Some(name) = &self.name {
             let name_span = name.span();
-            Doc::text("[")
+            Doc::char('[')
                 .concat(ctx.end_spaced_comments(
                     ctx.get_comments_between(self.span.start, name_span.start),
                 ))
@@ -353,15 +353,15 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessLookup<'s> {
                         ctx.get_comments_between(name_span.end, self.span.end),
                     ),
                 )
-                .append(Doc::text("]"))
+                .append(Doc::char(']'))
         } else {
-            Doc::text("[")
+            Doc::char('[')
                 .concat(
                     ctx.end_spaced_comments(
                         ctx.get_comments_between(self.span.start, self.span.end),
                     ),
                 )
-                .append(Doc::text("]"))
+                .append(Doc::char(']'))
         }
     }
 }
@@ -427,7 +427,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessMixinArguments<'s> {
             Doc::line_or_nil()
         };
 
-        Doc::text("(")
+        Doc::char('(')
             .append(doc_close_to_paren.clone())
             .append(
                 helpers::SeparatedListFormatter::new(
@@ -471,7 +471,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessMixinArguments<'s> {
                 doc_close_to_paren
             })
             .group()
-            .append(Doc::text(")"))
+            .append(Doc::char(')'))
     }
 }
 
@@ -727,17 +727,17 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessNegatedCondition<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessNegativeValue<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        Doc::text("-").append(self.value.doc(ctx, state))
+        Doc::char('-').append(self.value.doc(ctx, state))
     }
 }
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessOperationOperator {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
-            LessOperationOperatorKind::Multiply => Doc::text("*"),
-            LessOperationOperatorKind::Division => Doc::text("/"),
-            LessOperationOperatorKind::Plus => Doc::text("+"),
-            LessOperationOperatorKind::Minus => Doc::text("-"),
+            LessOperationOperatorKind::Multiply => Doc::char('*'),
+            LessOperationOperatorKind::Division => Doc::char('/'),
+            LessOperationOperatorKind::Plus => Doc::char('+'),
+            LessOperationOperatorKind::Minus => Doc::char('-'),
         }
     }
 }
@@ -780,7 +780,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessParenthesizedOperation<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessPercentKeyword {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
-        Doc::text("%")
+        Doc::char('%')
     }
 }
 
@@ -788,14 +788,14 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessPlugin<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let path = self.path.doc(ctx, state);
         if let Some(args) = &self.args {
-            Doc::text("(")
+            Doc::char('(')
                 .append(
                     Doc::line_or_nil()
                         .append(args.doc(ctx, state))
                         .nest(ctx.indent_width),
                 )
                 .append(Doc::line_or_nil())
-                .append(Doc::text(")"))
+                .append(Doc::char(')'))
                 .append(Doc::line_or_space())
                 .append(path)
                 .group()
@@ -824,7 +824,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessPropertyInterpolation<'s> {
 impl<'a, 's: 'a> DocGen<'a, 's> for LessPropertyMerge {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
-            LessPropertyMergeKind::Comma => Doc::text("+"),
+            LessPropertyMergeKind::Comma => Doc::char('+'),
             LessPropertyMergeKind::Space => Doc::text("+_"),
         }
     }
@@ -838,7 +838,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessPropertyVariable<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessVariable<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        Doc::text("@").append(self.name.doc(ctx, state))
+        Doc::char('@').append(self.name.doc(ctx, state))
     }
 }
 
@@ -858,7 +858,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessVariableDeclaration<'s> {
         docs.extend(ctx.start_spaced_comments(
             ctx.get_comments_between(self.name.span.end, self.colon_span.start),
         ));
-        docs.push(Doc::text(":"));
+        docs.push(Doc::char(':'));
 
         let should_group = if let ComponentValue::LessList(LessList {
             elements,
@@ -881,7 +881,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessVariableDeclaration<'s> {
                 ),
             );
             if elements.len() == 1 {
-                docs.push(Doc::text(","));
+                docs.push(Doc::char(','));
             }
             true
         } else {

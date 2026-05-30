@@ -34,7 +34,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassAtRoot<'s> {
 impl<'a, 's: 'a> DocGen<'a, 's> for SassAtRootQuery<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(7);
-        docs.push(Doc::text("("));
+        docs.push(Doc::char('('));
         docs.extend(ctx.end_spaced_comments(
             ctx.get_comments_between(self.span.start, self.modifier.span.start),
         ));
@@ -70,7 +70,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassAtRootQuery<'s> {
             );
         }
 
-        docs.push(Doc::text(")"));
+        docs.push(Doc::char(')'));
         Doc::list(docs)
     }
 }
@@ -341,7 +341,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassForwardPrefix<'s> {
                 ctx.get_comments_between(self.as_span.end, self.name.span.start),
             ))
             .append(self.name.doc(ctx, state))
-            .append(Doc::text("*"))
+            .append(Doc::char('*'))
     }
 }
 
@@ -526,7 +526,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassInterpolatedIdent<'s> {
                             ),
                         ),
                     );
-                    docs.push(Doc::text("}"));
+                    docs.push(Doc::char('}'));
                 }
             }
         }
@@ -582,7 +582,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassInterpolatedStr<'s> {
                                 ),
                             ),
                         );
-                        docs.push(Doc::text("}"));
+                        docs.push(Doc::char('}'));
                     }
                 }
             }
@@ -627,7 +627,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassInterpolatedUrl<'s> {
                             ),
                         ),
                     );
-                    docs.push(Doc::text("}"));
+                    docs.push(Doc::char('}'));
                 }
             }
         }
@@ -895,7 +895,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassParenthesizedExpression<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for SassPlaceholderSelector<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        Doc::text("%").append(self.name.doc(ctx, state))
+        Doc::char('%').append(self.name.doc(ctx, state))
     }
 }
 
@@ -903,7 +903,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassQualifiedName<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         Doc::list(vec![
             self.module.doc(ctx, state),
-            Doc::text("."),
+            Doc::char('.'),
             self.member.doc(ctx, state),
         ])
     }
@@ -918,8 +918,8 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassUnaryExpression<'s> {
 impl<'a, 's: 'a> DocGen<'a, 's> for SassUnaryOperator {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
-            SassUnaryOperatorKind::Plus => Doc::text("+"),
-            SassUnaryOperatorKind::Minus => Doc::text("-"),
+            SassUnaryOperatorKind::Plus => Doc::char('+'),
+            SassUnaryOperatorKind::Minus => Doc::char('-'),
             SassUnaryOperatorKind::Not => Doc::text("not "),
         }
     }
@@ -927,7 +927,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassUnaryOperator {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for SassUnnamedNamespace {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
-        Doc::text("*")
+        Doc::char('*')
     }
 }
 
@@ -981,14 +981,14 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassVariableDeclaration<'s> {
 
         if let Some(namespace) = &self.namespace {
             docs.push(namespace.doc(ctx, state));
-            docs.push(Doc::text("."));
+            docs.push(Doc::char('.'));
         }
         docs.push(self.name.doc(ctx, state));
 
         docs.extend(ctx.start_spaced_comments(
             ctx.get_comments_between(self.name.span.end, self.colon_span.start),
         ));
-        docs.push(Doc::text(":"));
+        docs.push(Doc::char(':'));
 
         let should_group = match &self.value {
             ComponentValue::SassList(SassList {
@@ -1007,7 +1007,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for SassVariableDeclaration<'s> {
                         .format(elements, comma_spans, span.start, ctx, state),
                 );
                 if elements.len() == 1 {
-                    docs.push(Doc::text(","));
+                    docs.push(Doc::char(','));
                 }
                 true
             }
@@ -1061,7 +1061,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for UnknownSassAtRule<'s> {
         let mut docs = Vec::with_capacity(6);
         let mut pos = self.name.span().end;
 
-        docs.push(Doc::text("@"));
+        docs.push(Doc::char('@'));
         docs.push(self.name.doc(ctx, state));
 
         if let Some(prelude) = &self.prelude {

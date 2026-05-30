@@ -14,8 +14,8 @@ impl<'a, 's: 'a> DocGen<'a, 's> for BracketBlock<'s> {
             Doc::soft_line(),
         )
         .collect::<Vec<_>>();
-        docs.insert(0, Doc::text("["));
-        docs.push(Doc::text("]"));
+        docs.insert(0, Doc::char('['));
+        docs.push(Doc::char(']'));
         Doc::list(docs)
     }
 }
@@ -34,12 +34,12 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Calc<'s> {
             CalcOperatorKind::Multiply | CalcOperatorKind::Division,
         ) = (&*self.left, &self.op.kind)
         {
-            Doc::text("(")
+            Doc::char('(')
                 .append(Doc::line_or_nil())
                 .append(self.left.doc(ctx, state))
                 .nest(ctx.indent_width)
                 .append(Doc::line_or_nil())
-                .append(Doc::text(")"))
+                .append(Doc::char(')'))
         } else {
             self.left.doc(ctx, state)
         };
@@ -110,12 +110,12 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Calc<'s> {
             }),
         ) = (&self.op.kind, &*self.right)
         {
-            Doc::text("(")
+            Doc::char('(')
                 .append(Doc::line_or_nil())
                 .append(self.right.doc(ctx, state))
                 .nest(ctx.indent_width)
                 .append(Doc::line_or_nil())
-                .append(Doc::text(")"))
+                .append(Doc::char(')'))
         } else {
             self.right.doc(ctx, state)
         };
@@ -231,9 +231,9 @@ impl<'a, 's: 'a> DocGen<'a, 's> for ComponentValue<'s> {
 impl<'a, 's: 'a> DocGen<'a, 's> for Delimiter {
     fn doc(&self, _: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
         match self.kind {
-            DelimiterKind::Comma => Doc::text(","),
-            DelimiterKind::Solidus => Doc::text("/"),
-            DelimiterKind::Semicolon => Doc::text(";"),
+            DelimiterKind::Comma => Doc::char(','),
+            DelimiterKind::Solidus => Doc::char('/'),
+            DelimiterKind::Semicolon => Doc::char(';'),
         }
     }
 }
@@ -243,7 +243,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Dimension<'s> {
         let unit = match self.kind {
             DimensionKind::Length => {
                 if self.unit.name.eq_ignore_ascii_case("Q") {
-                    Doc::text("Q")
+                    Doc::char('Q')
                 } else {
                     Doc::text(self.unit.raw.to_ascii_lowercase())
                 }
@@ -271,7 +271,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Function<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         let mut docs = Vec::with_capacity(4);
         docs.push(self.name.doc(ctx, state));
-        docs.push(Doc::text("("));
+        docs.push(Doc::char('('));
 
         let mut pos = self.name.span().end;
         let mut arg_docs = Vec::with_capacity(self.args.len() * 2);
@@ -375,7 +375,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Function<'s> {
                 .group(),
         );
 
-        docs.push(Doc::text(")"));
+        docs.push(Doc::char(')'));
         Doc::list(docs)
     }
 }
@@ -453,7 +453,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Number<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for Percentage<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        self.value.doc(ctx, state).append(Doc::text("%"))
+        self.value.doc(ctx, state).append(Doc::char('%'))
     }
 }
 
@@ -461,7 +461,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Ratio<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
         self.numerator
             .doc(ctx, state)
-            .append(Doc::text("/"))
+            .append(Doc::char('/'))
             .append(self.denominator.doc(ctx, state))
     }
 }
@@ -482,24 +482,24 @@ impl<'a, 's: 'a> DocGen<'a, 's> for TokenWithSpan<'s> {
         use raffia::token::Token;
 
         match &self.token {
-            Token::Ampersand(..) => Doc::text("&"),
-            Token::Asterisk(..) => Doc::text("*"),
+            Token::Ampersand(..) => Doc::char('&'),
+            Token::Asterisk(..) => Doc::char('*'),
             Token::AsteriskEqual(..) => Doc::text("*="),
-            Token::At(..) => Doc::text("@"),
+            Token::At(..) => Doc::char('@'),
             Token::AtKeyword(at_keyword) => Doc::text(format!("@{}", at_keyword.ident.raw)),
             Token::AtLBraceVar(at_lbrace_var) => {
                 Doc::text(format!("@{}{}{}", '{', at_lbrace_var.ident.raw, '}'))
             }
             Token::BacktickCode(backtick_code) => Doc::text(format!("`{}`", backtick_code.raw)),
-            Token::Bar(..) => Doc::text("|"),
+            Token::Bar(..) => Doc::char('|'),
             Token::BarBar(..) => Doc::text("||"),
             Token::BarEqual(..) => Doc::text("|="),
             Token::CaretEqual(..) => Doc::text("^="),
             Token::Cdo(..) => Doc::text("<!--"),
             Token::Cdc(..) => Doc::text("-->"),
-            Token::Colon(..) => Doc::text(":"),
+            Token::Colon(..) => Doc::char(':'),
             Token::ColonColon(..) => Doc::text("::"),
-            Token::Comma(..) => Doc::text(","),
+            Token::Comma(..) => Doc::char(','),
             Token::Dedent(..) => unreachable!(),
             Token::Dimension(dimension) => {
                 Doc::text(format!("{}{}", dimension.value.raw, dimension.unit.raw))
@@ -509,38 +509,38 @@ impl<'a, 's: 'a> DocGen<'a, 's> for TokenWithSpan<'s> {
                 Doc::text(format!("${}{}{}", '{', dollar_lbrace_var.ident.raw, '}'))
             }
             Token::DollarVar(dollar_var) => Doc::text(format!("${}", dollar_var.ident.raw)),
-            Token::Dot(..) => Doc::text("."),
+            Token::Dot(..) => Doc::char('.'),
             Token::DotDotDot(..) => Doc::text("..."),
             Token::Eof(..) => unreachable!(),
-            Token::Equal(..) => Doc::text("="),
+            Token::Equal(..) => Doc::char('='),
             Token::EqualEqual(..) => Doc::text("=="),
-            Token::Exclamation(..) => Doc::text("!"),
+            Token::Exclamation(..) => Doc::char('!'),
             Token::ExclamationEqual(..) => Doc::text("!="),
-            Token::GreaterThan(..) => Doc::text(">"),
+            Token::GreaterThan(..) => Doc::char('>'),
             Token::GreaterThanEqual(..) => Doc::text(">="),
             Token::Hash(hash) => Doc::text(format_hex_raw(hash.raw, ctx)),
             Token::HashLBrace(..) => Doc::text("#{"),
             Token::Ident(ident) => Doc::text(ident.raw),
             Token::Indent(..) => unreachable!(),
-            Token::LBrace(..) => Doc::text("{"),
-            Token::LBracket(..) => Doc::text("["),
-            Token::LessThan(..) => Doc::text("<"),
+            Token::LBrace(..) => Doc::char('{'),
+            Token::LBracket(..) => Doc::char('['),
+            Token::LessThan(..) => Doc::char('<'),
             Token::LessThanEqual(..) => Doc::text("<="),
             Token::Linebreak(..) => unreachable!(),
-            Token::LParen(..) => Doc::text("("),
-            Token::Minus(..) => Doc::text("-"),
+            Token::LParen(..) => Doc::char('('),
+            Token::Minus(..) => Doc::char('-'),
             Token::Number(number) => Doc::text(number.raw),
-            Token::NumberSign(..) => Doc::text("#"),
-            Token::Percent(..) => Doc::text("%"),
+            Token::NumberSign(..) => Doc::char('#'),
+            Token::Percent(..) => Doc::char('%'),
             Token::Percentage(percentage) => Doc::text(format!("{}%", percentage.value.raw)),
-            Token::Plus(..) => Doc::text("+"),
+            Token::Plus(..) => Doc::char('+'),
             Token::PlusUnderscore(..) => Doc::text("+_"),
-            Token::Question(..) => Doc::text("?"),
-            Token::RBrace(..) => Doc::text("}"),
-            Token::RBracket(..) => Doc::text("]"),
-            Token::RParen(..) => Doc::text(")"),
-            Token::Semicolon(..) => Doc::text(";"),
-            Token::Solidus(..) => Doc::text("/"),
+            Token::Question(..) => Doc::char('?'),
+            Token::RBrace(..) => Doc::char('}'),
+            Token::RBracket(..) => Doc::char(']'),
+            Token::RParen(..) => Doc::char(')'),
+            Token::Semicolon(..) => Doc::char(';'),
+            Token::Solidus(..) => Doc::char('/'),
             Token::Str(str) => Doc::text(format_str(
                 str.raw,
                 CssStrRawFormatter::new(str.raw),
@@ -548,7 +548,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for TokenWithSpan<'s> {
                 ctx.options.quotes,
             )),
             Token::StrTemplate(..) => unreachable!(),
-            Token::Tilde(..) => Doc::text("~"),
+            Token::Tilde(..) => Doc::char('~'),
             Token::TildeEqual(..) => Doc::text("~="),
             Token::UrlRaw(..) | Token::UrlTemplate(..) => unreachable!(),
         }
@@ -594,7 +594,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Url<'s> {
         }
 
         docs.push(Doc::list(args).group().nest(ctx.indent_width));
-        docs.push(Doc::text(")"));
+        docs.push(Doc::char(')'));
 
         Doc::list(docs)
     }

@@ -11,7 +11,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for CustomSelector<'s> {
             docs.push(prefix_arg.doc(ctx, state));
         }
 
-        docs.push(Doc::text(":"));
+        docs.push(Doc::char(':'));
         docs.push(self.name.doc(ctx, state));
 
         if let Some(args) = &self.args {
@@ -24,7 +24,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for CustomSelector<'s> {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for CustomSelectorArg<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
-        Doc::text("$").append(self.name.doc(ctx, state))
+        Doc::char('$').append(self.name.doc(ctx, state))
     }
 }
 
