@@ -23,3 +23,52 @@
 .parens-binary-spaced {
   margin: 2 - (@card-spacing);
 }
+
+@spacing-name: card-spacing;
+@spacing-map: {
+  card: 15px;
+};
+
+.times-keeps-unary-variable {
+  margin: 2 -@card-spacing * 2;
+}
+
+.division-keeps-unary-variable {
+  margin: 2 -@card-spacing / 2;
+}
+
+.addition-keeps-unary-variable {
+  margin: 2 -@card-spacing + 1px;
+}
+
+.indirect-variable-product {
+  margin: 2 -@@spacing-name * 2;
+}
+
+.namespace-lookup-product {
+  margin: 2 -@spacing-map[card] * 2;
+}
+
+.parenthesized-variable-product {
+  margin: 2 -(@card-spacing) * 2;
+}
+
+.parenthesized-expression-product {
+  margin: 2 -(@card-spacing + 1px) * 2;
+}
+
+.spaced-minus-product {
+  margin: 2 - @card-spacing * 2;
+}
+
+.spaced-minus-parenthesized-product {
+  margin: 2 - (@card-spacing) * 2;
+}
+
+.trailing-comment-product {
+  margin: 2 -@card-spacing /* comment */ * 2;
+}
+
+.comment-breaks-unary-minus {
+  margin: 2 -/* comment */@card-spacing * 2;
+}
