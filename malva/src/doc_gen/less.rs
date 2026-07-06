@@ -73,10 +73,21 @@ fn is_spaced_unary_negative_operation(operation: &LessBinaryOperation) -> bool {
     matches!(operation.op.kind, LessOperationOperatorKind::Minus)
         && operation.left.span().end < operation.op.span.start
         && operation.op.span.end == operation.right.span().start
-        && can_be_less_negative_value(&operation.right)
+        && starts_with_less_negative_value(&operation.right)
 }
 
-fn can_be_less_negative_value(value: &ComponentValue) -> bool {
+fn starts_with_less_negative_value(value: &ComponentValue) -> bool {
+    match value {
+        // The right side may be a higher-precedence expression such as
+        // `@b * 2`; Less negative-value syntax only depends on the first atom.
+        ComponentValue::LessBinaryOperation(operation) => {
+            starts_with_less_negative_value(&operation.left)
+        }
+        value => is_less_negative_value_atom(value),
+    }
+}
+
+fn is_less_negative_value_atom(value: &ComponentValue) -> bool {
     match value {
         ComponentValue::LessVariable(..)
         | ComponentValue::LessVariableVariable(..)
