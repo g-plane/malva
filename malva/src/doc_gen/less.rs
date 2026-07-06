@@ -46,6 +46,8 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessBinaryConditionOperator {
 
 impl<'a, 's: 'a> DocGen<'a, 's> for LessBinaryOperation<'s> {
     fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
+        let is_spaced_unary_negative = is_spaced_unary_negative_operation(self);
+
         self.left
             .doc(ctx, state)
             .append(helpers::format_operator_prefix_space(ctx))
@@ -53,12 +55,40 @@ impl<'a, 's: 'a> DocGen<'a, 's> for LessBinaryOperation<'s> {
                 ctx.get_comments_between(self.left.span().end, self.op.span.start),
             ))
             .append(self.op.doc(ctx, state))
-            .append(helpers::format_operator_suffix_space(ctx))
+            .append(if is_spaced_unary_negative {
+                Doc::nil()
+            } else {
+                helpers::format_operator_suffix_space(ctx)
+            })
             .concat(ctx.end_spaced_comments(
                 ctx.get_comments_between(self.op.span.end, self.right.span().start),
             ))
             .append(self.right.doc(ctx, state))
             .group()
+    }
+}
+
+fn is_spaced_unary_negative_operation(operation: &LessBinaryOperation) -> bool {
+    // Less treats `a -@b` and `a -(@b)` as a value followed by a negative value.
+    matches!(operation.op.kind, LessOperationOperatorKind::Minus)
+        && operation.left.span().end < operation.op.span.start
+        && operation.op.span.end == operation.right.span().start
+        && can_be_less_negative_value(&operation.right)
+}
+
+fn can_be_less_negative_value(value: &ComponentValue) -> bool {
+    match value {
+        ComponentValue::LessVariable(..)
+        | ComponentValue::LessVariableVariable(..)
+        | ComponentValue::LessPropertyVariable(..)
+        | ComponentValue::LessParenthesizedOperation(..) => true,
+        ComponentValue::LessNamespaceValue(namespace_value) => {
+            matches!(
+                &namespace_value.callee,
+                LessNamespaceValueCallee::LessVariable(..)
+            )
+        }
+        _ => false,
     }
 }
 
