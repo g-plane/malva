@@ -10,14 +10,14 @@ exclude = ["/tests"]
 
 [dependencies]
 aho-corasick = "1.1"
-itertools = "0.14"
+itertools = "0.15"
 memchr = "2.8"
-raffia = "0.12"
+raffia = "0.13"
 serde = { version = "1.0", optional = true }
 tiny_pretty = "0.4"
 
 [dev-dependencies]
-insta = { version = "1.47", features = ["glob"] }
+insta = { version = "1.48", features = ["glob"] }
 similar-asserts = "2.0"
 toml = "1.1"
 

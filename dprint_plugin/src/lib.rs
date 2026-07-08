@@ -1,9 +1,8 @@
 use crate::config::resolve_config;
-use anyhow::{Error, Result};
 use dprint_core::{
     configuration::{ConfigKeyMap, GlobalConfiguration},
     plugins::{
-        CheckConfigUpdatesMessage, ConfigChange, FormatResult, PluginInfo,
+        CheckConfigUpdatesMessage, ConfigChange, FormatError, FormatResult, PluginInfo,
         PluginResolveConfigurationResult, SyncFormatRequest, SyncHostFormatRequest,
         SyncPluginHandler,
     },
@@ -41,7 +40,10 @@ impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
         resolve_config(config, global_config)
     }
 
-    fn check_config_updates(&self, _: CheckConfigUpdatesMessage) -> Result<Vec<ConfigChange>> {
+    fn check_config_updates(
+        &self,
+        _: CheckConfigUpdatesMessage,
+    ) -> Result<Vec<ConfigChange>, FormatError> {
         Ok(Vec::new())
     }
 
@@ -51,18 +53,19 @@ impl SyncPluginHandler<FormatOptions> for MalvaPluginHandler {
         _: impl FnMut(SyncHostFormatRequest) -> FormatResult,
     ) -> FormatResult {
         let Some(syntax) = detect_syntax(request.file_path) else {
-            return Err(anyhow::anyhow!(
+            return Err(format!(
                 "unknown file extension of file: {}",
                 request.file_path.display()
-            ));
+            )
+            .into());
         };
         format_text(
-            std::str::from_utf8(&request.file_bytes)?,
+            std::str::from_utf8(&request.file_bytes).map_err(FormatError::new)?,
             syntax,
             request.config,
         )
         .map(|s| Some(s.into_bytes()))
-        .map_err(Error::from)
+        .map_err(FormatError::new)
     }
 }
 

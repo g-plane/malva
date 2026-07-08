@@ -550,6 +550,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for TokenWithSpan<'s> {
             Token::StrTemplate(..) => unreachable!(),
             Token::Tilde(..) => Doc::char('~'),
             Token::TildeEqual(..) => Doc::text("~="),
+            Token::Unknown(unknown) => Doc::char(unknown.char),
             Token::UrlRaw(..) | Token::UrlTemplate(..) => unreachable!(),
         }
     }
