@@ -187,6 +187,20 @@ impl<'s> SeparatedListFormatter<'s> {
     }
 }
 
+/// A `.`-led number glued to the preceding token is printed verbatim:
+/// a leading zero would fuse the tokens, growing `c.1` into `c0.1`, then `c00.1`, on every format.
+pub(super) fn verbatim_glued_number<'s>(span: &Span, ctx: &Ctx<'_, 's>) -> Option<Doc<'s>> {
+    let source = ctx.source?;
+    if !source[span.start..].starts_with('.') {
+        return None;
+    }
+    let preceding = source[..span.start].chars().next_back()?;
+    let absorbs_zero = preceding.is_ascii_alphanumeric()
+        || !preceding.is_ascii()
+        || matches!(preceding, '_' | '-' | '.' | '#' | '\\' | '}');
+    absorbs_zero.then(|| Doc::text(&source[span.start..span.end]))
+}
+
 /// Only for SCSS/Sass/Less.
 pub(super) fn format_values_list<'a, 's: 'a>(
     values: &[ComponentValue<'s>],

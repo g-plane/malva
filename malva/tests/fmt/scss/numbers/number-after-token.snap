@@ -1,0 +1,9 @@
+---
+source: malva/tests/fmt.rs
+---
+a {
+  a: #{$x}.1;
+
+  /* operators print their own separator, so the operand still normalizes */
+  a: 1 - 0.1;
+}

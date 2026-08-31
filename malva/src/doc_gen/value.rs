@@ -320,7 +320,10 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Function<'s> {
                         {
                             docs.push(Doc::text(number.raw));
                         }
-                        _ => docs.push(arg.doc(ctx, state)),
+                        _ => docs.push(
+                            helpers::verbatim_glued_number(arg_span, ctx)
+                                .unwrap_or_else(|| arg.doc(ctx, state)),
+                        ),
                     }
                     docs
                 },

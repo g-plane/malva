@@ -1,0 +1,12 @@
+a {
+  transition: all.3s ease;
+  opacity: o.5;
+  a: c-.1;
+  a: é.1;
+  a: f(a.1, .1);
+
+  /* a separator keeps the number safe to normalize */
+  a: c .1;
+  a: 12px/.1;
+  grid-template: c.1;
+}

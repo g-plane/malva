@@ -66,7 +66,10 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                         .nest(ctx.indent_width),
                     );
 
-                    docs.push(value.doc(ctx, state));
+                    docs.push(
+                        helpers::verbatim_glued_number(span, ctx)
+                            .unwrap_or_else(|| value.doc(ctx, state)),
+                    );
                     if matches!(
                         value,
                         ComponentValue::Delimiter(Delimiter {
@@ -186,7 +189,10 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                             )
                             .nest(ctx.indent_width),
                         );
-                        docs.push(value.doc(ctx, state));
+                        docs.push(
+                            helpers::verbatim_glued_number(span, ctx)
+                                .unwrap_or_else(|| value.doc(ctx, state)),
+                        );
                     }
                     match value {
                         ComponentValue::Delimiter(Delimiter {
