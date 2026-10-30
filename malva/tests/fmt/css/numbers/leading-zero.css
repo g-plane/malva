@@ -1,0 +1,11 @@
+a {
+  opacity: o.5;
+  opacity: o .5;
+  --opacity: o.5;
+  --opacity: o .5;
+  grid: o.5;
+  grid: o .5;
+
+  a: 12px/.1;
+  --a: 12px/.1;
+}

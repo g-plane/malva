@@ -446,8 +446,45 @@ impl<'a, 's: 'a> DocGen<'a, 's> for InterpolableUrlStaticPart<'s> {
 }
 
 impl<'a, 's: 'a> DocGen<'a, 's> for Number<'s> {
-    fn doc(&self, ctx: &Ctx<'a, 's>, _: &State) -> Doc<'s> {
-        Doc::text(format_number_raw(self.raw, ctx))
+    fn doc(&self, ctx: &Ctx<'a, 's>, state: &State) -> Doc<'s> {
+        let number = self.raw.strip_suffix('.').unwrap_or(self.raw);
+        #[expect(clippy::collapsible_else_if)]
+        let number: Cow<_> = if ctx.options.omit_number_leading_zero {
+            if let Some(number) = number.strip_prefix("0.") {
+                format!(".{number}").into()
+            } else if let Some(number) = number.strip_prefix("-0.") {
+                format!("-.{number}").into()
+            } else if let Some(number) = number.strip_prefix("+0.") {
+                format!("+.{number}").into()
+            } else {
+                number.into()
+            }
+        } else if state
+            .prev_decl_value_span
+            .as_ref()
+            .is_some_and(|span| span.end == self.span.start)
+        {
+            number.into()
+        } else {
+            if let Some(number) = number.strip_prefix('.') {
+                format!("0.{number}").into()
+            } else if let Some(number) = number.strip_prefix("-.") {
+                format!("-0.{number}").into()
+            } else if let Some(number) = number.strip_prefix("+.") {
+                format!("+0.{number}").into()
+            } else {
+                number.into()
+            }
+        };
+
+        if let Some((coefficient, exponent)) = number.split_once(['e', 'E']) {
+            Doc::text(format!(
+                "{}e{exponent}",
+                coefficient.strip_suffix('.').unwrap_or(coefficient)
+            ))
+        } else {
+            Doc::text(number)
+        }
     }
 }
 
@@ -671,40 +708,4 @@ fn format_hex_raw(raw: &str, ctx: &Ctx) -> String {
     };
 
     hex
-}
-
-fn format_number_raw<'a, 's: 'a>(raw: &'s str, ctx: &Ctx<'a, 's>) -> Cow<'s, str> {
-    let number = raw.strip_suffix('.').unwrap_or(raw);
-    #[allow(clippy::collapsible_else_if)]
-    let number: Cow<_> = if ctx.options.omit_number_leading_zero {
-        if let Some(number) = number.strip_prefix("0.") {
-            format!(".{number}").into()
-        } else if let Some(number) = number.strip_prefix("-0.") {
-            format!("-.{number}").into()
-        } else if let Some(number) = number.strip_prefix("+0.") {
-            format!("+.{number}").into()
-        } else {
-            number.into()
-        }
-    } else {
-        if let Some(number) = number.strip_prefix('.') {
-            format!("0.{number}").into()
-        } else if let Some(number) = number.strip_prefix("-.") {
-            format!("-0.{number}").into()
-        } else if let Some(number) = number.strip_prefix("+.") {
-            format!("+0.{number}").into()
-        } else {
-            number.into()
-        }
-    };
-
-    if let Some((coefficient, exponent)) = number.split_once(['e', 'E']) {
-        format!(
-            "{}e{exponent}",
-            coefficient.strip_suffix('.').unwrap_or(coefficient)
-        )
-        .into()
-    } else {
-        number
-    }
 }

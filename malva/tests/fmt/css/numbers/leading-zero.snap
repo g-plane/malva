@@ -1,0 +1,14 @@
+---
+source: malva/tests/fmt.rs
+---
+a {
+  opacity: o.5;
+  opacity: o 0.5;
+  --opacity: o.5;
+  --opacity: o 0.5;
+  grid: o 0.5;
+  grid: o 0.5;
+
+  a: 12px/0.1;
+  --a: 12px/0.1;
+}

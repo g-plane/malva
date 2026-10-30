@@ -80,6 +80,7 @@ pub fn print_stylesheet<'a, 's>(
     let state = State {
         keep_decl_name_case: false,
         selector_override: crate::state::SelectorOverride::Unset,
+        prev_decl_value_span: None,
     };
     let doc = stylesheet.doc(&ctx, &state);
     tiny_pretty::print(

@@ -56,8 +56,17 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                 docs.push(space_after_colon);
 
                 let mut iter = self.value.iter().peekable();
+                let mut prev_decl_value_span = None;
                 while let Some(value) = iter.next() {
                     let span = value.span();
+                    let state = State {
+                        prev_decl_value_span: if matches!(value, ComponentValue::Delimiter(..)) {
+                            None
+                        } else {
+                            prev_decl_value_span.replace(span.clone())
+                        },
+                        ..state.clone()
+                    };
                     docs.push(
                         Doc::list(
                             ctx.end_spaced_comments(ctx.get_comments_between(pos, span.start))
@@ -66,7 +75,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                         .nest(ctx.indent_width),
                     );
 
-                    docs.push(value.doc(ctx, state));
+                    docs.push(value.doc(ctx, &state));
                     if matches!(
                         value,
                         ComponentValue::Delimiter(Delimiter {
@@ -122,6 +131,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
             }
             _ => {
                 let mut iter = self.value.iter().enumerate().peekable();
+                let mut prev_decl_value_span = None;
 
                 if !matches!(iter.peek(), Some((_, ComponentValue::Function(..)))) {
                     docs.push(space_after_colon);
@@ -138,6 +148,14 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                 };
                 while let Some((index, value)) = iter.next() {
                     let span = value.span();
+                    let state = State {
+                        prev_decl_value_span: if matches!(value, ComponentValue::Delimiter(..)) {
+                            None
+                        } else {
+                            prev_decl_value_span.replace(span.clone())
+                        },
+                        ..state.clone()
+                    };
 
                     if let ComponentValue::Function(function) = value {
                         let mut has_last_line_comment = false;
@@ -154,12 +172,12 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                         if has_last_line_comment || has_comma && index == 0 {
                             docs.push(
                                 Doc::hard_line()
-                                    .append(function.doc(ctx, state))
+                                    .append(function.doc(ctx, &state))
                                     .nest(ctx.indent_width),
                             );
                         } else if index == 0 {
                             docs.push(Doc::space());
-                            docs.push(function.doc(ctx, state));
+                            docs.push(function.doc(ctx, &state));
                         } else if matches!(
                             self.value.get(index - 1),
                             Some(ComponentValue::Delimiter(Delimiter {
@@ -169,11 +187,11 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                         ) {
                             // spaces around solidus have been
                             // considered when formatting solidus
-                            docs.push(function.doc(ctx, state));
+                            docs.push(function.doc(ctx, &state));
                         } else {
                             docs.push(
                                 Doc::line_or_space()
-                                    .append(function.doc(ctx, state))
+                                    .append(function.doc(ctx, &state))
                                     .group()
                                     .nest(ctx.indent_width),
                             );
@@ -186,7 +204,7 @@ impl<'a, 's: 'a> DocGen<'a, 's> for Declaration<'s> {
                             )
                             .nest(ctx.indent_width),
                         );
-                        docs.push(value.doc(ctx, state));
+                        docs.push(value.doc(ctx, &state));
                     }
                     match value {
                         ComponentValue::Delimiter(Delimiter {
