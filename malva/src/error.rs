@@ -8,6 +8,12 @@ pub enum Error {
     /// and the second component is error line number,
     /// and the third component is error column number.
     Parser(raffia::error::Error, usize, usize),
+
+    /// The specified range is outside of the source file bounds.
+    RangeOutOfBounds {
+        range: std::ops::Range<usize>,
+        source_len: usize,
+    },
 }
 
 impl Display for Error {
@@ -15,6 +21,13 @@ impl Display for Error {
         match self {
             Error::Parser(error, line, col) => {
                 write!(f, "syntax error at line {line}, col {col}: {}", error.kind)
+            }
+            Error::RangeOutOfBounds { range, source_len } => {
+                write!(
+                    f,
+                    "range {}..{} is out of bounds (source length: {})",
+                    range.start, range.end, source_len
+                )
             }
         }
     }
