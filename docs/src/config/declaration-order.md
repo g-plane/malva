@@ -17,6 +17,7 @@ Default value is `null`.
 ## Notes
 
 - For all strategies, custom properties (whose name starts with `--`) won't be sorted.
+- A shorthand and a longhand it overrides, such as `margin` and `margin-top`, keep their relative order, because swapping them would change the computed styles. The pairs follow [css-declaration-sorter](https://github.com/Siilwyn/css-declaration-sorter)'s `keepOverrides` data.
 - It will only sort adjacent CSS declarations. For example:
 
   ```css

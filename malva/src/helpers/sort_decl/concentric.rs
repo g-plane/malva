@@ -1,12 +1,5 @@
-use super::compare_by_list_index;
-use std::cmp::Ordering;
-
-pub fn compare_in_concentric(a: &str, b: &str) -> Ordering {
-    compare_by_list_index(a, b, PROPERTIES)
-}
-
 // https://github.com/Siilwyn/css-declaration-sorter/blob/master/src/orders/concentric-css.mjs
-static PROPERTIES: [&str; 399] = [
+pub static PROPERTIES: [&str; 399] = [
     // --------- positioning
     "all",
     "display",

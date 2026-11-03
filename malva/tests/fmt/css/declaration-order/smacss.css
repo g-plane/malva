@@ -62,3 +62,61 @@ a {
   --a: 0;
   display: flex;
 }
+
+a {
+  --bs-card-spacer-y: 0;
+  --bs-card-spacer-x: 0;
+  --bs-card-title-spacer-y: 0;
+  --bs-card-title-color: 0;
+  --bs-card-subtitle-color: 0;
+  --bs-card-border-width: 0;
+  --bs-card-border-color: 0;
+  --bs-card-border-radius: 0;
+  --bs-card-box-shadow: 0;
+  --bs-card-inner-border-radius: 0;
+  --bs-card-cap-padding-y: 0;
+  --bs-card-cap-padding-x: 0;
+  --bs-card-cap-bg: 0;
+  --bs-card-cap-color: 0;
+  --bs-card-height: 0;
+  --bs-card-color: 0;
+  --bs-card-bg: 0;
+  --bs-card-img-overlay-padding: 0;
+  --bs-card-group-margin: 0;
+  position: 0;
+  display: 0;
+  flex-direction: 0;
+  min-width: 0;
+  height: 0;
+  color: 0;
+  word-wrap: 0;
+  background-color: 0;
+  background-clip: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+a {
+  margin-top: 5px;
+  margin: 0;
+}
+
+a {
+  top: 5px;
+  inset: 0;
+}
+
+a {
+  -webkit-animation-name: x;
+  animation: y;
+}
+
+a {
+  margin-top: 5px;
+  MARGIN: 0;
+}
+
+a {
+  color: red;
+  all: unset;
+}
