@@ -499,21 +499,7 @@ fn format_statements<'a, 's: 'a>(
                     }))
                 ) || is_grouped_by_empty_line
                 {
-                    use crate::{config::DeclarationOrder, helpers::sort_decl};
-                    match declaration_order {
-                        DeclarationOrder::Alphabetical => {
-                            sortable_decls
-                                .sort_by(|(a, _), (b, _)| sort_decl::compare_in_alphabetical(a, b));
-                        }
-                        DeclarationOrder::Smacss => {
-                            sortable_decls
-                                .sort_by(|(a, _), (b, _)| sort_decl::compare_in_smacss(a, b));
-                        }
-                        DeclarationOrder::Concentric => {
-                            sortable_decls
-                                .sort_by(|(a, _), (b, _)| sort_decl::compare_in_concentric(a, b));
-                        }
-                    }
+                    crate::helpers::sort_decl::sort(&mut sortable_decls, declaration_order);
                     if is_first_stmt_or_decls_group {
                         is_first_stmt_or_decls_group = false;
                     } else {
